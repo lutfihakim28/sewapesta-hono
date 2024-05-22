@@ -6,7 +6,7 @@ export const UserResponseSchema = z
       example: 1,
     }),
     username: z.string().openapi({
-      example: 'John Doe',
+      example: 'superadmin',
     }),
   })
-  .openapi('User')
+  .openapi('User');

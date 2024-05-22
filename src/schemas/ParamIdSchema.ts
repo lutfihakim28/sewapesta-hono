@@ -1,14 +1,15 @@
 import { z } from '@hono/zod-openapi'
 
-export const UserParamSchema = z.object({
+export const ParamIdSchema = z.object({
   id: z
     .string()
-    .min(3, 'parameter id minimal 3 digit')
     .openapi({
       param: {
         name: 'id',
         in: 'path',
       },
-      example: '1212121',
+      example: '28',
     }),
 })
+
+export type ParamId = z.infer<typeof ParamIdSchema>

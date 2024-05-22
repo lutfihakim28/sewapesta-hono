@@ -5,6 +5,7 @@ import { honoApp } from './lib/hono'
 import AuthController from './controllers/AuthController'
 import { getCookie } from 'hono/cookie'
 import { verify } from 'hono/jwt'
+import CategoryController from './controllers/CategoryController'
 
 const app = honoApp()
 
@@ -76,6 +77,7 @@ app.route('/api/auth', AuthController)
 
 // PRIVATE PATH
 app.route('/api/private/users', UserController)
+app.route('/api/private/categories', CategoryController)
 
 app.get(
   '/swagger',

@@ -1,16 +1,16 @@
 import { deleteCookie, setCookie } from 'hono/cookie';
-import { honoApp } from '../lib/hono';
-import { AuthLoginRoute, AuthLogoutRoute } from '../routes/AuthRoute';
-import { UserService } from '../services/UserService';
+import { honoApp } from '@/lib/hono';
+import { AuthLoginRoute, AuthLogoutRoute } from '@/routes/AuthRoute';
+import { UserService } from '@/services/UserService';
 import { sign } from 'hono/jwt';
 
 const AuthController = honoApp()
 
 AuthController.openapi(AuthLoginRoute, async (context) => {
   try {
-    const { password, username } = context.req.valid('json');
+    const loginRequest = context.req.valid('json');
 
-    const user = await UserService.checkCredentials(username, password);
+    const user = await UserService.checkCredentials(loginRequest);
 
     if (!user) {
       return context.json({
@@ -35,10 +35,14 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
     });
 
     return context.json({
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
+      code: 200,
+      messages: ['Berhasil login'],
+      data: {
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+        }
       }
     }, 200)
   } catch (error) {
@@ -54,6 +58,7 @@ AuthController.openapi(AuthLogoutRoute, async (context) => {
     deleteCookie(context, 'token')
 
     return context.json({
+      code: 200,
       messages: ['Berhasil keluar.']
     }, 200)
   } catch (error) {

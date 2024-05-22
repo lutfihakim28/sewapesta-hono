@@ -1,10 +1,6 @@
 import { createRoute } from '@hono/zod-openapi';
-import { LoginResponseSchema } from '../schemas/responses/LoginResponseSchema';
-import { ValidationErrorSchema } from '../schemas/errors/ValidationErrorSchema';
-import { LoginRequestSchema } from '../schemas/requests/LoginRequestSchema';
-import { LogoutResponseSchema } from '../schemas/responses/LogoutResponseSchema';
-import { UnauthorizedErrorSchema } from '../schemas/errors/UnauthorizedErrorSchema';
-import { InternalErrorSchema } from '../schemas/errors/InternalErrorSchema';
+import { ResponseSchema } from '@/schemas/ResponseSchema';
+import { LoginRequestSchema, LoginResponseSchema, LogoutResponseSchema } from '../schemas/AuthSchema';
 
 const tags = ['Auth'];
 
@@ -25,7 +21,7 @@ export const AuthLoginRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: LoginResponseSchema
+          schema: ResponseSchema(200, 'Berhasil login', LoginResponseSchema)
         }
       },
       description: 'Login success',
@@ -33,7 +29,7 @@ export const AuthLoginRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: UnauthorizedErrorSchema,
+          schema: ResponseSchema(401, 'Token tidak valid.'),
         },
       },
       description: 'Unauthorized',
@@ -41,7 +37,7 @@ export const AuthLoginRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ValidationErrorSchema,
+          schema: ResponseSchema(422, 'Password minimal 8 karakter.'),
         },
       },
       description: 'Validation error',
@@ -49,7 +45,7 @@ export const AuthLoginRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: InternalErrorSchema,
+          schema: ResponseSchema(500, 'Terjadi kesalahan server'),
         },
       },
       description: 'Internal error',
@@ -70,7 +66,7 @@ export const AuthLogoutRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: LogoutResponseSchema
+          schema: ResponseSchema(200, 'Berhasil logout.', LogoutResponseSchema),
         }
       },
       description: 'Logout success',
@@ -78,7 +74,7 @@ export const AuthLogoutRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: UnauthorizedErrorSchema,
+          schema: ResponseSchema(401, 'Token tidak valid.'),
         },
       },
       description: 'Unauthorized',
@@ -86,7 +82,7 @@ export const AuthLogoutRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: InternalErrorSchema,
+          schema: ResponseSchema(500, 'Terjadi kesalahan server'),
         },
       },
       description: 'Internal error',

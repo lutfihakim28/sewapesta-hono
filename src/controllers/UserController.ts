@@ -1,13 +1,17 @@
-import { UserRoute } from '../routes/UserRoute';
-import { honoApp } from '../lib/hono';
+import { UserRoute } from '@/routes/UserRoute';
+import { honoApp } from '@/lib/hono';
 
 const UserController = honoApp()
 
 UserController.openapi(UserRoute, (context) => {
   const { id } = context.req.valid('param')
   return context.json({
-    id: Number(id),
-    username: 'Ultra-man',
+    code: 200,
+    messages: ['Sukses'],
+    data: {
+      id: Number(id),
+      username: 'Ultra-man',
+    }
   }, 200)
 })
 

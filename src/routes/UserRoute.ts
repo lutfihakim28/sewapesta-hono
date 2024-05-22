@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi';
-import { UserParamSchema } from '../schemas/params/UserParamSchema';
-import { UserResponseSchema } from '../schemas/responses/UserResponseSchema';
-import { ValidationErrorSchema } from '../schemas/errors/ValidationErrorSchema';
+import { ParamIdSchema } from '@/schemas/ParamIdSchema';
+import { ResponseSchema } from '@/schemas/ResponseSchema';
+import { UserResponseSchema } from '@/schemas/UserSchema';
 
 const tags = ['User'];
 
@@ -13,13 +13,13 @@ export const UserRoute = createRoute({
     cookieAuth: [],
   }],
   request: {
-    params: UserParamSchema,
+    params: ParamIdSchema,
   },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: UserResponseSchema,
+          schema: ResponseSchema(200, 'Berhasil mendapatkan user', UserResponseSchema),
         },
       },
       description: 'Retrieve the user',
@@ -27,7 +27,7 @@ export const UserRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ValidationErrorSchema,
+          schema: ResponseSchema(422, 'Id tidak valid'),
         },
       },
       description: 'Validation error',
