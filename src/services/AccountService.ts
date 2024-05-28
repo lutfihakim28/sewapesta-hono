@@ -1,10 +1,11 @@
 import { db } from '@/db';
 import { accountsTable } from '@/db/schema/accounts';
+import { ParamId } from '@/schemas/ParamIdSchema';
 import { AccountRequest } from '@/schemas/accounts/AccountRequestSchema';
 import { AccountResponse } from '@/schemas/accounts/AccountResponseSchema';
 import { ExtendedAccountResponse } from '@/schemas/accounts/ExtendedAccountResponseSchema';
 import dayjs from 'dayjs';
-import { eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 export abstract class AccountService {
   static async getList(): Promise<Array<AccountResponse>> {
@@ -15,9 +16,12 @@ export abstract class AccountService {
     return accounts
   }
 
-  static async get(): Promise<ExtendedAccountResponse | undefined> {
+  static async get(param: ParamId): Promise<ExtendedAccountResponse | undefined> {
     const account = await db.query.accountsTable.findFirst({
-      where: isNull(accountsTable.deletedAt),
+      where: and(
+        eq(accountsTable.id, Number(param.id)),
+        isNull(accountsTable.deletedAt),
+      ),
       with: {
         employee: true,
         owner: true,
@@ -44,5 +48,13 @@ export abstract class AccountService {
       .get()
 
     return account.id;
+  }
+
+  static async delete(param: ParamId) {
+    const deletedAt = dayjs().unix();
+    await db
+      .update(accountsTable)
+      .set({ deletedAt })
+      .where(eq(accountsTable.id, Number(param.id)))
   }
 }
