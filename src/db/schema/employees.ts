@@ -1,12 +1,20 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { categoriesTable } from './categories';
 import { accountsTable } from './accounts';
+import { relations } from 'drizzle-orm';
 
 export const employeesTable = sqliteTable('employees', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name', { length: 100 }).notNull(),
   phone: text('phone', { length: 14 }).notNull(),
-  categoryId: integer('category_id', { mode: 'number' }).references(() => categoriesTable.id),
-  accountId: integer('account_id', { mode: 'number' }).references(() => accountsTable.id).notNull(),
-  deletedAt: integer('deleted_at', { mode: 'timestamp' }),
+  accountId: integer('account_id', { mode: 'number' }).notNull(),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'number' }),
+  deletedAt: integer('deleted_at', { mode: 'number' }),
 })
+
+export const employeesRelations = relations(employeesTable, ({ one }) => ({
+  account: one(accountsTable, {
+    fields: [employeesTable.accountId],
+    references: [accountsTable.id],
+  }),
+}))

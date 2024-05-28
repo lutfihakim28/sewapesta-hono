@@ -1,30 +1,34 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '@/db';
 import { categoriesTable } from '@/db/schema/categories';
-import { subCategoriesTable } from '@/db/schema/subCategories';
+import { subcategoriesTable } from '@/db/schema/subcategories';
 import { ParamId } from '@/schemas/ParamIdSchema';
-import { CategoryRequest, CategoryRelationsResponse, CategoryResponse } from '@/schemas/CategorySchema';
+import { ExtendedCategoryResponse } from '@/schemas/categories/ExtendedCategoryResponseSchema';
+import { CategoryRequest } from '@/schemas/categories/CategoryRequestSchema';
+import { CategoryResponse } from '@/schemas/categories/CategoryResponseSchema';
+import { SubcategoryService } from './SubcategoryService';
+import dayjs from 'dayjs';
 
 export abstract class CategoryService {
-  static async getCategories(): Promise<Array<CategoryRelationsResponse>> {
+  static async getList(): Promise<Array<ExtendedCategoryResponse>> {
     const categories = await db.query.categoriesTable.findMany({
       where: isNull(categoriesTable.deletedAt),
       with: {
-        subCategories: {
-          where: isNull(subCategoriesTable.deletedAt)
+        subcategories: {
+          where: isNull(subcategoriesTable.deletedAt)
         },
       }
     })
 
-    return categories;
+    return categories
   }
 
-  static async getCategory(params: ParamId): Promise<CategoryRelationsResponse | undefined> {
+  static async get(param: ParamId): Promise<ExtendedCategoryResponse | undefined> {
     const category = await db.query.categoriesTable.findFirst({
-      where: and(eq(categoriesTable.id, Number(params.id)), isNull(categoriesTable.deletedAt)),
+      where: and(eq(categoriesTable.id, Number(param.id)), isNull(categoriesTable.deletedAt)),
       with: {
-        subCategories: {
-          where: isNull(subCategoriesTable.deletedAt)
+        subcategories: {
+          where: isNull(subcategoriesTable.deletedAt)
         },
       }
     })
@@ -32,38 +36,45 @@ export abstract class CategoryService {
     return category
   }
 
-  static async createCategory(request: CategoryRequest): Promise<CategoryResponse> {
+  static async create(request: CategoryRequest): Promise<CategoryResponse> {
+    const createdAt = dayjs().unix();
     const category = db
       .insert(categoriesTable)
-      .values(request)
+      .values({
+        ...request,
+        createdAt,
+      })
       .returning()
       .get()
 
     return category
   }
 
-  static async updateCategory(params: ParamId, request: CategoryRequest): Promise<CategoryResponse> {
+  static async update(param: ParamId, request: CategoryRequest): Promise<CategoryResponse> {
+    const updatedAt = dayjs().unix();
     const category = db
       .update(categoriesTable)
-      .set(request)
-      .where(eq(categoriesTable.id, Number(params.id)))
+      .set({
+        ...request,
+        updatedAt,
+      })
+      .where(eq(categoriesTable.id, Number(param.id)))
       .returning()
       .get()
 
     return category
   }
 
-  static async deleteCategory(params: ParamId) {
-    await db.update(subCategoriesTable)
-      .set({
-        deletedAt: new Date(),
-      })
-      .where(eq(subCategoriesTable.categoryId, Number(params.id)))
+  static async delete(param: ParamId) {
+    const deletedAt = dayjs().unix();
+    await db.transaction(async (transaction) => {
+      await SubcategoryService.delete(param)
 
-    await db.update(categoriesTable)
-      .set({
-        deletedAt: new Date(),
-      })
-      .where(eq(categoriesTable.id, Number(params.id)))
+      await transaction.update(categoriesTable)
+        .set({
+          deletedAt,
+        })
+        .where(eq(categoriesTable.id, Number(param.id)))
+    })
   }
 }

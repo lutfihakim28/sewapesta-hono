@@ -8,5 +8,8 @@ export const UserResponseSchema = z
     username: z.string().openapi({
       example: 'superadmin',
     }),
+    accountId: z.number().openapi({
+      example: 1,
+    }),
   })
   .openapi('User');

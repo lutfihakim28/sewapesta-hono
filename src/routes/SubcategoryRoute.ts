@@ -1,50 +1,13 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { ResponseSchema } from '@/schemas/ResponseSchema'
-import { CategoryRequestSchema } from '@/schemas/categories/CategoryRequestSchema'
-import { ExtendedCategoryResponseSchema } from '@/schemas/categories/ExtendedCategoryResponseSchema'
-import { CategoryResponseSchema } from '@/schemas/categories/CategoryResponseSchema'
+import { SubcategoryRequestSchema } from '@/schemas/subcategories/SubcategoryRequestSchema'
+import { SubcategoryResponseSchema } from '@/schemas/subcategories/SubcategoryResponseSchema'
 
-const tags = ['Category']
-
-// GET All
-export const ListCategoryRoute = createRoute({
-  method: 'get',
-  path: '/',
-  tags,
-  security: [{
-    cookieAuth: [],
-  }],
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mendapat daftar kategori.', z.array(ExtendedCategoryResponseSchema)),
-        },
-      },
-      description: 'Retrieve list categories',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
-        },
-      },
-      description: 'Unauthorized',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
-        },
-      },
-      description: 'Internal error',
-    },
-  }
-})
+const tags = ['Subcategory']
 
 // POST
-export const CreateCategoryRoute = createRoute({
+export const CreateSubcategoryRoute = createRoute({
   method: 'post',
   path: '/',
   tags,
@@ -55,7 +18,7 @@ export const CreateCategoryRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: CategoryRequestSchema,
+          schema: SubcategoryRequestSchema,
         }
       }
     }
@@ -64,7 +27,7 @@ export const CreateCategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil menyimpan kategori.', CategoryResponseSchema),
+          schema: ResponseSchema(200, 'Berhasil menyimpan kategori.', SubcategoryResponseSchema),
         },
       },
       description: 'Create category',
@@ -97,7 +60,7 @@ export const CreateCategoryRoute = createRoute({
 })
 
 // PUT
-export const UpdateCategoryRoute = createRoute({
+export const UpdateSubcategoryRoute = createRoute({
   method: 'put',
   path: '/{id}',
   tags,
@@ -109,7 +72,7 @@ export const UpdateCategoryRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: CategoryRequestSchema
+          schema: SubcategoryRequestSchema
         }
       }
     }
@@ -118,7 +81,7 @@ export const UpdateCategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mengubah kategori.', ExtendedCategoryResponseSchema),
+          schema: ResponseSchema(200, 'Berhasil mengubah kategori.', SubcategoryResponseSchema),
         },
       },
       description: 'Update category',
@@ -159,7 +122,7 @@ export const UpdateCategoryRoute = createRoute({
 })
 
 // Delete
-export const DeleteCategoryRoute = createRoute({
+export const DeleteSubcategoryRoute = createRoute({
   method: 'delete',
   path: '/{id}',
   tags,

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { db } from '..'
 import { itemsTable } from '../schema/items'
 import { faker } from '@faker-js/faker/locale/id_ID'
@@ -12,6 +13,7 @@ export async function seedItems() {
       min: 20000,
       max: 500000,
     }),
-    subCategoryId: faker.helpers.arrayElement([1, 2, 3, 4, 5])
+    subcategoryId: faker.helpers.arrayElement([1, 2, 3, 4, 5]),
+    createdAt: dayjs().unix(),
   })))
 }
