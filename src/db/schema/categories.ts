@@ -12,6 +12,6 @@ export const categoriesTable = sqliteTable('categories', {
 
 export const categoriesRelations = relations(categoriesTable, ({ many }) => ({
   subcategories: many(subcategoriesTable, {
-    relationName: 'categories.subcategories'
+    relationName: 'category.subcategories'
   }),
 }))

@@ -27,10 +27,12 @@ export const itemsTable = sqliteTable('items', {
 export const itemsRelations = relations(itemsTable, ({ one }) => ({
   subcategory: one(subcategoriesTable, {
     fields: [itemsTable.subcategoryId],
-    references: [subcategoriesTable.id]
+    references: [subcategoriesTable.id],
+    relationName: 'subcategory.item'
   }),
   owner: one(ownersTable, {
     fields: [itemsTable.ownerId],
-    references: [ownersTable.id]
+    references: [ownersTable.id],
+    relationName: 'owner.item',
   })
 }))

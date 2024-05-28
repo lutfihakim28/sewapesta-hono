@@ -13,5 +13,6 @@ export const usersRelations = relations(usersTable, ({ one }) => ({
   account: one(accountsTable, {
     fields: [usersTable.accountId],
     references: [accountsTable.id],
+    relationName: 'account.user'
   }),
 }))

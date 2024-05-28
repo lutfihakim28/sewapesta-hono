@@ -3,6 +3,7 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { usersTable } from './users';
 import { employeesTable } from './employees';
 import { ownersTable } from './owners';
+import { accountMutationsTable } from './accountMutations';
 
 export const accountsTable = sqliteTable('accounts', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -12,8 +13,11 @@ export const accountsTable = sqliteTable('accounts', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-export const accountsRelations = relations(accountsTable, ({ one }) => ({
+export const accountsRelations = relations(accountsTable, ({ one, many }) => ({
   user: one(usersTable),
   employee: one(employeesTable),
   owner: one(ownersTable),
+  mutations: many(accountMutationsTable, {
+    relationName: 'account.mutations'
+  })
 }))

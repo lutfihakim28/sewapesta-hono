@@ -16,5 +16,6 @@ export const employeesRelations = relations(employeesTable, ({ one }) => ({
   account: one(accountsTable, {
     fields: [employeesTable.accountId],
     references: [accountsTable.id],
+    relationName: 'account.employee'
   }),
 }))
