@@ -60,7 +60,10 @@ export abstract class EmployeeService {
         ...request,
         updatedAt,
       })
-      .where(eq(employeesTable.id, Number(param.id)))
+      .where(and(
+        eq(employeesTable.id, Number(param.id)),
+        isNull(employeesTable.deletedAt),
+      ))
       .returning()
       .get()
 
@@ -75,6 +78,9 @@ export abstract class EmployeeService {
       .set({
         deletedAt,
       })
-      .where(eq(employeesTable.id, Number(param.id)))
+      .where(and(
+        eq(employeesTable.id, Number(param.id)),
+        isNull(employeesTable.deletedAt),
+      ))
   }
 }

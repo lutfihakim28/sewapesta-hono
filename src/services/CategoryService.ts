@@ -58,7 +58,7 @@ export abstract class CategoryService {
         ...request,
         updatedAt,
       })
-      .where(eq(categoriesTable.id, Number(param.id)))
+      .where(and(eq(categoriesTable.id, Number(param.id)), isNull(categoriesTable.deletedAt)))
       .returning()
       .get()
 
@@ -74,7 +74,7 @@ export abstract class CategoryService {
         .set({
           deletedAt,
         })
-        .where(eq(categoriesTable.id, Number(param.id)))
+        .where(and(eq(categoriesTable.id, Number(param.id)), isNull(categoriesTable.deletedAt)))
     })
   }
 }

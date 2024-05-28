@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '@/db';
 import { subcategoriesTable } from '@/db/schema/subcategories';
 import { ParamId } from '@/schemas/ParamIdSchema';
@@ -29,7 +29,10 @@ export abstract class SubcategoryService {
         ...request,
         updatedAt,
       })
-      .where(eq(subcategoriesTable.id, Number(param.id)))
+      .where(and(
+        eq(subcategoriesTable.id, Number(param.id)),
+        isNull(subcategoriesTable.deletedAt)
+      ))
       .returning()
       .get()
 
@@ -42,6 +45,9 @@ export abstract class SubcategoryService {
       .set({
         deletedAt,
       })
-      .where(eq(subcategoriesTable.categoryId, Number(param.id)))
+      .where(and(
+        eq(subcategoriesTable.id, Number(param.id)),
+        isNull(subcategoriesTable.deletedAt)
+      ))
   }
 }
