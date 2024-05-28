@@ -50,6 +50,17 @@ export abstract class AccountService {
     return account.id;
   }
 
+  static async update(param: ParamId) {
+    const updatedAt = dayjs().unix();
+    await db
+      .update(accountsTable)
+      .set({ updatedAt })
+      .where(and(
+        eq(accountsTable.id, Number(param.id)),
+        isNull(accountsTable.deletedAt),
+      ))
+  }
+
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db
