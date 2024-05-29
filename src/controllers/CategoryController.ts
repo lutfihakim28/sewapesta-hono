@@ -41,41 +41,27 @@ CategoryController.openapi(CreateCategoryRoute, async (context) => {
 })
 
 CategoryController.openapi(UpdateCategoryRoute, async (context) => {
-  try {
-    const payload = context.req.valid('json');
-    const param = context.req.valid('param');
+  const payload = context.req.valid('json');
+  const param = context.req.valid('param');
 
-    const category = await CategoryService.update(param, payload);
+  const category = await CategoryService.update(param, payload);
 
-    return context.json({
-      code: 200,
-      messages: [`Berhasil mengubah kategori ${category.name}.`],
-      data: category,
-    }, 200)
-  } catch (error) {
-    return context.json({
-      code: 500,
-      messages: ['Terjadi kesalahan server.'],
-    }, 500)
-  }
+  return context.json({
+    code: 200,
+    messages: [`Berhasil mengubah kategori ${category.name}.`],
+    data: category,
+  }, 200)
 })
 
 CategoryController.openapi(DeleteCategoryRoute, async (context) => {
-  try {
-    const param = context.req.valid('param');
+  const param = context.req.valid('param');
 
-    await CategoryService.delete(param);
+  await CategoryService.delete(param);
 
-    return context.json({
-      code: 200,
-      messages: ['Berhasil menghapus kategori.'],
-    }, 200)
-  } catch (error) {
-    return context.json({
-      code: 500,
-      messages: ['Terjadi kesalahan server.'],
-    }, 500)
-  }
+  return context.json({
+    code: 200,
+    messages: ['Berhasil menghapus kategori.'],
+  }, 200)
 })
 
 export default CategoryController;

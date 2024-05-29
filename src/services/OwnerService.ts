@@ -7,6 +7,7 @@ import { ExtendedOwnerResponse } from '@/schemas/owners/ExtendedOwnerResponseSch
 import { ownersTable } from '@/db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
 import { OwnerResponse } from '@/schemas/owners/OwnerResponseSchema';
+import { NotFoundException } from '@/exceptions/NotFoundException';
 
 export abstract class OwnerService {
   static async getList(): Promise<Array<ExtendedOwnerResponse>> {
@@ -31,6 +32,10 @@ export abstract class OwnerService {
       }
     })
 
+    if (!owner) {
+      throw new NotFoundException('Barang tidak ditemukan.')
+    }
+
     return owner;
   }
 
@@ -54,33 +59,60 @@ export abstract class OwnerService {
 
   static async update(param: ParamId, request: OwnerRequest): Promise<OwnerResponse> {
     const updatedAt = dayjs().unix();
-    const owner = db
-      .update(ownersTable)
-      .set({
-        ...request,
-        updatedAt,
-      })
-      .where(and(
-        eq(ownersTable.id, Number(param.id)),
-        isNull(ownersTable.deletedAt),
-      ))
-      .returning()
-      .get()
+    const owner = await db.transaction(async (transaction) => {
+      const existingOwnerId = await this.checkRecord(param);
+      const newOwner = transaction
+        .update(ownersTable)
+        .set({
+          ...request,
+          updatedAt,
+        })
+        .where(and(
+          eq(ownersTable.id, existingOwnerId),
+          isNull(ownersTable.deletedAt),
+        ))
+        .returning()
+        .get()
+
+      return newOwner;
+    })
+
 
     return owner;
   }
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
-    await AccountService.delete(param)
-    await db
-      .update(ownersTable)
-      .set({
-        deletedAt,
-      })
+    await db.transaction(async (transaction) => {
+      const existingOwnerId = await this.checkRecord(param);
+      await AccountService.delete(param)
+      await transaction
+        .update(ownersTable)
+        .set({
+          deletedAt,
+        })
+        .where(and(
+          eq(ownersTable.id, existingOwnerId),
+          isNull(ownersTable.deletedAt),
+        ))
+    })
+  }
+
+  static async checkRecord(param: ParamId) {
+    const owner = db
+      .select({ id: ownersTable.id })
+      .from(ownersTable)
       .where(and(
         eq(ownersTable.id, Number(param.id)),
-        isNull(ownersTable.deletedAt),
+        isNull(ownersTable.deletedAt)
       ))
+      .get();
+
+
+    if (!owner) {
+      throw new NotFoundException('Pemilik tidak ditemukan.')
+    }
+
+    return owner.id
   }
 }

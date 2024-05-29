@@ -7,6 +7,7 @@ import { ExtendedEmployeeResponse } from '@/schemas/employees/ExtendedEmployeeRe
 import { and, eq, isNull } from 'drizzle-orm';
 import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
+import { NotFoundException } from '@/exceptions/NotFoundException';
 
 export abstract class EmployeeService {
   static async getList(): Promise<Array<ExtendedEmployeeResponse>> {
@@ -31,6 +32,10 @@ export abstract class EmployeeService {
       }
     })
 
+    if (!employee) {
+      throw new NotFoundException('Karyawan tidak ditemukan.')
+    }
+
     return employee;
   }
 
@@ -54,33 +59,60 @@ export abstract class EmployeeService {
 
   static async update(param: ParamId, request: EmployeeRequest): Promise<EmployeeResponse> {
     const updatedAt = dayjs().unix();
-    const employee = db
-      .update(employeesTable)
-      .set({
-        ...request,
-        updatedAt,
-      })
-      .where(and(
-        eq(employeesTable.id, Number(param.id)),
-        isNull(employeesTable.deletedAt),
-      ))
-      .returning()
-      .get()
+    const employee = db.transaction(async (transaction) => {
+      const existingEmployeeId = await this.checkRecord(param);
+
+      const newEmployee = transaction
+        .update(employeesTable)
+        .set({
+          ...request,
+          updatedAt,
+        })
+        .where(and(
+          eq(employeesTable.id, Number(param.id)),
+          isNull(employeesTable.deletedAt),
+        ))
+        .returning()
+        .get()
+
+      return newEmployee
+    })
 
     return employee;
   }
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
-    await AccountService.delete(param)
-    await db
-      .update(employeesTable)
-      .set({
-        deletedAt,
-      })
+    await db.transaction(async (transaction) => {
+      const existingEmployeeId = await this.checkRecord(param)
+      await AccountService.delete(param)
+      await transaction
+        .update(employeesTable)
+        .set({
+          deletedAt,
+        })
+        .where(and(
+          eq(employeesTable.id, existingEmployeeId),
+          isNull(employeesTable.deletedAt),
+        ))
+    })
+  }
+
+  static async checkRecord(param: ParamId) {
+    const employee = db
+      .select({ id: employeesTable.id })
+      .from(employeesTable)
       .where(and(
         eq(employeesTable.id, Number(param.id)),
-        isNull(employeesTable.deletedAt),
+        isNull(employeesTable.deletedAt)
       ))
+      .get();
+
+
+    if (!employee) {
+      throw new NotFoundException('Karyawan tidak ditemukan.')
+    }
+
+    return employee.id
   }
 }

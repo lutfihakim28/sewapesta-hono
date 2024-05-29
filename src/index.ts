@@ -7,69 +7,70 @@ import { getCookie } from 'hono/cookie'
 import { verify } from 'hono/jwt'
 import CategoryController from './controllers/CategoryController'
 import SubcategoryController from './controllers/SubcategoryController'
+import { HTTPException } from 'hono/http-exception'
+import { UnauthorizedException } from './exceptions/UnauthorizedException'
 
 const app = honoApp()
 
-app.use('/api/auth/logout', async (context, next) => {
-  try {
-    const token = getCookie(context, 'token');
-    const secretKey = Bun.env.JWT_SECRET;
-
-    if (!token) {
+app.onError((error, context) => {
+  if (error instanceof HTTPException) {
+    if (error.status === 401) {
       return context.json({
-        code: 401,
-        messages: ['Token tidak ditemukan.']
-      }, 401)
+        code: error.status,
+        messages: [error.message],
+      }, error.status)
     }
-
-    const payload = await verify(token, secretKey);
-
-    if (!payload) {
+    if (error.status === 404) {
       return context.json({
-        code: 401,
-        messages: ['Token kadaluarsa.']
-      }, 401)
+        code: error.status,
+        messages: [error.message],
+      }, error.status)
     }
-
-    await next()
-
-  } catch (error) {
-    return context.json({
-      code: 401,
-      messages: ['Unauthorized.']
-    }, 401)
+    if (error.status === 422) {
+      return context.json({
+        code: error.status,
+        messages: error.cause,
+      }, error.status)
+    }
   }
+  return context.json({
+    code: 500,
+    messages: ['Terjadi kesalahan server.']
+  }, 500)
+})
+
+app.use('/api/auth/logout', async (context, next) => {
+  const token = getCookie(context, 'token');
+  const secretKey = Bun.env.JWT_SECRET;
+
+  if (!token) {
+    throw new UnauthorizedException('Token tidak ditemukan.')
+  }
+
+  const payload = await verify(token, secretKey);
+
+  if (!payload) {
+    throw new UnauthorizedException('Token kadaluarsa.')
+  }
+
+  await next()
 })
 
 app.use('/api/private/*', async (context, next) => {
-  try {
-    const token = getCookie(context, 'token');
-    const secretKey = Bun.env.JWT_SECRET;
+  const token = getCookie(context, 'token');
+  const secretKey = Bun.env.JWT_SECRET;
 
-    if (!token) {
-      return context.json({
-        code: 401,
-        messages: ['Token tidak ditemukan.']
-      }, 401)
-    }
-
-    const payload = await verify(token, secretKey);
-
-    if (!payload) {
-      return context.json({
-        code: 401,
-        messages: ['Token kadaluarsa.']
-      }, 401)
-    }
-
-    await next()
-
-  } catch (error) {
-    return context.json({
-      code: 401,
-      messages: ['Unauthorized.']
-    }, 401)
+  if (!token) {
+    throw new UnauthorizedException('Token tidak ditemukan.')
   }
+
+  const payload = await verify(token, secretKey);
+
+  if (!payload) {
+    throw new UnauthorizedException('Token kadaluarsa.')
+  }
+
+  await next()
 })
 app.use(logger())
 

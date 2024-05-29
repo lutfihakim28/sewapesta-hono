@@ -1,15 +1,13 @@
+import { InvalidException } from '@/exceptions/InvalidException';
 import { OpenAPIHono } from '@hono/zod-openapi';
 
 export function honoApp() {
   return new OpenAPIHono({
-    defaultHook: (result, context) => {
+    defaultHook: (result) => {
       if (result.success) {
         return;
       }
-      return context.json({
-        code: 422,
-        messages: result.error.errors.map((e) => e.message)
-      }, 422)
+      throw new InvalidException(result.error.errors.map((e) => e.message))
     },
   })
 };

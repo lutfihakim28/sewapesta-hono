@@ -1,5 +1,6 @@
 import { db } from '@/db';
 import { accountsTable } from '@/db/schema/accounts';
+import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { AccountRequest, AccountUpdate } from '@/schemas/accounts/AccountRequestSchema';
 import { AccountResponse } from '@/schemas/accounts/AccountResponseSchema';
@@ -34,6 +35,10 @@ export abstract class AccountService {
       }
     })
 
+    if (!account) {
+      throw new NotFoundException('Akun tidak ditemukan.')
+    }
+
     return account
   }
 
@@ -53,20 +58,46 @@ export abstract class AccountService {
 
   static async update(param: ParamId, request: AccountUpdate) {
     const updatedAt = dayjs().unix();
-    await db
-      .update(accountsTable)
-      .set({ ...request, updatedAt })
-      .where(and(
-        eq(accountsTable.id, Number(param.id)),
-        isNull(accountsTable.deletedAt),
-      ))
+    await db.transaction(async (transaction) => {
+      const existingAccountId = await this.checkRecord(param);
+
+      await transaction
+        .update(accountsTable)
+        .set({ ...request, updatedAt })
+        .where(and(
+          eq(accountsTable.id, existingAccountId),
+          isNull(accountsTable.deletedAt),
+        ))
+    })
   }
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
-    await db
-      .update(accountsTable)
-      .set({ deletedAt })
-      .where(eq(accountsTable.id, Number(param.id)))
+    await db.transaction(async (transaction) => {
+      const existingAccountId = await this.checkRecord(param);
+
+      await transaction
+        .update(accountsTable)
+        .set({ deletedAt })
+        .where(eq(accountsTable.id, existingAccountId))
+    })
+  }
+
+  static async checkRecord(param: ParamId) {
+    const account = db
+      .select({ id: accountsTable.id })
+      .from(accountsTable)
+      .where(and(
+        eq(accountsTable.id, Number(param.id)),
+        isNull(accountsTable.deletedAt)
+      ))
+      .get();
+
+
+    if (!account) {
+      throw new NotFoundException('Akun tidak ditemukan.')
+    }
+
+    return account.id
   }
 }

@@ -8,6 +8,7 @@ import { CategoryRequest } from '@/schemas/categories/CategoryRequestSchema';
 import { CategoryResponse } from '@/schemas/categories/CategoryResponseSchema';
 import { SubcategoryService } from './SubcategoryService';
 import dayjs from 'dayjs';
+import { NotFoundException } from '@/exceptions/NotFoundException';
 
 export abstract class CategoryService {
   static async getList(): Promise<Array<ExtendedCategoryResponse>> {
@@ -33,6 +34,10 @@ export abstract class CategoryService {
       }
     })
 
+    if (!category) {
+      throw new NotFoundException('Kategori tidak ditemukan.')
+    }
+
     return category
   }
 
@@ -52,15 +57,21 @@ export abstract class CategoryService {
 
   static async update(param: ParamId, request: CategoryRequest): Promise<CategoryResponse> {
     const updatedAt = dayjs().unix();
-    const category = db
-      .update(categoriesTable)
-      .set({
-        ...request,
-        updatedAt,
-      })
-      .where(and(eq(categoriesTable.id, Number(param.id)), isNull(categoriesTable.deletedAt)))
-      .returning()
-      .get()
+    const category = await db.transaction(async (transaction) => {
+      const existingCategoryId = await this.checkRecord(param);
+
+      const newCategory = transaction
+        .update(categoriesTable)
+        .set({
+          ...request,
+          updatedAt,
+        })
+        .where(eq(categoriesTable.id, existingCategoryId))
+        .returning()
+        .get()
+
+      return newCategory
+    })
 
     return category
   }
@@ -68,13 +79,33 @@ export abstract class CategoryService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
+      const existingCategoryId = await this.checkRecord(param);
+
       await SubcategoryService.delete(param)
 
       await transaction.update(categoriesTable)
         .set({
           deletedAt,
         })
-        .where(and(eq(categoriesTable.id, Number(param.id)), isNull(categoriesTable.deletedAt)))
+        .where(eq(categoriesTable.id, existingCategoryId))
     })
+  }
+
+  static async checkRecord(param: ParamId) {
+    const category = db
+      .select({ id: categoriesTable.id })
+      .from(categoriesTable)
+      .where(and(
+        eq(categoriesTable.id, Number(param.id)),
+        isNull(categoriesTable.deletedAt)
+      ))
+      .get();
+
+
+    if (!category) {
+      throw new NotFoundException('Kategori tidak ditemukan.')
+    }
+
+    return category.id
   }
 }

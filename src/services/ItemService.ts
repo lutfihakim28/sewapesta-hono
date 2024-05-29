@@ -6,6 +6,7 @@ import { itemsTable } from '@/db/schema/items';
 import { ExtendedItemResponse } from '@/schemas/items/ExtendedItemResponseSchema';
 import { ItemResponse } from '@/schemas/items/ItemResponseSchema';
 import { ItemRequest } from '@/schemas/items/ItemRequestSchema';
+import { NotFoundException } from '@/exceptions/NotFoundException';
 
 export abstract class ItemService {
   static async getList(): Promise<Array<ExtendedItemResponse>> {
@@ -32,6 +33,10 @@ export abstract class ItemService {
       }
     })
 
+    if (!item) {
+      throw new NotFoundException('Barang tidak ditemukan.')
+    }
+
     return item;
   }
 
@@ -51,32 +56,58 @@ export abstract class ItemService {
 
   static async update(param: ParamId, request: ItemRequest): Promise<ItemResponse> {
     const updatedAt = dayjs().unix();
-    const item = db
-      .update(itemsTable)
-      .set({
-        ...request,
-        updatedAt,
-      })
-      .where(and(
-        eq(itemsTable.id, Number(param.id)),
-        isNull(itemsTable.deletedAt),
-      ))
-      .returning()
-      .get()
+    const item = await db.transaction(async (transaction) => {
+      const existingItemId = await this.checkRecord(param);
+      const newItem = transaction
+        .update(itemsTable)
+        .set({
+          ...request,
+          updatedAt,
+        })
+        .where(and(
+          eq(itemsTable.id, existingItemId),
+          isNull(itemsTable.deletedAt),
+        ))
+        .returning()
+        .get()
+
+      return newItem;
+    })
 
     return item;
   }
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
-    await db
-      .update(itemsTable)
-      .set({
-        deletedAt,
-      })
+    await db.transaction(async (transaction) => {
+      const existingItemId = await this.checkRecord(param);
+      await transaction
+        .update(itemsTable)
+        .set({
+          deletedAt,
+        })
+        .where(and(
+          eq(itemsTable.id, existingItemId),
+          isNull(itemsTable.deletedAt),
+        ))
+    })
+  }
+
+  static async checkRecord(param: ParamId) {
+    const item = db
+      .select({ id: itemsTable.id })
+      .from(itemsTable)
       .where(and(
         eq(itemsTable.id, Number(param.id)),
-        isNull(itemsTable.deletedAt),
+        isNull(itemsTable.deletedAt)
       ))
+      .get();
+
+
+    if (!item) {
+      throw new NotFoundException('Barang tidak ditemukan.')
+    }
+
+    return item.id
   }
 }
