@@ -11,12 +11,10 @@ export const accountMutationsTable = sqliteTable('account_mutations', {
       AccountMutationTypeEnum.Credit,
     ]
   }).notNull(),
-  amount: real('amount').notNull().default(0),
+  amount: real('amount').notNull(),
   accountId: integer('account_id').notNull(),
   description: text('description'),
   createdAt: integer('created_at', { mode: 'number' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'number' }),
-  deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
 export const accountMutationsRelations = relations(accountMutationsTable, ({ one }) => ({

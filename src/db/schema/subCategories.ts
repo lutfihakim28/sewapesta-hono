@@ -15,6 +15,6 @@ export const subcategoriesRelations = relations(subcategoriesTable, ({ one }) =>
   category: one(categoriesTable, {
     fields: [subcategoriesTable.categoryId],
     references: [categoriesTable.id],
-    relationName: 'categories.subcategories',
+    relationName: 'category.subcategories',
   })
 }))

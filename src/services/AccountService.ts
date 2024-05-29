@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { accountsTable } from '@/db/schema/accounts';
 import { ParamId } from '@/schemas/ParamIdSchema';
-import { AccountRequest } from '@/schemas/accounts/AccountRequestSchema';
+import { AccountRequest, AccountUpdate } from '@/schemas/accounts/AccountRequestSchema';
 import { AccountResponse } from '@/schemas/accounts/AccountResponseSchema';
 import { ExtendedAccountResponse } from '@/schemas/accounts/ExtendedAccountResponseSchema';
 import dayjs from 'dayjs';
@@ -30,6 +30,7 @@ export abstract class AccountService {
             password: false,
           }
         },
+        mutations: true,
       }
     })
 
@@ -50,11 +51,11 @@ export abstract class AccountService {
     return account.id;
   }
 
-  static async update(param: ParamId) {
+  static async update(param: ParamId, request: AccountUpdate) {
     const updatedAt = dayjs().unix();
     await db
       .update(accountsTable)
-      .set({ updatedAt })
+      .set({ ...request, updatedAt })
       .where(and(
         eq(accountsTable.id, Number(param.id)),
         isNull(accountsTable.deletedAt),

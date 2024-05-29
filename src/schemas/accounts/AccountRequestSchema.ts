@@ -10,4 +10,11 @@ export const AccountRequestSchema = createInsertSchema(accountsTable, {
   })
 }).pick({ name: true }).openapi('AccountRequest')
 
+export const AccountUpdateSchema = createInsertSchema(accountsTable, {
+  balance: z.number({
+    message: 'Saldo akun harus diisi.'
+  })
+}).pick({ balance: true })
+
 export type AccountRequest = z.infer<typeof AccountRequestSchema>
+export type AccountUpdate = z.infer<typeof AccountUpdateSchema>

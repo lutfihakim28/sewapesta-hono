@@ -1,5 +1,6 @@
 import { Database } from 'bun:sqlite';
 import { drizzle } from 'drizzle-orm/bun-sqlite'
+import * as accountMutations from './schema/accountMutations';
 import * as accounts from './schema/accounts';
 import * as categories from './schema/categories';
 import * as employees from './schema/employees';
@@ -11,6 +12,7 @@ import * as users from './schema/users';
 const connection = new Database('sewapesta.db')
 export const db = drizzle(connection, {
   schema: {
+    ...accountMutations,
     ...accounts,
     ...categories,
     ...employees,
