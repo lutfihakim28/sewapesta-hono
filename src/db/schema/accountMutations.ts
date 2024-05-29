@@ -7,8 +7,8 @@ export const accountMutationsTable = sqliteTable('account_mutations', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   type: text('type', {
     enum: [
-      AccountMutationTypeEnum.Deposit,
-      AccountMutationTypeEnum.Withdraw,
+      AccountMutationTypeEnum.Debit,
+      AccountMutationTypeEnum.Credit,
     ]
   }).notNull(),
   amount: real('amount').notNull(),

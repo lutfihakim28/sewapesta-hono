@@ -59,13 +59,13 @@ export abstract class AccountService {
   static async update(param: ParamId, request: AccountUpdate) {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingAccountId = await this.checkRecord(param);
+      const existingAccount = await this.checkRecord(param);
 
       await transaction
         .update(accountsTable)
         .set({ ...request, updatedAt })
         .where(and(
-          eq(accountsTable.id, existingAccountId),
+          eq(accountsTable.id, existingAccount.id),
           isNull(accountsTable.deletedAt),
         ))
     })
@@ -74,18 +74,18 @@ export abstract class AccountService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingAccountId = await this.checkRecord(param);
+      const existingAccount = await this.checkRecord(param);
 
       await transaction
         .update(accountsTable)
         .set({ deletedAt })
-        .where(eq(accountsTable.id, existingAccountId))
+        .where(eq(accountsTable.id, existingAccount.id))
     })
   }
 
   static async checkRecord(param: ParamId) {
     const account = db
-      .select({ id: accountsTable.id })
+      .select({ id: accountsTable.id, balance: accountsTable.balance })
       .from(accountsTable)
       .where(and(
         eq(accountsTable.id, Number(param.id)),
@@ -98,6 +98,6 @@ export abstract class AccountService {
       throw new NotFoundException('Akun tidak ditemukan.')
     }
 
-    return account.id
+    return account
   }
 }

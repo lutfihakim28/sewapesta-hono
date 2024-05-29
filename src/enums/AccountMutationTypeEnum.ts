@@ -1,4 +1,4 @@
 export enum AccountMutationTypeEnum {
-  Deposit = '+',
-  Withdraw = '-',
+  Debit = 'Debit',
+  Credit = 'Credit',
 }
