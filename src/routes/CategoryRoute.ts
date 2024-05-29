@@ -142,7 +142,7 @@ export const UpdateCategoryRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Nama tidak valid.'),
+          schema: ResponseSchema(422, 'Nama tidak valid.'),
         },
       },
       description: 'Validation error',
@@ -197,7 +197,7 @@ export const DeleteCategoryRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Id tidak valid.'),
+          schema: ResponseSchema(422, 'Id tidak valid.'),
         },
       },
       description: 'Validation error',
