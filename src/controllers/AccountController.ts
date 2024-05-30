@@ -1,3 +1,4 @@
+import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
 import { ListAccountRoute, DetailAccountRoute, DepositAccountRoute, WithdrawAccountRoute } from '@/routes/AccountRoute';
 import { AccountMutationService } from '@/services/AccountMutationService';
@@ -10,7 +11,7 @@ AccountController.openapi(ListAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil mendapatkan daftar akun.'],
+    messages: [messages.successList('akun')],
     data: accounts,
   }, 200)
 })
@@ -22,7 +23,7 @@ AccountController.openapi(DetailAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil mendapatkan detail akun.'],
+    messages: [messages.successDetail('akun')],
     data: account,
   }, 200)
 })
@@ -38,7 +39,7 @@ AccountController.openapi(DepositAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil deposit saldo.'],
+    messages: [messages.successDeposit],
   }, 200)
 })
 
@@ -53,7 +54,7 @@ AccountController.openapi(WithdrawAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil menarik saldo.'],
+    messages: [messages.successWithdraw],
   }, 200)
 })
 

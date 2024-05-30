@@ -11,6 +11,7 @@ import { HTTPException } from 'hono/http-exception'
 import { UnauthorizedException } from './exceptions/UnauthorizedException'
 import AccountController from './controllers/AccountController'
 import EmployeeController from './controllers/EmployeeController'
+import { messages } from './constatnts/messages'
 
 const app = honoApp()
 
@@ -38,7 +39,7 @@ app.onError((error, context) => {
   console.log(error)
   return context.json({
     code: 500,
-    messages: ['Terjadi kesalahan server.']
+    messages: [messages.errorServer]
   }, 500)
 })
 
@@ -47,13 +48,13 @@ app.use('/api/auth/logout', async (context, next) => {
   const secretKey = Bun.env.JWT_SECRET;
 
   if (!token) {
-    throw new UnauthorizedException('Token tidak ditemukan.')
+    throw new UnauthorizedException(messages.tokenNotFound)
   }
 
   const payload = await verify(token, secretKey);
 
   if (!payload) {
-    throw new UnauthorizedException('Token kadaluarsa.')
+    throw new UnauthorizedException(messages.tokenNotFound)
   }
 
   await next()
@@ -64,13 +65,13 @@ app.use('/api/private/*', async (context, next) => {
   const secretKey = Bun.env.JWT_SECRET;
 
   if (!token) {
-    throw new UnauthorizedException('Token tidak ditemukan.')
+    throw new UnauthorizedException(messages.tokenNotFound)
   }
 
   const payload = await verify(token, secretKey);
 
   if (!payload) {
-    throw new UnauthorizedException('Token kadaluarsa.')
+    throw new UnauthorizedException(messages.tokenNotFound)
   }
 
   await next()

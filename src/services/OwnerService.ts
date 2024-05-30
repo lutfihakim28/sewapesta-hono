@@ -8,6 +8,7 @@ import { ownersTable } from '@/db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
 import { OwnerResponse } from '@/schemas/owners/OwnerResponseSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
+import { messages } from '@/constatnts/messages';
 
 export abstract class OwnerService {
   static async getList(): Promise<Array<ExtendedOwnerResponse>> {
@@ -33,7 +34,7 @@ export abstract class OwnerService {
     })
 
     if (!owner) {
-      throw new NotFoundException('Barang tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('Pemilik'))
     }
 
     return owner;

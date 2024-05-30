@@ -1,3 +1,4 @@
+import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
 import { CreateEmployeeRoute, DeleteEmployeeRoute, DetailEmployeeRoute, ListEmployeeRoute, UpdateEmployeeRoute } from '@/routes/EmployeeRoute';
 import { EmployeeService } from '@/services/EmployeeService';
@@ -9,7 +10,7 @@ EmployeeController.openapi(ListEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil mendapatkan daftar karyawan.'],
+    messages: [messages.successList('karyawan')],
     data: employees,
   }, 200)
 })
@@ -21,7 +22,7 @@ EmployeeController.openapi(DetailEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil mendapatkan detail karyawan.'],
+    messages: [messages.successDetail('karyawan')],
     data: employee,
   }, 200)
 })
@@ -33,7 +34,7 @@ EmployeeController.openapi(CreateEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil menambah karyawan.'],
+    messages: [messages.successCreate('karyawan')],
     data: employee,
   }, 200)
 })
@@ -46,7 +47,7 @@ EmployeeController.openapi(UpdateEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil mengubah karyawan.'],
+    messages: [messages.successUpdate('karyawan')],
     data: employee,
   }, 200)
 })
@@ -58,7 +59,7 @@ EmployeeController.openapi(DeleteEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil menghapus karyawan.'],
+    messages: [messages.successDelete('karyawan')],
     data: employee,
   }, 200)
 })

@@ -1,3 +1,5 @@
+import { messages } from '@/constatnts/messages'
+import { validationMessages } from '@/constatnts/validationMessages'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { ResponseSchema } from '@/schemas/ResponseSchema'
 import { AccountMutationRequestSchema } from '@/schemas/accountMutations/AccountMutationRequestSchema'
@@ -18,7 +20,7 @@ export const ListAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mendapat daftar akun.', z.array(AccountResponseSchema)),
+          schema: ResponseSchema(200, messages.successList('akun'), z.array(AccountResponseSchema)),
         },
       },
       description: 'Retrieve list accounts',
@@ -26,7 +28,7 @@ export const ListAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -34,7 +36,7 @@ export const ListAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -56,7 +58,7 @@ export const DetailAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mendapat detail akun.', ExtendedAccountResponseSchema),
+          schema: ResponseSchema(200, messages.successDetail('akun'), ExtendedAccountResponseSchema),
         },
       },
       description: 'Retrieve list categories',
@@ -64,7 +66,7 @@ export const DetailAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -72,7 +74,7 @@ export const DetailAccountRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Akun tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('akun')),
         },
       },
       description: 'Not Found',
@@ -80,7 +82,7 @@ export const DetailAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -109,7 +111,7 @@ export const DepositAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil deposit saldo.'),
+          schema: ResponseSchema(200, messages.successDeposit),
         },
       },
       description: 'Retrieve list categories',
@@ -117,7 +119,7 @@ export const DepositAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -125,7 +127,7 @@ export const DepositAccountRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Akun tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('akun')),
         },
       },
       description: 'Not Found',
@@ -133,7 +135,7 @@ export const DepositAccountRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, 'Nominal tidak valid.'),
+          schema: ResponseSchema(422, validationMessages.requiredNumber('Nominal')),
         },
       },
       description: 'Validation error',
@@ -141,7 +143,7 @@ export const DepositAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -170,7 +172,7 @@ export const WithdrawAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil menarik saldo.'),
+          schema: ResponseSchema(200, messages.successWithdraw),
         },
       },
       description: 'Retrieve list categories',
@@ -178,7 +180,7 @@ export const WithdrawAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -186,7 +188,7 @@ export const WithdrawAccountRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Akun tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('akun')),
         },
       },
       description: 'Not Found',
@@ -194,7 +196,7 @@ export const WithdrawAccountRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, 'Nominal tidak valid.'),
+          schema: ResponseSchema(422, validationMessages.requiredNumber('Nominal')),
         },
       },
       description: 'Validation error',
@@ -202,7 +204,7 @@ export const WithdrawAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',

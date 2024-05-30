@@ -6,6 +6,7 @@ import { SubcategoryRequest } from '@/schemas/subcategories/SubcategoryRequestSc
 import { SubcategoryResponse } from '@/schemas/subcategories/SubcategoryResponseSchema';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
+import { messages } from '@/constatnts/messages';
 
 export abstract class SubcategoryService {
   static async create(request: SubcategoryRequest): Promise<SubcategoryResponse> {
@@ -72,7 +73,7 @@ export abstract class SubcategoryService {
 
 
     if (!subcategory) {
-      throw new NotFoundException('Subkategori tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('subkategori'))
     }
 
     return subcategory.id

@@ -1,3 +1,4 @@
+import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
 import { CreateCategoryRoute, DeleteCategoryRoute, ListCategoryRoute, UpdateCategoryRoute } from '@/routes/CategoryRoute';
 import { CategoryService } from '@/services/CategoryService';
@@ -9,7 +10,7 @@ CategoryController.openapi(ListCategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil mendapatkan daftar kategori.'],
+    messages: [messages.successList('kategori')],
     data: categories,
   }, 200)
 })
@@ -21,7 +22,7 @@ CategoryController.openapi(CreateCategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil membuat kategori baru.'],
+    messages: [messages.successCreate('kategori')],
     data: category,
   }, 200)
 })
@@ -34,7 +35,7 @@ CategoryController.openapi(UpdateCategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [`Berhasil mengubah kategori ${category.name}.`],
+    messages: [messages.successUpdate('kategori')],
     data: category,
   }, 200)
 })
@@ -46,7 +47,7 @@ CategoryController.openapi(DeleteCategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil menghapus kategori.'],
+    messages: [messages.successDelete('kategori')],
   }, 200)
 })
 

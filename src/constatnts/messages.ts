@@ -1,0 +1,16 @@
+export const messages = {
+  errorServer: 'Terjadi kesalahan server.',
+  tokenNotFound: 'Token tidak ditemukan atau kadaluarsa.',
+  unauthorized: 'Token tidak valid.',
+  successDeposit: 'Berhasil menambah saldo.',
+  successWithdraw: 'Berhasil menarik saldo.',
+  invalidCredential: 'Nama pengguna atau kata sandi salah.',
+  successLogin: 'Berhasil masuk.',
+  successLogout: 'Berhasil keluar.',
+  errorNotFound: (data: string) => `${data.charAt(0).toUpperCase() + data.slice(1)} tidak ditemukan`,
+  successList: (data: string) => `Berhasil mengambil daftar ${data}.`,
+  successDetail: (data: string) => `Berhasil mengambil detail ${data}.`,
+  successCreate: (data: string) => `Berhasil menambah ${data}.`,
+  successUpdate: (data: string) => `Berhasil memperbarui ${data}.`,
+  successDelete: (data: string) => `Berhasil menghapus ${data}.`,
+}

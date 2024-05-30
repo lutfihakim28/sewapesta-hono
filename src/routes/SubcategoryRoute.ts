@@ -3,6 +3,8 @@ import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { ResponseSchema } from '@/schemas/ResponseSchema'
 import { SubcategoryRequestSchema } from '@/schemas/subcategories/SubcategoryRequestSchema'
 import { SubcategoryResponseSchema } from '@/schemas/subcategories/SubcategoryResponseSchema'
+import { messages } from '@/constatnts/messages'
+import { validationMessages } from '@/constatnts/validationMessages'
 
 const tags = ['Subcategory']
 
@@ -27,7 +29,7 @@ export const CreateSubcategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil menyimpan kategori.', SubcategoryResponseSchema),
+          schema: ResponseSchema(200, messages.successCreate('subkategori'), SubcategoryResponseSchema),
         },
       },
       description: 'Create category',
@@ -35,7 +37,7 @@ export const CreateSubcategoryRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -43,7 +45,7 @@ export const CreateSubcategoryRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, 'Nama tidak valid.'),
+          schema: ResponseSchema(422, validationMessages.required('Nama')),
         },
       },
       description: 'Validation error',
@@ -51,7 +53,7 @@ export const CreateSubcategoryRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -81,7 +83,7 @@ export const UpdateSubcategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mengubah kategori.', SubcategoryResponseSchema),
+          schema: ResponseSchema(200, messages.successUpdate('subkategori'), SubcategoryResponseSchema),
         },
       },
       description: 'Update category',
@@ -89,7 +91,7 @@ export const UpdateSubcategoryRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -97,7 +99,7 @@ export const UpdateSubcategoryRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Kategori tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('subkategori')),
         },
       },
       description: 'Not Found',
@@ -105,7 +107,7 @@ export const UpdateSubcategoryRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, 'Nama tidak valid.'),
+          schema: ResponseSchema(422, validationMessages.required('Nama')),
         },
       },
       description: 'Validation error',
@@ -113,7 +115,7 @@ export const UpdateSubcategoryRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -136,7 +138,7 @@ export const DeleteSubcategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil menghapus kategori'),
+          schema: ResponseSchema(200, messages.successDelete('subkategori')),
         },
       },
       description: 'Retrieve the user',
@@ -144,7 +146,7 @@ export const DeleteSubcategoryRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -152,23 +154,15 @@ export const DeleteSubcategoryRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Kategori tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('subkategori')),
         },
       },
       description: 'Not Found',
     },
-    422: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(422, 'Id tidak valid.'),
-        },
-      },
-      description: 'Validation error',
-    },
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',

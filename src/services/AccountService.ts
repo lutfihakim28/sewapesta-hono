@@ -1,3 +1,4 @@
+import { messages } from '@/constatnts/messages';
 import { db } from '@/db';
 import { accountsTable } from '@/db/schema/accounts';
 import { NotFoundException } from '@/exceptions/NotFoundException';
@@ -36,7 +37,7 @@ export abstract class AccountService {
     })
 
     if (!account) {
-      throw new NotFoundException('Akun tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('akun'))
     }
 
     return account
@@ -90,7 +91,7 @@ export abstract class AccountService {
 
 
     if (!account) {
-      throw new NotFoundException('Akun tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('akun'))
     }
 
     return account

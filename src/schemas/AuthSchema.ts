@@ -1,15 +1,17 @@
 import { z } from 'zod';
 import { UserResponseSchema } from './UserSchema';
+import { validationMessages } from '@/constatnts/validationMessages';
+import { messages } from '@/constatnts/messages';
 
 export const LoginRequestSchema = z.object({
   username: z.string({
-    message: 'Username harus diisi.',
+    message: validationMessages.required('Nama pengguna')
   }).openapi({
     example: 'superadmin',
   }),
   password: z.string({
-    message: 'Password harus diisi.'
-  }).min(8, 'Password minimal 8 karakter.').openapi({
+    message: validationMessages.required('Kata sandi')
+  }).min(8, validationMessages.minLength('Kata sandi', 8)).openapi({
     example: 'password',
   }),
 }).openapi('Login');
@@ -20,8 +22,8 @@ export const LoginResponseSchema = z.object({
 });
 
 export const LogoutResponseSchema = z.object({
-  messages: z.string().array().default(['Berhasil keluar']).openapi({
-    example: ['Berhasil keluar']
+  messages: z.string().array().default([messages.successLogout]).openapi({
+    example: [messages.successLogout]
   }),
 });
 

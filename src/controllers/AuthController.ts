@@ -4,6 +4,7 @@ import { AuthLoginRoute, AuthLogoutRoute } from '@/routes/AuthRoute';
 import { UserService } from '@/services/UserService';
 import { sign } from 'hono/jwt';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
+import { messages } from '@/constatnts/messages';
 
 const AuthController = honoApp()
 
@@ -13,7 +14,7 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
   const user = await UserService.checkCredentials(loginRequest);
 
   if (!user) {
-    throw new UnauthorizedException('Username atau password salah.')
+    throw new UnauthorizedException(messages.invalidCredential)
   }
 
   const payload = {
@@ -33,7 +34,7 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil login'],
+    messages: [messages.successLogin],
     data: {
       token,
       user: {
@@ -49,7 +50,7 @@ AuthController.openapi(AuthLogoutRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil keluar.']
+    messages: [messages.successLogout]
   }, 200)
 })
 

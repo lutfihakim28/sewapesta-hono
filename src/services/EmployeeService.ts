@@ -8,6 +8,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
+import { messages } from '@/constatnts/messages';
 
 export abstract class EmployeeService {
   static async getList(): Promise<Array<ExtendedEmployeeResponse>> {
@@ -33,7 +34,7 @@ export abstract class EmployeeService {
     })
 
     if (!employee) {
-      throw new NotFoundException('Karyawan tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('karyawan'))
     }
 
     return employee;
@@ -110,7 +111,7 @@ export abstract class EmployeeService {
 
 
     if (!employee) {
-      throw new NotFoundException('Karyawan tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('karyawan'))
     }
 
     return employee.id

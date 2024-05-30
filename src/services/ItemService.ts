@@ -7,6 +7,7 @@ import { ExtendedItemResponse } from '@/schemas/items/ExtendedItemResponseSchema
 import { ItemResponse } from '@/schemas/items/ItemResponseSchema';
 import { ItemRequest } from '@/schemas/items/ItemRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
+import { messages } from '@/constatnts/messages';
 
 export abstract class ItemService {
   static async getList(): Promise<Array<ExtendedItemResponse>> {
@@ -34,7 +35,7 @@ export abstract class ItemService {
     })
 
     if (!item) {
-      throw new NotFoundException('Barang tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('barang'))
     }
 
     return item;
@@ -105,7 +106,7 @@ export abstract class ItemService {
 
 
     if (!item) {
-      throw new NotFoundException('Barang tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('barang'))
     }
 
     return item.id

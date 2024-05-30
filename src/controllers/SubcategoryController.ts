@@ -1,3 +1,4 @@
+import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
 import { CreateSubcategoryRoute, DeleteSubcategoryRoute, UpdateSubcategoryRoute } from '@/routes/SubcategoryRoute'
 import { SubcategoryService } from '@/services/SubcategoryService';
@@ -11,7 +12,7 @@ SubcategoryController.openapi(CreateSubcategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil menambahkan subkategori.'],
+    messages: [messages.successCreate('subkategori')],
     data: subcategory,
   }, 200)
 })
@@ -24,7 +25,7 @@ SubcategoryController.openapi(UpdateSubcategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [`Berhasil mengubah subkategori ${subcategory.name}.`],
+    messages: [messages.successUpdate('subkategori')],
     data: subcategory,
   }, 200)
 })
@@ -36,7 +37,7 @@ SubcategoryController.openapi(DeleteSubcategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: ['Berhasil menghapus subkategori.']
+    messages: [messages.successDelete('subkategori')]
   }, 200)
 })
 

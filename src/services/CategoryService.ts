@@ -9,6 +9,7 @@ import { CategoryResponse } from '@/schemas/categories/CategoryResponseSchema';
 import { SubcategoryService } from './SubcategoryService';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
+import { messages } from '@/constatnts/messages';
 
 export abstract class CategoryService {
   static async getList(): Promise<Array<ExtendedCategoryResponse>> {
@@ -35,7 +36,7 @@ export abstract class CategoryService {
     })
 
     if (!category) {
-      throw new NotFoundException('Kategori tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('kategori'))
     }
 
     return category
@@ -103,7 +104,7 @@ export abstract class CategoryService {
 
 
     if (!category) {
-      throw new NotFoundException('Kategori tidak ditemukan.')
+      throw new NotFoundException(messages.errorNotFound('kategori'))
     }
 
     return category.id

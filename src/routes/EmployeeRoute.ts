@@ -1,3 +1,5 @@
+import { messages } from '@/constatnts/messages';
+import { validationMessages } from '@/constatnts/validationMessages';
 import { ParamIdSchema } from '@/schemas/ParamIdSchema';
 import { ResponseSchema } from '@/schemas/ResponseSchema';
 import { EmployeeRequestSchema } from '@/schemas/employees/EmployeeRequestSchema';
@@ -18,7 +20,7 @@ export const ListEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mendapatkan daftar karyawan.', z.array(ExtendedEmployeeResponseSchema)),
+          schema: ResponseSchema(200, messages.successList('karyawan'), z.array(ExtendedEmployeeResponseSchema)),
         },
       },
       description: 'Retrieve list categories',
@@ -26,7 +28,7 @@ export const ListEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -34,7 +36,7 @@ export const ListEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -56,7 +58,7 @@ export const DetailEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mendapatkan detail karyawan.', ExtendedEmployeeResponseSchema),
+          schema: ResponseSchema(200, messages.successDetail('karyawan'), ExtendedEmployeeResponseSchema),
         },
       },
       description: 'Retrieve list categories',
@@ -64,7 +66,7 @@ export const DetailEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -72,7 +74,7 @@ export const DetailEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Karyawan tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
         },
       },
       description: 'Not Found',
@@ -80,7 +82,7 @@ export const DetailEmployeeRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, 'Nama tidak valid.'),
+          schema: ResponseSchema(422, validationMessages.required('Nama')),
         },
       },
       description: 'Validation error',
@@ -88,7 +90,7 @@ export const DetailEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -116,7 +118,7 @@ export const CreateEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil menambah karyawan.', EmployeeResponseSchema),
+          schema: ResponseSchema(200, messages.successCreate('karyawan'), EmployeeResponseSchema),
         },
       },
       description: 'Retrieve list categories',
@@ -124,7 +126,7 @@ export const CreateEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -132,7 +134,7 @@ export const CreateEmployeeRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, 'Nama tidak valid.'),
+          schema: ResponseSchema(422, validationMessages.required('Nama')),
         },
       },
       description: 'Validation error',
@@ -140,7 +142,7 @@ export const CreateEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -169,7 +171,7 @@ export const UpdateEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil mengubah karyawan.', EmployeeResponseSchema),
+          schema: ResponseSchema(200, messages.successUpdate('karyawan'), EmployeeResponseSchema),
         },
       },
       description: 'Retrieve list categories',
@@ -177,7 +179,7 @@ export const UpdateEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -185,7 +187,7 @@ export const UpdateEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Karyawan tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
         },
       },
       description: 'Not Found',
@@ -193,7 +195,7 @@ export const UpdateEmployeeRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, 'Nama tidak valid.'),
+          schema: ResponseSchema(422, validationMessages.required('Nama')),
         },
       },
       description: 'Validation error',
@@ -201,7 +203,7 @@ export const UpdateEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
@@ -223,7 +225,7 @@ export const DeleteEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil menghapus karyawan.'),
+          schema: ResponseSchema(200, messages.successDelete('karyawan')),
         },
       },
       description: 'Retrieve list categories',
@@ -231,7 +233,7 @@ export const DeleteEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, 'Token tidak valid.'),
+          schema: ResponseSchema(401, messages.unauthorized),
         },
       },
       description: 'Unauthorized',
@@ -239,7 +241,7 @@ export const DeleteEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, 'Karyawan tidak ditemukan.'),
+          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
         },
       },
       description: 'Not Found',
@@ -247,7 +249,7 @@ export const DeleteEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+          schema: ResponseSchema(500, messages.errorServer),
         },
       },
       description: 'Internal error',
