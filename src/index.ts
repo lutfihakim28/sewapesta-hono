@@ -12,6 +12,8 @@ import { UnauthorizedException } from './exceptions/UnauthorizedException'
 import AccountController from './controllers/AccountController'
 import EmployeeController from './controllers/EmployeeController'
 import { messages } from './constatnts/messages'
+import ItemController from './controllers/ItemController'
+import OwnerController from './controllers/OwnerController'
 
 const app = honoApp()
 
@@ -85,6 +87,8 @@ app.route('/api/auth', AuthController)
 app.route('/api/private/accounts', AccountController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/employees', EmployeeController)
+app.route('/api/private/items', ItemController)
+app.route('/api/private/owners', OwnerController)
 app.route('/api/private/subcategories', SubcategoryController)
 app.route('/api/private/users', UserController)
 
