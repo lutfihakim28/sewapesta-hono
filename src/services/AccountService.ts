@@ -56,19 +56,14 @@ export abstract class AccountService {
     return account.id;
   }
 
-  static async update(param: ParamId, request: AccountUpdate) {
+  static async update(accountId: number, request: AccountUpdate) {
     const updatedAt = dayjs().unix();
-    await db.transaction(async (transaction) => {
-      const existingAccount = await this.checkRecord(param);
-
-      await transaction
-        .update(accountsTable)
-        .set({ ...request, updatedAt })
-        .where(and(
-          eq(accountsTable.id, existingAccount.id),
-          isNull(accountsTable.deletedAt),
-        ))
-    })
+    await db
+      .update(accountsTable)
+      .set({ ...request, updatedAt })
+      .where(and(
+        eq(accountsTable.id, accountId),
+      ))
   }
 
   static async delete(param: ParamId) {

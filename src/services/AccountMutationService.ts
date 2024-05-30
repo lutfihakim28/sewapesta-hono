@@ -9,7 +9,7 @@ import { AccountMutationTypeEnum } from '@/enums/AccountMutationTypeEnum';
 import { InvalidException } from '@/exceptions/InvalidException';
 
 export abstract class AccountMutationService {
-  static async debit(request: AccountMutationRequest) {
+  static async debit(request: AccountMutationRequest & { accountId: number }) {
     const createdAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const account = await AccountService.checkRecord({ id: request.accountId.toString() });
@@ -22,23 +22,19 @@ export abstract class AccountMutationService {
           type: AccountMutationTypeEnum.Debit,
         })
 
-      await transaction
-        .update(accountsTable)
-        .set({
-          balance: sql`${accountsTable.balance} + ${request.amount}`
-        })
-        .where(eq(accountsTable.id, account.id))
+      await AccountService.update(account.id, {
+        balance: account.balance + request.amount,
+      })
     })
   }
 
-  static async credit(request: AccountMutationRequest) {
+  static async credit(request: AccountMutationRequest & { accountId: number }) {
     const createdAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const account = await AccountService.checkRecord({ id: request.accountId.toString() });
 
       if (request.amount > account.balance) {
-        transaction.rollback()
-        throw new InvalidException(['Nominal tidak boleh melebihi saldo akun'])
+        throw new InvalidException(['Nominal tidak boleh melebihi saldo akun.'])
       }
 
       await transaction
@@ -49,12 +45,9 @@ export abstract class AccountMutationService {
           type: AccountMutationTypeEnum.Credit,
         })
 
-      await transaction
-        .update(accountsTable)
-        .set({
-          balance: sql`${accountsTable.balance} - ${request.amount}`
-        })
-        .where(eq(accountsTable.id, account.id))
+      await AccountService.update(account.id, {
+        balance: account.balance - request.amount,
+      })
     })
   }
 }

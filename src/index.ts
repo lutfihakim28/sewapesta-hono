@@ -9,6 +9,7 @@ import CategoryController from './controllers/CategoryController'
 import SubcategoryController from './controllers/SubcategoryController'
 import { HTTPException } from 'hono/http-exception'
 import { UnauthorizedException } from './exceptions/UnauthorizedException'
+import AccountController from './controllers/AccountController'
 
 const app = honoApp()
 
@@ -33,6 +34,7 @@ app.onError((error, context) => {
       }, error.status)
     }
   }
+  console.log(error)
   return context.json({
     code: 500,
     messages: ['Terjadi kesalahan server.']
@@ -81,6 +83,7 @@ app.route('/api/auth', AuthController)
 app.route('/api/private/users', UserController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/subcategories', SubcategoryController)
+app.route('/api/private/accounts', AccountController)
 
 app.get(
   '/swagger',

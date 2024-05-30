@@ -1,3 +1,4 @@
+import { accountMutationsTable } from '@/db/schema/accountMutations';
 import { accountsTable } from '@/db/schema/accounts';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
@@ -16,14 +17,5 @@ export const AccountUpdateSchema = createInsertSchema(accountsTable, {
   })
 }).pick({ balance: true })
 
-export const AccountWithdrawSchema = z.object({
-  amount: z.number({
-    message: 'Nominal harus diisi angka.',
-  }).openapi({
-    example: 400000,
-  }).openapi('AccountWithdraw')
-})
-
 export type AccountRequest = z.infer<typeof AccountRequestSchema>
 export type AccountUpdate = z.infer<typeof AccountUpdateSchema>
-export type AccountWithdraw = z.infer<typeof AccountWithdrawSchema>

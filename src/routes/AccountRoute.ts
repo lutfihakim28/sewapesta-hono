@@ -1,6 +1,6 @@
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { ResponseSchema } from '@/schemas/ResponseSchema'
-import { AccountWithdrawSchema } from '@/schemas/accounts/AccountRequestSchema'
+import { AccountMutationRequestSchema } from '@/schemas/accountMutations/AccountMutationRequestSchema'
 import { AccountResponseSchema } from '@/schemas/accounts/AccountResponseSchema'
 import { ExtendedAccountResponseSchema } from '@/schemas/accounts/ExtendedAccountResponseSchema'
 import { createRoute, z } from '@hono/zod-openapi'
@@ -88,9 +88,9 @@ export const DetailAccountRoute = createRoute({
   }
 })
 
-export const WithdrawAccountRoute = createRoute({
+export const DepositAccountRoute = createRoute({
   method: 'patch',
-  path: '/{id}/withdraw',
+  path: '/{id}/deposits',
   tags,
   security: [{
     cookieAuth: [],
@@ -100,7 +100,7 @@ export const WithdrawAccountRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: AccountWithdrawSchema
+          schema: AccountMutationRequestSchema
         }
       }
     }
@@ -109,7 +109,68 @@ export const WithdrawAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, 'Berhasil menarik saldo.', AccountResponseSchema),
+          schema: ResponseSchema(200, 'Berhasil deposit saldo.'),
+        },
+      },
+      description: 'Retrieve list categories',
+    },
+    401: {
+      content: {
+        'application/json': {
+          schema: ResponseSchema(401, 'Token tidak valid.'),
+        },
+      },
+      description: 'Unauthorized',
+    },
+    404: {
+      content: {
+        'application/json': {
+          schema: ResponseSchema(404, 'Akun tidak ditemukan.'),
+        },
+      },
+      description: 'Not Found',
+    },
+    422: {
+      content: {
+        'application/json': {
+          schema: ResponseSchema(422, 'Nominal tidak valid.'),
+        },
+      },
+      description: 'Validation error',
+    },
+    500: {
+      content: {
+        'application/json': {
+          schema: ResponseSchema(500, 'Terjadi kesalahan server.'),
+        },
+      },
+      description: 'Internal error',
+    },
+  }
+})
+
+export const WithdrawAccountRoute = createRoute({
+  method: 'patch',
+  path: '/{id}/withdraws',
+  tags,
+  security: [{
+    cookieAuth: [],
+  }],
+  request: {
+    params: ParamIdSchema,
+    body: {
+      content: {
+        'application/json': {
+          schema: AccountMutationRequestSchema
+        }
+      }
+    }
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: ResponseSchema(200, 'Berhasil menarik saldo.'),
         },
       },
       description: 'Retrieve list categories',
