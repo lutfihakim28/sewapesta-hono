@@ -1,8 +1,6 @@
 import { db } from '@/db';
 import { AccountMutationRequest } from '@/schemas/accountMutations/AccountMutationRequestSchema';
 import { AccountService } from './AccountService';
-import { accountsTable } from '@/db/schema/accounts';
-import { eq, sql } from 'drizzle-orm';
 import { accountMutationsTable } from '@/db/schema/accountMutations';
 import dayjs from 'dayjs';
 import { AccountMutationTypeEnum } from '@/enums/AccountMutationTypeEnum';

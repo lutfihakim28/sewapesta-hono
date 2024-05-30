@@ -69,7 +69,7 @@ export abstract class EmployeeService {
           updatedAt,
         })
         .where(and(
-          eq(employeesTable.id, Number(param.id)),
+          eq(employeesTable.id, existingEmployeeId),
           isNull(employeesTable.deletedAt),
         ))
         .returning()

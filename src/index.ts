@@ -10,6 +10,7 @@ import SubcategoryController from './controllers/SubcategoryController'
 import { HTTPException } from 'hono/http-exception'
 import { UnauthorizedException } from './exceptions/UnauthorizedException'
 import AccountController from './controllers/AccountController'
+import EmployeeController from './controllers/EmployeeController'
 
 const app = honoApp()
 
@@ -80,10 +81,11 @@ app.use(logger())
 app.route('/api/auth', AuthController)
 
 // PRIVATE PATH
-app.route('/api/private/users', UserController)
-app.route('/api/private/categories', CategoryController)
-app.route('/api/private/subcategories', SubcategoryController)
 app.route('/api/private/accounts', AccountController)
+app.route('/api/private/categories', CategoryController)
+app.route('/api/private/employees', EmployeeController)
+app.route('/api/private/subcategories', SubcategoryController)
+app.route('/api/private/users', UserController)
 
 app.get(
   '/swagger',
