@@ -14,6 +14,7 @@ import EmployeeController from './controllers/EmployeeController'
 import { messages } from './constatnts/messages'
 import ItemController from './controllers/ItemController'
 import OwnerController from './controllers/OwnerController'
+import { cors } from 'hono/cors'
 
 const app = honoApp()
 
@@ -44,6 +45,11 @@ app.onError((error, context) => {
     messages: [messages.errorServer]
   }, 500)
 })
+
+app.use('/api/*', cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}))
 
 app.use('/api/auth/logout', async (context, next) => {
   const token = getCookie(context, 'token');

@@ -17,7 +17,7 @@ export abstract class CategoryService {
       where: isNull(categoriesTable.deletedAt),
       with: {
         subcategories: {
-          where: isNull(subcategoriesTable.deletedAt)
+          where: isNull(subcategoriesTable.deletedAt),
         },
       }
     })
