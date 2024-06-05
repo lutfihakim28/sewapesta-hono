@@ -1,4 +1,4 @@
-import { InvalidException } from '@/exceptions/InvalidException';
+import { BadRequestException } from '@/exceptions/BadRequestException';
 import { OpenAPIHono } from '@hono/zod-openapi';
 
 export function honoApp() {
@@ -7,7 +7,7 @@ export function honoApp() {
       if (result.success) {
         return;
       }
-      throw new InvalidException(result.error.errors.map((e) => e.message))
+      throw new BadRequestException(result.error.errors.map((e) => e.message))
     },
   })
 };

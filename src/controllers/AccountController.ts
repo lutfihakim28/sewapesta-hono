@@ -1,6 +1,7 @@
 import { messages } from '@/constatnts/messages';
+import { BadRequestException } from '@/exceptions/BadRequestException';
 import { honoApp } from '@/lib/hono';
-import { ListAccountRoute, DetailAccountRoute, DepositAccountRoute, WithdrawAccountRoute } from '@/routes/AccountRoute';
+import { ListAccountRoute, DetailAccountRoute, DepositAccountRoute, WithdrawAccountRoute, AccountMutationRoute } from '@/routes/AccountRoute';
 import { AccountMutationService } from '@/services/AccountMutationService';
 import { AccountService } from '@/services/AccountService';
 
@@ -25,6 +26,29 @@ AccountController.openapi(DetailAccountRoute, async (context) => {
     code: 200,
     messages: [messages.successDetail('akun')],
     data: account,
+  }, 200)
+})
+
+AccountController.openapi(AccountMutationRoute, async (context) => {
+  const param = context.req.valid('param');
+  const query = context.req.valid('query');
+
+  if (query.sortBy === 'amount' && !query.type) {
+    throw new BadRequestException(['Tipe mutasi harus dipilih saat mengurutkan berdasarkan nominal.'])
+  }
+
+  const mutations = await AccountMutationService.getList(param, query);
+  const totalData = await AccountMutationService.count(param, query);
+
+  return context.json({
+    code: 200,
+    messages: [messages.successList('mutasi akun')],
+    data: mutations,
+    meta: {
+      page: Number(query.page),
+      limit: Number(query.limit),
+      totalPage: Math.ceil(totalData / Number(query.limit)),
+    }
   }, 200)
 })
 

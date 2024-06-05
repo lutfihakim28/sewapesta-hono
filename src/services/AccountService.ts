@@ -18,22 +18,12 @@ export abstract class AccountService {
     return accounts
   }
 
-  static async get(param: ParamId): Promise<ExtendedAccountResponse | undefined> {
+  static async get(param: ParamId): Promise<AccountResponse | undefined> {
     const account = await db.query.accountsTable.findFirst({
       where: and(
         eq(accountsTable.id, Number(param.id)),
         isNull(accountsTable.deletedAt),
       ),
-      with: {
-        employee: true,
-        owner: true,
-        user: {
-          columns: {
-            password: false,
-          }
-        },
-        mutations: true,
-      }
     })
 
     if (!account) {

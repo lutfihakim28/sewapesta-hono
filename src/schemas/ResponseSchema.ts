@@ -13,7 +13,7 @@ export function ResponseSchema<T>(code: number, message: string, dataSchema?: z.
     })
   }
 
-  if (!!dataSchema && pagination) {
+  if (!!dataSchema && !!pagination) {
     return z.object({
       code: z.number().openapi({
         example: code,
@@ -26,7 +26,6 @@ export function ResponseSchema<T>(code: number, message: string, dataSchema?: z.
         page: z.number().positive(),
         limit: z.number().positive(),
         totalPage: z.number().positive(),
-        totalData: z.number().positive(),
       })
     })
   }
