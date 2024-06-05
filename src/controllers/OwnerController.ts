@@ -55,12 +55,11 @@ OwnerController.openapi(UpdateOwnerRoute, async (context) => {
 OwnerController.openapi(DeleteOwnerRoute, async (context) => {
   const param = context.req.valid('param');
 
-  const owner = await OwnerService.delete(param);
+  await OwnerService.delete(param);
 
   return context.json({
     code: 200,
     messages: [messages.successDelete('pemilik')],
-    data: owner,
   }, 200)
 })
 

@@ -61,7 +61,7 @@ export const DetailAccountRoute = createRoute({
           schema: ResponseSchema(200, messages.successDetail('akun'), ExtendedAccountResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Retrieve detail account',
     },
     401: {
       content: {
@@ -114,7 +114,7 @@ export const DepositAccountRoute = createRoute({
           schema: ResponseSchema(200, messages.successDeposit),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Deposit success',
     },
     401: {
       content: {
@@ -175,7 +175,7 @@ export const WithdrawAccountRoute = createRoute({
           schema: ResponseSchema(200, messages.successWithdraw),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Withdraw success',
     },
     401: {
       content: {

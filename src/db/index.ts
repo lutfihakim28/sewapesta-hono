@@ -8,6 +8,7 @@ import * as items from './schema/items';
 import * as owners from './schema/owners';
 import * as subcategories from './schema/subcategories';
 import * as users from './schema/users';
+import * as vehicles from './schema/vehicles';
 
 const connection = new Database('sewapesta.db')
 export const db = drizzle(connection, {
@@ -20,5 +21,6 @@ export const db = drizzle(connection, {
     ...owners,
     ...subcategories,
     ...users,
+    ...vehicles,
   },
 })

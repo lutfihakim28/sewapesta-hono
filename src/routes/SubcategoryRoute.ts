@@ -32,7 +32,7 @@ export const CreateSubcategoryRoute = createRoute({
           schema: ResponseSchema(200, messages.successCreate('subkategori'), SubcategoryResponseSchema),
         },
       },
-      description: 'Create category',
+      description: 'Subcategory created',
     },
     401: {
       content: {
@@ -86,7 +86,7 @@ export const UpdateSubcategoryRoute = createRoute({
           schema: ResponseSchema(200, messages.successUpdate('subkategori'), SubcategoryResponseSchema),
         },
       },
-      description: 'Update category',
+      description: 'Subcategory updated',
     },
     401: {
       content: {
@@ -141,7 +141,7 @@ export const DeleteSubcategoryRoute = createRoute({
           schema: ResponseSchema(200, messages.successDelete('subkategori')),
         },
       },
-      description: 'Retrieve the user',
+      description: 'Subcategory deleted',
     },
     401: {
       content: {

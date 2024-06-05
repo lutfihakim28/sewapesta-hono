@@ -1,20 +1,22 @@
-import { logger } from 'hono/logger'
-import UserController from './controllers/UserController'
-import { swaggerUI } from '@hono/swagger-ui'
-import { honoApp } from './lib/hono'
-import AuthController from './controllers/AuthController'
+import { cors } from 'hono/cors'
 import { getCookie } from 'hono/cookie'
-import { verify } from 'hono/jwt'
-import CategoryController from './controllers/CategoryController'
-import SubcategoryController from './controllers/SubcategoryController'
+import { honoApp } from './lib/hono'
 import { HTTPException } from 'hono/http-exception'
-import { UnauthorizedException } from './exceptions/UnauthorizedException'
-import AccountController from './controllers/AccountController'
-import EmployeeController from './controllers/EmployeeController'
+import { JwtTokenExpired } from 'hono/utils/jwt/types'
+import { logger } from 'hono/logger'
 import { messages } from './constatnts/messages'
+import { swaggerUI } from '@hono/swagger-ui'
+import { UnauthorizedException } from './exceptions/UnauthorizedException'
+import { verify } from 'hono/jwt'
+import AccountController from './controllers/AccountController'
+import AuthController from './controllers/AuthController'
+import CategoryController from './controllers/CategoryController'
+import EmployeeController from './controllers/EmployeeController'
 import ItemController from './controllers/ItemController'
 import OwnerController from './controllers/OwnerController'
-import { cors } from 'hono/cors'
+import SubcategoryController from './controllers/SubcategoryController'
+import UserController from './controllers/UserController'
+import VehicleController from './controllers/VehicleController'
 
 const app = honoApp()
 
@@ -38,6 +40,12 @@ app.onError((error, context) => {
         messages: error.cause,
       }, error.status)
     }
+  }
+  if (error instanceof JwtTokenExpired) {
+    return context.json({
+      code: 401,
+      messages: ['Token kadaluarsa.']
+    }, 401)
   }
   console.log(error)
   return context.json({
@@ -97,6 +105,7 @@ app.route('/api/private/items', ItemController)
 app.route('/api/private/owners', OwnerController)
 app.route('/api/private/subcategories', SubcategoryController)
 app.route('/api/private/users', UserController)
+app.route('/api/private/vehicles', VehicleController)
 
 app.get(
   '/swagger',

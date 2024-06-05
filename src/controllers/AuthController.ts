@@ -5,6 +5,7 @@ import { UserService } from '@/services/UserService';
 import { sign } from 'hono/jwt';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
 import { messages } from '@/constatnts/messages';
+import { JWTPayload } from 'hono/utils/jwt/types';
 
 const AuthController = honoApp()
 
@@ -17,10 +18,9 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
     throw new UnauthorizedException(messages.invalidCredential)
   }
 
-  const payload = {
+  const payload: JWTPayload = {
     id: user.id,
     username: user.username,
-    exp: Math.floor(Date.now() / 1000) + 60 * 20,
   };
 
   const secretKey = Bun.env.JWT_SECRET;

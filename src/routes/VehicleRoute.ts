@@ -2,14 +2,13 @@ import { messages } from '@/constatnts/messages';
 import { validationMessages } from '@/constatnts/validationMessages';
 import { ParamIdSchema } from '@/schemas/ParamIdSchema';
 import { ResponseSchema } from '@/schemas/ResponseSchema';
-import { EmployeeRequestSchema } from '@/schemas/employees/EmployeeRequestSchema';
-import { EmployeeResponseSchema } from '@/schemas/employees/EmployeeResponseSchema';
-import { ExtendedEmployeeResponseSchema } from '@/schemas/employees/ExtendedEmployeeResponseSchema';
+import { VehicleRequestSchema } from '@/schemas/vehicles/VehicleRequestSchema';
+import { VehicleResponseSchema } from '@/schemas/vehicles/VehicleResponseSchema';
 import { createRoute, z } from '@hono/zod-openapi';
 
-const tags = ['Employee']
+const tags = ['Vehicle'];
 
-export const ListEmployeeRoute = createRoute({
+export const ListVehicleRoute = createRoute({
   method: 'get',
   path: '/',
   tags,
@@ -20,10 +19,10 @@ export const ListEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('karyawan'), z.array(ExtendedEmployeeResponseSchema)),
-        },
+          schema: ResponseSchema(200, messages.successList('kendaraan'), z.array(VehicleResponseSchema))
+        }
       },
-      description: 'Retrieve list employees',
+      description: 'Retrieve list vehicles',
     },
     401: {
       content: {
@@ -44,7 +43,7 @@ export const ListEmployeeRoute = createRoute({
   }
 })
 
-export const DetailEmployeeRoute = createRoute({
+export const DetailVehicleRoute = createRoute({
   method: 'get',
   path: '/{id}',
   tags,
@@ -58,10 +57,10 @@ export const DetailEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('karyawan'), ExtendedEmployeeResponseSchema),
+          schema: ResponseSchema(200, messages.successDetail('kendaraan'), VehicleResponseSchema),
         },
       },
-      description: 'Retrieve detail employee',
+      description: 'Retrieve detail vehicle',
     },
     401: {
       content: {
@@ -74,7 +73,7 @@ export const DetailEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
+          schema: ResponseSchema(404, messages.errorNotFound('kendaraan')),
         },
       },
       description: 'Not Found',
@@ -90,7 +89,7 @@ export const DetailEmployeeRoute = createRoute({
   }
 })
 
-export const CreateEmployeeRoute = createRoute({
+export const CreateVehicleRoute = createRoute({
   method: 'post',
   path: '/',
   tags,
@@ -100,20 +99,20 @@ export const CreateEmployeeRoute = createRoute({
   request: {
     body: {
       content: {
-        "application/json": {
-          schema: EmployeeRequestSchema
+        'application/json': {
+          schema: VehicleRequestSchema,
         }
-      },
+      }
     }
   },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successCreate('karyawan'), EmployeeResponseSchema),
+          schema: ResponseSchema(200, messages.successCreate('kendaraan'), VehicleResponseSchema),
         },
       },
-      description: 'Employee created',
+      description: 'Vehicle created',
     },
     401: {
       content: {
@@ -142,7 +141,7 @@ export const CreateEmployeeRoute = createRoute({
   }
 })
 
-export const UpdateEmployeeRoute = createRoute({
+export const UpdateVehicleRoute = createRoute({
   method: 'put',
   path: '/{id}',
   tags,
@@ -154,19 +153,19 @@ export const UpdateEmployeeRoute = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: EmployeeRequestSchema
+          schema: VehicleRequestSchema,
         }
-      },
+      }
     }
   },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successUpdate('karyawan'), EmployeeResponseSchema),
+          schema: ResponseSchema(200, messages.successUpdate('kendaraan'), VehicleResponseSchema),
         },
       },
-      description: 'Employee updated',
+      description: 'Vehicle updated',
     },
     401: {
       content: {
@@ -179,7 +178,7 @@ export const UpdateEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
+          schema: ResponseSchema(404, messages.errorNotFound('kendaraan')),
         },
       },
       description: 'Not Found',
@@ -203,7 +202,7 @@ export const UpdateEmployeeRoute = createRoute({
   }
 })
 
-export const DeleteEmployeeRoute = createRoute({
+export const DeleteVehicleRoute = createRoute({
   method: 'delete',
   path: '/{id}',
   tags,
@@ -217,10 +216,10 @@ export const DeleteEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDelete('karyawan')),
+          schema: ResponseSchema(200, messages.successDelete('kendaraan')),
         },
       },
-      description: 'Employee deleted',
+      description: 'Vehicle deleted',
     },
     401: {
       content: {
@@ -233,7 +232,7 @@ export const DeleteEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
+          schema: ResponseSchema(404, messages.errorNotFound('kendaraan')),
         },
       },
       description: 'Not Found',

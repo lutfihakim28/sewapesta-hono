@@ -55,12 +55,11 @@ EmployeeController.openapi(UpdateEmployeeRoute, async (context) => {
 EmployeeController.openapi(DeleteEmployeeRoute, async (context) => {
   const param = context.req.valid('param');
 
-  const employee = await EmployeeService.delete(param);
+  await EmployeeService.delete(param);
 
   return context.json({
     code: 200,
     messages: [messages.successDelete('karyawan')],
-    data: employee,
   }, 200)
 })
 

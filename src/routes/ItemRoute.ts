@@ -23,7 +23,7 @@ export const ListItemRoute = createRoute({
           schema: ResponseSchema(200, messages.successList('barang'), ExtendedItemResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Retrieve list items',
     },
     401: {
       content: {
@@ -61,7 +61,7 @@ export const DetailItemRoute = createRoute({
           schema: ResponseSchema(200, messages.successDetail('barang'), ExtendedItemResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Retrieve detail item',
     },
     401: {
       content: {
@@ -113,7 +113,7 @@ export const CreateItemRoute = createRoute({
           schema: ResponseSchema(200, messages.successCreate('barang'), ItemResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Item created',
     },
     401: {
       content: {
@@ -166,7 +166,7 @@ export const UpdateItemRoute = createRoute({
           schema: ResponseSchema(200, messages.successUpdate('barang'), ItemResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Item updated',
     },
     401: {
       content: {
@@ -220,7 +220,7 @@ export const DeleteItemRoute = createRoute({
           schema: ResponseSchema(200, messages.successDelete('barang')),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Item deleted',
     },
     401: {
       content: {

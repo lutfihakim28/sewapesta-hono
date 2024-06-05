@@ -55,12 +55,11 @@ ItemController.openapi(UpdateItemRoute, async (context) => {
 ItemController.openapi(DeleteItemRoute, async (context) => {
   const param = context.req.valid('param');
 
-  const item = await ItemService.delete(param);
+  await ItemService.delete(param);
 
   return context.json({
     code: 200,
     messages: [messages.successDelete('barang')],
-    data: item,
   }, 200)
 })
 

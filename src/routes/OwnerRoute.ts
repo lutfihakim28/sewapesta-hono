@@ -23,7 +23,7 @@ export const ListOwnerRoute = createRoute({
           schema: ResponseSchema(200, messages.successList('pemilik'), ExtendedOwnerResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Retrieve list owners',
     },
     401: {
       content: {
@@ -61,7 +61,7 @@ export const DetailOwnerRoute = createRoute({
           schema: ResponseSchema(200, messages.successDetail('pemilik'), ExtendedOwnerResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Retrieve detail owner',
     },
     401: {
       content: {
@@ -113,7 +113,7 @@ export const CreateOwnerRoute = createRoute({
           schema: ResponseSchema(200, messages.successCreate('pemilik'), OwnerResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Owner created',
     },
     401: {
       content: {
@@ -166,7 +166,7 @@ export const UpdateOwnerRoute = createRoute({
           schema: ResponseSchema(200, messages.successUpdate('pemilik'), OwnerResponseSchema),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Owner updated',
     },
     401: {
       content: {
@@ -220,7 +220,7 @@ export const DeleteOwnerRoute = createRoute({
           schema: ResponseSchema(200, messages.successDelete('pemilik')),
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Owner deleted',
     },
     401: {
       content: {

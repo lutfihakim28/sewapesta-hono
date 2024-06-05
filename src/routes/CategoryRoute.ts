@@ -69,7 +69,7 @@ export const CreateCategoryRoute = createRoute({
           schema: ResponseSchema(200, messages.successCreate('kategori'), CategoryResponseSchema),
         },
       },
-      description: 'Create category',
+      description: 'Category created',
     },
     401: {
       content: {
@@ -123,7 +123,7 @@ export const UpdateCategoryRoute = createRoute({
           schema: ResponseSchema(200, messages.successUpdate('kategori'), ExtendedCategoryResponseSchema),
         },
       },
-      description: 'Update category',
+      description: 'Category updated',
     },
     401: {
       content: {
@@ -178,7 +178,7 @@ export const DeleteCategoryRoute = createRoute({
           schema: ResponseSchema(200, 'Berhasil menghapus kategori'),
         },
       },
-      description: 'Retrieve the user',
+      description: 'Category deleted',
     },
     401: {
       content: {
