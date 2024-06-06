@@ -6,12 +6,20 @@ import { OwnerService } from '@/services/OwnerService';
 const OwnerController = honoApp()
 
 OwnerController.openapi(ListOwnerRoute, async (context) => {
-  const owners = await OwnerService.getList();
+  const query = context.req.valid('query');
+
+  const owners = await OwnerService.getList(query);
+  const totalData = await OwnerService.count(query);
 
   return context.json({
     code: 200,
     messages: [messages.successList('pemilik')],
     data: owners,
+    meta: {
+      page: Number(query.page),
+      limit: Number(query.limit),
+      totalPage: Math.ceil(totalData / Number(query.limit)),
+    }
   }, 200)
 })
 

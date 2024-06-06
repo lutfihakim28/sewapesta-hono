@@ -26,6 +26,9 @@ export abstract class EmployeeService {
     }
 
     const employees = db.query.employeesTable.findMany({
+      with: {
+        account: true
+      },
       where: and(
         isNull(employeesTable.deletedAt),
         query.keyword
@@ -35,9 +38,6 @@ export abstract class EmployeeService {
           )
           : undefined,
       ),
-      with: {
-        account: true
-      },
       orderBy: sort === 'asc'
         ? asc(employeesTable[sortBy])
         : desc(employeesTable[sortBy]),

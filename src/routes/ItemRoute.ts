@@ -5,7 +5,7 @@ import { ResponseSchema } from '@/schemas/ResponseSchema'
 import { ExtendedItemResponseSchema } from '@/schemas/items/ExtendedItemResponseSchema'
 import { ItemRequestSchema } from '@/schemas/items/ItemRequestSchema'
 import { ItemResponseSchema } from '@/schemas/items/ItemResponseSchema'
-import { createRoute } from '@hono/zod-openapi'
+import { createRoute, z } from '@hono/zod-openapi'
 
 const tags = ['Item']
 
@@ -20,7 +20,7 @@ export const ListItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('barang'), ExtendedItemResponseSchema),
+          schema: ResponseSchema(200, messages.successList('barang'), z.array(ExtendedItemResponseSchema)),
         },
       },
       description: 'Retrieve list items',

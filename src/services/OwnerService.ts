@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { ParamId } from '@/schemas/ParamIdSchema';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
 import { ExtendedOwnerResponse } from '@/schemas/owners/ExtendedOwnerResponseSchema';
@@ -9,14 +9,40 @@ import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
 import { OwnerResponse } from '@/schemas/owners/OwnerResponseSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
+import { OwnerColumn, OwnerFilter } from '@/schemas/owners/OwnerFilterScheme';
+import { countOffset } from '@/utils/countOffset';
 
 export abstract class OwnerService {
-  static async getList(): Promise<Array<ExtendedOwnerResponse>> {
+  static async getList(query: OwnerFilter): Promise<Array<ExtendedOwnerResponse>> {
+    let sort: 'asc' | 'desc' = 'asc';
+    let sortBy: OwnerColumn = 'id';
+
+    if (query.sort) {
+      sort = query.sort
+    }
+
+    if (query.sortBy) {
+      sortBy = query.sortBy
+    }
+
     const owners = db.query.ownersTable.findMany({
-      where: isNull(ownersTable.deletedAt),
       with: {
         account: true
-      }
+      },
+      where: and(
+        isNull(ownersTable.deletedAt),
+        query.keyword
+          ? or(
+            like(ownersTable.name, `%${query.keyword}%`),
+            like(ownersTable.phone, `%${query.keyword}%`)
+          )
+          : undefined,
+      ),
+      orderBy: sort === 'asc'
+        ? asc(ownersTable[sortBy])
+        : desc(ownersTable[sortBy]),
+      limit: Number(query.limit || 5),
+      offset: countOffset(query.page, query.limit)
     })
 
     return owners;
@@ -115,5 +141,23 @@ export abstract class OwnerService {
     }
 
     return owner.id
+  }
+
+  static async count(query: OwnerFilter): Promise<number> {
+    const owner = db
+      .select({ count: count() })
+      .from(ownersTable)
+      .where(and(
+        isNull(ownersTable.deletedAt),
+        query.keyword
+          ? or(
+            like(ownersTable.name, `%${query.keyword}%`),
+            like(ownersTable.phone, `%${query.keyword}%`)
+          )
+          : undefined,
+      ))
+      .get();
+
+    return owner ? owner.count : 0;
   }
 }

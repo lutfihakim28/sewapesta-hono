@@ -3,9 +3,10 @@ import { validationMessages } from '@/constatnts/validationMessages'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { ResponseSchema } from '@/schemas/ResponseSchema'
 import { ExtendedOwnerResponseSchema } from '@/schemas/owners/ExtendedOwnerResponseSchema'
+import { OwnerFilterSchema } from '@/schemas/owners/OwnerFilterScheme'
 import { OwnerRequestSchema } from '@/schemas/owners/OwnerRequestSchema'
 import { OwnerResponseSchema } from '@/schemas/owners/OwnerResponseSchema'
-import { createRoute } from '@hono/zod-openapi'
+import { createRoute, z } from '@hono/zod-openapi'
 
 const tags = ['Owner']
 
@@ -16,11 +17,14 @@ export const ListOwnerRoute = createRoute({
   security: [{
     cookieAuth: [],
   }],
+  request: {
+    query: OwnerFilterSchema,
+  },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('pemilik'), ExtendedOwnerResponseSchema),
+          schema: ResponseSchema(200, messages.successList('pemilik'), z.array(ExtendedOwnerResponseSchema)),
         },
       },
       description: 'Retrieve list owners',
