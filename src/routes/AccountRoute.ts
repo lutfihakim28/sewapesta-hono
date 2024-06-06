@@ -5,6 +5,7 @@ import { ResponseSchema } from '@/schemas/ResponseSchema'
 import { AccountMutationFilterSchema } from '@/schemas/accountMutations/AccountMutationFilterSchema'
 import { AccountMutationRequestSchema } from '@/schemas/accountMutations/AccountMutationRequestSchema'
 import { AccountMutationResponseSchema } from '@/schemas/accountMutations/AccountMutationResponseSchema'
+import { AccountFilterSchema } from '@/schemas/accounts/AccountFilterSchema'
 import { AccountResponseSchema } from '@/schemas/accounts/AccountResponseSchema'
 import { ExtendedAccountResponseSchema } from '@/schemas/accounts/ExtendedAccountResponseSchema'
 import { createRoute, z } from '@hono/zod-openapi'
@@ -18,6 +19,9 @@ export const ListAccountRoute = createRoute({
   security: [{
     cookieAuth: [],
   }],
+  request: {
+    query: AccountFilterSchema,
+  },
   responses: {
     200: {
       content: {
@@ -60,7 +64,7 @@ export const DetailAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('akun'), ExtendedAccountResponseSchema),
+          schema: ResponseSchema(200, messages.successDetail('akun'), AccountResponseSchema),
         },
       },
       description: 'Retrieve detail account',
@@ -107,7 +111,7 @@ export const AccountMutationRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('mutasi akun'), z.array(AccountMutationResponseSchema), true),
+          schema: ResponseSchema(200, messages.successList('mutasi akun'), z.array(AccountMutationResponseSchema)),
         },
       },
       description: 'Retrieve list account mutations',

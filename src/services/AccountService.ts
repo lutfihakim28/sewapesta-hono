@@ -3,16 +3,38 @@ import { db } from '@/db';
 import { accountsTable } from '@/db/schema/accounts';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
+import { AccountColumn, AccountFilter } from '@/schemas/accounts/AccountFilterSchema';
 import { AccountRequest, AccountUpdate } from '@/schemas/accounts/AccountRequestSchema';
 import { AccountResponse } from '@/schemas/accounts/AccountResponseSchema';
-import { ExtendedAccountResponse } from '@/schemas/accounts/ExtendedAccountResponseSchema';
+import { countOffset } from '@/utils/countOffset';
 import dayjs from 'dayjs';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like } from 'drizzle-orm';
 
 export abstract class AccountService {
-  static async getList(): Promise<Array<AccountResponse>> {
+  static async getList(query: AccountFilter): Promise<Array<AccountResponse>> {
+    let sort: 'asc' | 'desc' = 'asc';
+    let sortBy: AccountColumn = 'id';
+
+    if (query.sort) {
+      sort = query.sort
+    }
+
+    if (query.sortBy) {
+      sortBy = query.sortBy
+    }
+
     const accounts = await db.query.accountsTable.findMany({
-      where: isNull(accountsTable.deletedAt),
+      where: and(
+        isNull(accountsTable.deletedAt),
+        query.keyword
+          ? like(accountsTable.name, `%${query.keyword}%`)
+          : undefined
+      ),
+      orderBy: sort === 'asc'
+        ? asc(accountsTable[sortBy])
+        : desc(accountsTable[sortBy]),
+      limit: Number(query.limit || 5),
+      offset: countOffset(query.page, query.limit)
     })
 
     return accounts
@@ -85,5 +107,20 @@ export abstract class AccountService {
     }
 
     return account
+  }
+
+  static async count(query: AccountFilter): Promise<number> {
+    const account = db
+      .select({ count: count() })
+      .from(accountsTable)
+      .where(and(
+        isNull(accountsTable.deletedAt),
+        query.keyword
+          ? like(accountsTable.name, `%${query.keyword}%`)
+          : undefined
+      ))
+      .get();
+
+    return account ? account.count : 0;
   }
 }

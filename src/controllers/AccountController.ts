@@ -8,12 +8,20 @@ import { AccountService } from '@/services/AccountService';
 const AccountController = honoApp();
 
 AccountController.openapi(ListAccountRoute, async (context) => {
-  const accounts = await AccountService.getList();
+  const query = context.req.valid('query');
+
+  const accounts = await AccountService.getList(query);
+  const totalData = await AccountService.count(query);
 
   return context.json({
     code: 200,
     messages: [messages.successList('akun')],
     data: accounts,
+    meta: {
+      page: Number(query.page),
+      limit: Number(query.limit),
+      totalPage: Math.ceil(totalData / Number(query.limit)),
+    }
   }, 200)
 })
 
