@@ -6,12 +6,20 @@ import { EmployeeService } from '@/services/EmployeeService';
 const EmployeeController = honoApp()
 
 EmployeeController.openapi(ListEmployeeRoute, async (context) => {
-  const employees = await EmployeeService.getList();
+  const query = context.req.valid('query');
+
+  const employees = await EmployeeService.getList(query);
+  const totalData = await EmployeeService.count(query);
 
   return context.json({
     code: 200,
     messages: [messages.successList('karyawan')],
     data: employees,
+    meta: {
+      page: Number(query.page),
+      limit: Number(query.limit),
+      totalPage: Math.ceil(totalData / Number(query.limit)),
+    }
   }, 200)
 })
 

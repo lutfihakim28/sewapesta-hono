@@ -2,6 +2,7 @@ import { messages } from '@/constatnts/messages';
 import { validationMessages } from '@/constatnts/validationMessages';
 import { ParamIdSchema } from '@/schemas/ParamIdSchema';
 import { ResponseSchema } from '@/schemas/ResponseSchema';
+import { EmployeeFilterSchema } from '@/schemas/employees/EmployeeFilterSchema';
 import { EmployeeRequestSchema } from '@/schemas/employees/EmployeeRequestSchema';
 import { EmployeeResponseSchema } from '@/schemas/employees/EmployeeResponseSchema';
 import { ExtendedEmployeeResponseSchema } from '@/schemas/employees/ExtendedEmployeeResponseSchema';
@@ -16,6 +17,9 @@ export const ListEmployeeRoute = createRoute({
   security: [{
     cookieAuth: [],
   }],
+  request: {
+    query: EmployeeFilterSchema,
+  },
   responses: {
     200: {
       content: {
