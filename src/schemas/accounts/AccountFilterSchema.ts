@@ -1,6 +1,4 @@
-import { AccountMutationTypeEnum } from '@/enums/AccountMutationTypeEnum';
 import { z } from 'zod';
-import { DateRangeSchema } from '../DateRangeSchema';
 import { PaginationSchema } from '../PaginationSchema';
 import { SortSchema } from '../SortSchema';
 import { accountsTable } from '@/db/schema/accounts';
@@ -19,5 +17,6 @@ const _SortSchema = SortSchema<AccountColumn>([
 export const AccountFilterSchema = _SortSchema
   .merge(SearchSchema)
   .merge(PaginationSchema)
+  .openapi('AccountFilter')
 
 export type AccountFilter = z.infer<typeof AccountFilterSchema>

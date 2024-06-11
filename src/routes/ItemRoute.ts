@@ -2,9 +2,10 @@ import { messages } from '@/constatnts/messages'
 import { validationMessages } from '@/constatnts/validationMessages'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { ResponseSchema } from '@/schemas/ResponseSchema'
-import { ExtendedItemResponseSchema } from '@/schemas/items/ExtendedItemResponseSchema'
+import { ItemDetailSchema } from '@/schemas/items/ItemDetailSchema'
+import { ItemFilterSchema } from '@/schemas/items/ItemFilterSchema'
+import { ItemListSchema } from '@/schemas/items/ItemListSchema'
 import { ItemRequestSchema } from '@/schemas/items/ItemRequestSchema'
-import { ItemResponseSchema } from '@/schemas/items/ItemResponseSchema'
 import { createRoute, z } from '@hono/zod-openapi'
 
 const tags = ['Item']
@@ -16,11 +17,14 @@ export const ListItemRoute = createRoute({
   security: [{
     cookieAuth: [],
   }],
+  request: {
+    query: ItemFilterSchema,
+  },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('barang'), z.array(ExtendedItemResponseSchema)),
+          schema: ResponseSchema(200, messages.successList('barang'), ItemListSchema, true),
         },
       },
       description: 'Retrieve list items',
@@ -58,7 +62,7 @@ export const DetailItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('barang'), ExtendedItemResponseSchema),
+          schema: ResponseSchema(200, messages.successDetail('barang'), ItemDetailSchema),
         },
       },
       description: 'Retrieve detail item',
@@ -110,7 +114,7 @@ export const CreateItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successCreate('barang'), ItemResponseSchema),
+          schema: ResponseSchema(200, messages.successCreate('barang')),
         },
       },
       description: 'Item created',
@@ -163,7 +167,7 @@ export const UpdateItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successUpdate('barang'), ItemResponseSchema),
+          schema: ResponseSchema(200, messages.successUpdate('barang')),
         },
       },
       description: 'Item updated',

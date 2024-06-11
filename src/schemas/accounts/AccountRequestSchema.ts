@@ -15,7 +15,7 @@ export const AccountUpdateSchema = createInsertSchema(accountsTable, {
   balance: z.number({
     message: 'Saldo akun harus diisi.'
   })
-}).pick({ balance: true })
+}).pick({ balance: true }).openapi('AccountUpdate')
 
 export type AccountRequest = z.infer<typeof AccountRequestSchema>
 export type AccountUpdate = z.infer<typeof AccountUpdateSchema>

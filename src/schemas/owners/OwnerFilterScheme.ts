@@ -16,5 +16,6 @@ const _SortSchema = SortSchema<OwnerColumn>([
 export const OwnerFilterSchema = _SortSchema
   .merge(SearchSchema)
   .merge(PaginationSchema)
+  .openapi('OnwerFilter')
 
 export type OwnerFilter = z.infer<typeof OwnerFilterSchema>

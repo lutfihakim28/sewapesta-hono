@@ -17,10 +17,12 @@ import OwnerController from './controllers/OwnerController'
 import SubcategoryController from './controllers/SubcategoryController'
 import UserController from './controllers/UserController'
 import VehicleController from './controllers/VehicleController'
+import { prettyJSON } from 'hono/pretty-json'
 
 const app = honoApp()
 
 app.onError((error, context) => {
+  console.log(error)
   if (error instanceof HTTPException) {
     if (error.status === 401) {
       return context.json({
@@ -92,7 +94,7 @@ app.use('/api/private/*', async (context, next) => {
 
   await next()
 })
-app.use(logger())
+app.use(logger(), prettyJSON())
 
 // PUBLIC PATH
 app.route('/api/auth', AuthController)
@@ -110,19 +112,19 @@ app.route('/api/private/vehicles', VehicleController)
 app.get(
   '/swagger',
   swaggerUI({
-    url: '/doc',
+    url: '/docs',
     persistAuthorization: true,
   })
 )
 
-app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
-  type: "apiKey",
+app.openAPIRegistry.registerComponent('securitySchemes', 'cookieAuth', {
+  type: 'apiKey',
   name: 'token',
   in: 'cookie'
 });
 
-app.doc('/doc', {
-  openapi: '3.0.0',
+app.doc31('/docs', {
+  openapi: '3.1.0',
   info: {
     version: '1.0.0',
     title: 'Sewapesta API',

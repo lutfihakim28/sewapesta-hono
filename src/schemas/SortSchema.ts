@@ -6,5 +6,5 @@ export function SortSchema<T extends string>(columns: readonly [T, ...T[]]) {
     sortBy: z.enum(columns, {
       message: 'Column not found',
     }),
-  }).partial().openapi('SortSchema')
+  }).partial().openapi('Sort')
 }

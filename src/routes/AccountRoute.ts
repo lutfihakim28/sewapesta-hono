@@ -26,7 +26,7 @@ export const ListAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('akun'), z.array(AccountResponseSchema)),
+          schema: ResponseSchema(200, messages.successList('akun'), z.array(AccountResponseSchema), true),
         },
       },
       description: 'Retrieve list accounts',

@@ -24,7 +24,7 @@ export const ListOwnerRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('pemilik'), z.array(ExtendedOwnerResponseSchema)),
+          schema: ResponseSchema(200, messages.successList('pemilik'), z.array(ExtendedOwnerResponseSchema), true),
         },
       },
       description: 'Retrieve list owners',

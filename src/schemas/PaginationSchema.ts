@@ -11,4 +11,4 @@ export const PaginationSchema = z.object({
     .optional()
     .default('10')
     .openapi({ example: '10' }),
-}).partial().openapi('PaginationSchema')
+}).partial().openapi('Pagination')

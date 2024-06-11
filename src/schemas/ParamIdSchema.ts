@@ -10,6 +10,6 @@ export const ParamIdSchema = z.object({
       },
       example: '28',
     }),
-})
+}).openapi('ParamId')
 
 export type ParamId = z.infer<typeof ParamIdSchema>

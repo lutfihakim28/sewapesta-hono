@@ -24,7 +24,7 @@ export const ListEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('karyawan'), z.array(ExtendedEmployeeResponseSchema)),
+          schema: ResponseSchema(200, messages.successList('karyawan'), z.array(ExtendedEmployeeResponseSchema), true),
         },
       },
       description: 'Retrieve list employees',

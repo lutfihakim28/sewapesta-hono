@@ -1,5 +1,5 @@
-import { UserRoute } from '@/routes/UserRoute';
 import { honoApp } from '@/lib/hono';
+import { UserRoute } from '@/routes/UserRoute';
 
 const UserController = honoApp()
 
@@ -11,6 +11,7 @@ UserController.openapi(UserRoute, (context) => {
     data: {
       id: Number(id),
       username: 'Ultra-man',
+      accountId: 1,
     }
   }, 200)
 })

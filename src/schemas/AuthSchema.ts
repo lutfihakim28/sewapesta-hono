@@ -9,22 +9,33 @@ export const LoginRequestSchema = z.object({
   }).openapi({
     example: 'superadmin',
   }),
-  password: z.string({
-    message: validationMessages.required('Kata sandi')
-  }).min(8, validationMessages.minLength('Kata sandi', 8)).openapi({
-    example: 'password',
-  }),
+  password: z
+    .string({
+      message: validationMessages.required('Kata sandi')
+    })
+    .min(8, validationMessages.minLength('Kata sandi', 8))
+    .openapi({
+      example: 'password',
+    }),
 }).openapi('Login');
 
 export const LoginResponseSchema = z.object({
-  token: z.string(),
+  token: z
+    .string()
+    .openapi({
+      example: 'eyJH*************',
+    }),
   user: UserResponseSchema
-});
+}).openapi('LoginResponse');
 
 export const LogoutResponseSchema = z.object({
-  messages: z.string().array().default([messages.successLogout]).openapi({
-    example: [messages.successLogout]
-  }),
-});
+  messages: z
+    .string()
+    .array()
+    .default([messages.successLogout])
+    .openapi({
+      example: [messages.successLogout]
+    }),
+}).openapi('LogoutResponse');
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>

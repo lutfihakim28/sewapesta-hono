@@ -16,5 +16,6 @@ const _SortSchema = SortSchema<EmployeeColumn>([
 export const EmployeeFilterSchema = _SortSchema
   .merge(SearchSchema)
   .merge(PaginationSchema)
+  .openapi('EmployeeFilter')
 
 export type EmployeeFilter = z.infer<typeof EmployeeFilterSchema>

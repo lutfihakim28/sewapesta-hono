@@ -6,7 +6,8 @@ import { ItemService } from '@/services/ItemService';
 const ItemController = honoApp()
 
 ItemController.openapi(ListItemRoute, async (context) => {
-  const items = await ItemService.getList();
+  const query = context.req.valid('query');
+  const items = await ItemService.getList(query);
 
   return context.json({
     code: 200,

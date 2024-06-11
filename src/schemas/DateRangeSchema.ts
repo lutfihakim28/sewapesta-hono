@@ -7,4 +7,4 @@ export const DateRangeSchema = z.object({
   endAt: z.string().date().openapi({
     example: '2022-01-31',
   }),
-}).partial().openapi('DateRangeSchema')
+}).partial().openapi('DateRange')
