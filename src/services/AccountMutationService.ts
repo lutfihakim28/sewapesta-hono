@@ -7,12 +7,12 @@ import { AccountMutationTypeEnum } from '@/enums/AccountMutationTypeEnum';
 import { BadRequestException } from '@/exceptions/BadRequestException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { AccountMutationColumn, AccountMutationFilter } from '@/schemas/accountMutations/AccountMutationFilterSchema';
-import { AccountMutationResponse } from '@/schemas/accountMutations/AccountMutationResponseSchema';
-import { and, asc, between, desc, eq, count, getTableColumns } from 'drizzle-orm';
+import { AccountMutation } from '@/schemas/accountMutations/AccountMutationSchema';
+import { and, asc, between, desc, eq, count } from 'drizzle-orm';
 import { countOffset } from '@/utils/countOffset';
 
 export abstract class AccountMutationService {
-  static async getList(param: ParamId, query: AccountMutationFilter): Promise<Array<AccountMutationResponse>> {
+  static async getList(param: ParamId, query: AccountMutationFilter): Promise<Array<AccountMutation>> {
     const accountMutations = await db.transaction(async (transaction) => {
       const account = await AccountService.checkRecord({ id: param.id });
 
@@ -59,7 +59,10 @@ export abstract class AccountMutationService {
       return mutations;
     })
 
-    return accountMutations
+    return accountMutations.map((mutation) => ({
+      ...mutation,
+      createdAt: dayjs.unix(mutation.createdAt).format('DD MMMM YYYY HH:mm:ss'),
+    }))
   }
 
   static async debit(request: AccountMutationRequest & { accountId: number }) {

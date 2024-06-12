@@ -1,8 +1,9 @@
-import { createRoute } from '@hono/zod-openapi';
-import { ResponseSchema } from '@/schemas/ResponseSchema';
-import { LoginRequestSchema, LoginResponseSchema, LogoutResponseSchema } from '../schemas/AuthSchema';
+import { createRoute, z } from '@hono/zod-openapi';
+import { LoginRequestSchema, LoginResponseSchema } from '../schemas/AuthSchema';
 import { messages } from '@/constatnts/messages';
-import { validationMessages } from '@/constatnts/validationMessages';
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema';
+import { BadRequestSchema } from '@/schemas/BadRequestSchema';
+import { ServerErrorSchema } from '@/schemas/ServerErrorSchema';
 
 const tags = ['Auth'];
 
@@ -23,7 +24,11 @@ export const AuthLoginRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successLogin, LoginResponseSchema)
+          schema: z.object({
+            code: z.number().openapi({ example: 200 }),
+            messages: z.string().openapi({ example: messages.successLogin }),
+            data: LoginResponseSchema,
+          })
         }
       },
       description: 'Login success',
@@ -31,7 +36,7 @@ export const AuthLoginRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -39,7 +44,7 @@ export const AuthLoginRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.minLength('Kata sandi', 8)),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -47,7 +52,7 @@ export const AuthLoginRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -68,7 +73,10 @@ export const AuthLogoutRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successLogout, LogoutResponseSchema),
+          schema: z.object({
+            code: z.number().openapi({ example: 200 }),
+            messages: z.string().openapi({ example: messages.successLogout }),
+          }),
         }
       },
       description: 'Logout success',
@@ -76,7 +84,7 @@ export const AuthLogoutRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -84,7 +92,7 @@ export const AuthLogoutRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',

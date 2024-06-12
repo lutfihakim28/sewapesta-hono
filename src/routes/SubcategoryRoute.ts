@@ -1,10 +1,11 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
-import { ResponseSchema } from '@/schemas/ResponseSchema'
 import { SubcategoryRequestSchema } from '@/schemas/subcategories/SubcategoryRequestSchema'
-import { SubcategoryResponseSchema } from '@/schemas/subcategories/SubcategoryResponseSchema'
-import { messages } from '@/constatnts/messages'
-import { validationMessages } from '@/constatnts/validationMessages'
+import { SuccessSchema } from '@/schemas/SuccessSchema'
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
+import { BadRequestSchema } from '@/schemas/BadRequestSchema'
+import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
+import { NotFoundSchema } from '@/schemas/NotFoundSchema'
 
 const tags = ['Subcategory']
 
@@ -29,7 +30,7 @@ export const CreateSubcategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successCreate('subkategori'), SubcategoryResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Subcategory created',
@@ -37,7 +38,7 @@ export const CreateSubcategoryRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -45,7 +46,7 @@ export const CreateSubcategoryRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -53,7 +54,7 @@ export const CreateSubcategoryRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -83,7 +84,7 @@ export const UpdateSubcategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successUpdate('subkategori'), SubcategoryResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Subcategory updated',
@@ -91,7 +92,7 @@ export const UpdateSubcategoryRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -99,7 +100,7 @@ export const UpdateSubcategoryRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('subkategori')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -107,7 +108,7 @@ export const UpdateSubcategoryRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -115,7 +116,7 @@ export const UpdateSubcategoryRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -138,7 +139,7 @@ export const DeleteSubcategoryRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDelete('subkategori')),
+          schema: SuccessSchema,
         },
       },
       description: 'Subcategory deleted',
@@ -146,7 +147,7 @@ export const DeleteSubcategoryRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -154,7 +155,7 @@ export const DeleteSubcategoryRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('subkategori')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -162,7 +163,7 @@ export const DeleteSubcategoryRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',

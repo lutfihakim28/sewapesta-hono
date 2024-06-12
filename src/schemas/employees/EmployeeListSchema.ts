@@ -1,15 +1,15 @@
 import { messages } from '@/constatnts/messages';
 import { z } from 'zod';
-import { ItemSchema } from './ItemSchema';
+import { EmployeeSchema } from './EmployeeSchema';
 
-export const ItemDetailSchema = z.object({
+export const EmployeeListSchema = z.object({
   code: z.number().openapi({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: messages.successDetail('barang'),
+    example: messages.successList('karyawan'),
   }),
-  data: ItemSchema,
+  data: z.array(EmployeeSchema),
   meta: z.object({
     page: z.number().positive().openapi({ example: 1 }),
     limit: z.number().positive().openapi({ example: 10 }),

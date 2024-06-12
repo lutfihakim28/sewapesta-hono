@@ -1,33 +1,18 @@
+import { messages } from '@/constatnts/messages';
 import { z } from 'zod';
 import { ItemSchema } from './ItemSchema';
-import { SubcategoryResponseSchema } from '../subcategories/SubcategoryResponseSchema';
-import { OwnerResponseSchema } from '../owners/OwnerResponseSchema';
-import { UnitShcema } from '../units/UnitSchema';
 
-export const ItemListSchema = z.array(ItemSchema
-  .pick({
-    id: true,
-    name: true,
-    price: true,
-  })
-  .merge(z.object({
-    subcategory: SubcategoryResponseSchema.pick({
-      name: true,
-    }).nullable(),
-    owner: OwnerResponseSchema.pick({
-      id: true,
-      name: true,
-    }).nullable(),
-    unit: UnitShcema.pick({
-      name: true,
-    }),
-    quantity: z.object({
-      available: z.number().positive(),
-      damaged: z.number().positive(),
-      used: z.number().positive(),
-      total: z.number().positive(),
-    })
-  })))
-  .openapi('ItemList')
-
-export type ItemList = z.infer<typeof ItemListSchema>
+export const ItemListSchema = z.object({
+  code: z.number().openapi({
+    example: 200,
+  }),
+  messages: z.string().openapi({
+    example: messages.successList('barang'),
+  }),
+  data: z.array(ItemSchema),
+  meta: z.object({
+    page: z.number().positive().openapi({ example: 1 }),
+    limit: z.number().positive().openapi({ example: 10 }),
+    totalPage: z.number().positive().openapi({ example: 15 }),
+  }),
+})

@@ -1,7 +1,9 @@
-import { messages } from '@/constatnts/messages'
-import { validationMessages } from '@/constatnts/validationMessages'
+import { BadRequestSchema } from '@/schemas/BadRequestSchema'
+import { NotFoundSchema } from '@/schemas/NotFoundSchema'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
-import { ResponseSchema } from '@/schemas/ResponseSchema'
+import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
+import { SuccessSchema } from '@/schemas/SuccessSchema'
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
 import { ItemDetailSchema } from '@/schemas/items/ItemDetailSchema'
 import { ItemFilterSchema } from '@/schemas/items/ItemFilterSchema'
 import { ItemListSchema } from '@/schemas/items/ItemListSchema'
@@ -24,7 +26,7 @@ export const ListItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('barang'), ItemListSchema, true),
+          schema: ItemListSchema,
         },
       },
       description: 'Retrieve list items',
@@ -32,7 +34,7 @@ export const ListItemRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -40,7 +42,7 @@ export const ListItemRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -62,7 +64,7 @@ export const DetailItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('barang'), ItemDetailSchema),
+          schema: ItemDetailSchema,
         },
       },
       description: 'Retrieve detail item',
@@ -70,7 +72,7 @@ export const DetailItemRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -78,7 +80,7 @@ export const DetailItemRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('barang')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -86,7 +88,7 @@ export const DetailItemRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -114,7 +116,7 @@ export const CreateItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successCreate('barang')),
+          schema: SuccessSchema,
         },
       },
       description: 'Item created',
@@ -122,7 +124,7 @@ export const CreateItemRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -130,7 +132,7 @@ export const CreateItemRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -138,7 +140,7 @@ export const CreateItemRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -167,7 +169,7 @@ export const UpdateItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successUpdate('barang')),
+          schema: SuccessSchema,
         },
       },
       description: 'Item updated',
@@ -175,7 +177,7 @@ export const UpdateItemRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -183,7 +185,7 @@ export const UpdateItemRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('barang')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -191,7 +193,7 @@ export const UpdateItemRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -199,7 +201,7 @@ export const UpdateItemRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -221,7 +223,7 @@ export const DeleteItemRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDelete('barang')),
+          schema: SuccessSchema,
         },
       },
       description: 'Item deleted',
@@ -229,7 +231,7 @@ export const DeleteItemRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -237,7 +239,7 @@ export const DeleteItemRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('barang')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -245,7 +247,7 @@ export const DeleteItemRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',

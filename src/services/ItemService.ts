@@ -59,15 +59,18 @@ export abstract class ItemService {
           columns: {
             id: true,
             name: true,
+            phone: true,
           }
         },
         subcategory: {
           columns: {
+            id: true,
             name: true,
           }
         },
         unit: {
           columns: {
+            id: true,
             name: true,
           }
         },

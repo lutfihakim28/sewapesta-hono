@@ -15,7 +15,6 @@ import EmployeeController from './controllers/EmployeeController'
 import ItemController from './controllers/ItemController'
 import OwnerController from './controllers/OwnerController'
 import SubcategoryController from './controllers/SubcategoryController'
-import UserController from './controllers/UserController'
 import VehicleController from './controllers/VehicleController'
 import { prettyJSON } from 'hono/pretty-json'
 
@@ -106,7 +105,6 @@ app.route('/api/private/employees', EmployeeController)
 app.route('/api/private/items', ItemController)
 app.route('/api/private/owners', OwnerController)
 app.route('/api/private/subcategories', SubcategoryController)
-app.route('/api/private/users', UserController)
 app.route('/api/private/vehicles', VehicleController)
 
 app.get(

@@ -1,11 +1,13 @@
-import { messages } from '@/constatnts/messages';
-import { validationMessages } from '@/constatnts/validationMessages';
+import { BadRequestSchema } from '@/schemas/BadRequestSchema';
+import { NotFoundSchema } from '@/schemas/NotFoundSchema';
 import { ParamIdSchema } from '@/schemas/ParamIdSchema';
-import { ResponseSchema } from '@/schemas/ResponseSchema';
+import { ServerErrorSchema } from '@/schemas/ServerErrorSchema';
+import { SuccessSchema } from '@/schemas/SuccessSchema';
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema';
+import { EmployeeDetailSchema } from '@/schemas/employees/EmployeeDetailSchema';
 import { EmployeeFilterSchema } from '@/schemas/employees/EmployeeFilterSchema';
+import { EmployeeListSchema } from '@/schemas/employees/EmployeeListSchema';
 import { EmployeeRequestSchema } from '@/schemas/employees/EmployeeRequestSchema';
-import { EmployeeResponseSchema } from '@/schemas/employees/EmployeeResponseSchema';
-import { ExtendedEmployeeResponseSchema } from '@/schemas/employees/ExtendedEmployeeResponseSchema';
 import { createRoute, z } from '@hono/zod-openapi';
 
 const tags = ['Employee']
@@ -24,7 +26,7 @@ export const ListEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('karyawan'), z.array(ExtendedEmployeeResponseSchema), true),
+          schema: EmployeeListSchema,
         },
       },
       description: 'Retrieve list employees',
@@ -32,7 +34,7 @@ export const ListEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -40,7 +42,7 @@ export const ListEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -62,7 +64,7 @@ export const DetailEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('karyawan'), ExtendedEmployeeResponseSchema),
+          schema: EmployeeDetailSchema,
         },
       },
       description: 'Retrieve detail employee',
@@ -70,7 +72,7 @@ export const DetailEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -78,7 +80,7 @@ export const DetailEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -86,7 +88,7 @@ export const DetailEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -114,7 +116,7 @@ export const CreateEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successCreate('karyawan'), EmployeeResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Employee created',
@@ -122,7 +124,7 @@ export const CreateEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -130,7 +132,7 @@ export const CreateEmployeeRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -138,7 +140,7 @@ export const CreateEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -167,7 +169,7 @@ export const UpdateEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successUpdate('karyawan'), EmployeeResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Employee updated',
@@ -175,7 +177,7 @@ export const UpdateEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -183,7 +185,7 @@ export const UpdateEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -191,7 +193,7 @@ export const UpdateEmployeeRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -199,7 +201,7 @@ export const UpdateEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -221,7 +223,7 @@ export const DeleteEmployeeRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDelete('karyawan')),
+          schema: SuccessSchema,
         },
       },
       description: 'Employee deleted',
@@ -229,7 +231,7 @@ export const DeleteEmployeeRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -237,7 +239,7 @@ export const DeleteEmployeeRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('karyawan')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -245,7 +247,7 @@ export const DeleteEmployeeRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',

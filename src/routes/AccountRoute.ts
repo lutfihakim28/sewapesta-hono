@@ -1,13 +1,15 @@
-import { messages } from '@/constatnts/messages'
-import { validationMessages } from '@/constatnts/validationMessages'
+import { BadRequestSchema } from '@/schemas/BadRequestSchema'
+import { NotFoundSchema } from '@/schemas/NotFoundSchema'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
-import { ResponseSchema } from '@/schemas/ResponseSchema'
+import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
+import { SuccessSchema } from '@/schemas/SuccessSchema'
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
 import { AccountMutationFilterSchema } from '@/schemas/accountMutations/AccountMutationFilterSchema'
+import { AccountMutationListSchema } from '@/schemas/accountMutations/AccountMutationListSchema'
 import { AccountMutationRequestSchema } from '@/schemas/accountMutations/AccountMutationRequestSchema'
-import { AccountMutationResponseSchema } from '@/schemas/accountMutations/AccountMutationResponseSchema'
+import { AccountDetailSchema } from '@/schemas/accounts/AccountDetailSchema'
 import { AccountFilterSchema } from '@/schemas/accounts/AccountFilterSchema'
-import { AccountResponseSchema } from '@/schemas/accounts/AccountResponseSchema'
-import { ExtendedAccountResponseSchema } from '@/schemas/accounts/ExtendedAccountResponseSchema'
+import { AccountListSchema } from '@/schemas/accounts/AccountListSchema'
 import { createRoute, z } from '@hono/zod-openapi'
 
 const tags = ['Account']
@@ -26,7 +28,7 @@ export const ListAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('akun'), z.array(AccountResponseSchema), true),
+          schema: AccountListSchema,
         },
       },
       description: 'Retrieve list accounts',
@@ -34,7 +36,7 @@ export const ListAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -42,7 +44,7 @@ export const ListAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -64,7 +66,7 @@ export const DetailAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('akun'), AccountResponseSchema),
+          schema: AccountDetailSchema,
         },
       },
       description: 'Retrieve detail account',
@@ -72,7 +74,7 @@ export const DetailAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -80,7 +82,7 @@ export const DetailAccountRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('akun')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -88,7 +90,7 @@ export const DetailAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -111,7 +113,7 @@ export const AccountMutationRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('mutasi akun'), z.array(AccountMutationResponseSchema)),
+          schema: AccountMutationListSchema,
         },
       },
       description: 'Retrieve list account mutations',
@@ -119,7 +121,7 @@ export const AccountMutationRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -127,7 +129,7 @@ export const AccountMutationRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('akun')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -135,7 +137,7 @@ export const AccountMutationRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.requiredNumber('Page')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -143,7 +145,7 @@ export const AccountMutationRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -172,7 +174,7 @@ export const DepositAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDeposit),
+          schema: SuccessSchema,
         },
       },
       description: 'Deposit success',
@@ -180,7 +182,7 @@ export const DepositAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -188,7 +190,7 @@ export const DepositAccountRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('akun')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -196,7 +198,7 @@ export const DepositAccountRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.requiredNumber('Nominal')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -204,7 +206,7 @@ export const DepositAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -233,7 +235,7 @@ export const WithdrawAccountRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successWithdraw),
+          schema: SuccessSchema,
         },
       },
       description: 'Withdraw success',
@@ -241,7 +243,7 @@ export const WithdrawAccountRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -249,7 +251,7 @@ export const WithdrawAccountRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('akun')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -257,7 +259,7 @@ export const WithdrawAccountRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.requiredNumber('Nominal')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -265,7 +267,7 @@ export const WithdrawAccountRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',

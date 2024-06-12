@@ -1,9 +1,13 @@
 import { messages } from '@/constatnts/messages';
 import { validationMessages } from '@/constatnts/validationMessages';
+import { BadRequestSchema } from '@/schemas/BadRequestSchema';
+import { NotFoundSchema } from '@/schemas/NotFoundSchema';
 import { ParamIdSchema } from '@/schemas/ParamIdSchema';
-import { ResponseSchema } from '@/schemas/ResponseSchema';
+import { ServerErrorSchema } from '@/schemas/ServerErrorSchema';
+import { SuccessSchema } from '@/schemas/SuccessSchema';
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema';
+import { VehicleListSchema } from '@/schemas/vehicles/VehicleListSchema';
 import { VehicleRequestSchema } from '@/schemas/vehicles/VehicleRequestSchema';
-import { VehicleResponseSchema } from '@/schemas/vehicles/VehicleResponseSchema';
 import { createRoute, z } from '@hono/zod-openapi';
 
 const tags = ['Vehicle'];
@@ -19,7 +23,7 @@ export const ListVehicleRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('kendaraan'), z.array(VehicleResponseSchema))
+          schema: VehicleListSchema
         }
       },
       description: 'Retrieve list vehicles',
@@ -27,7 +31,7 @@ export const ListVehicleRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -35,53 +39,7 @@ export const ListVehicleRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
-        },
-      },
-      description: 'Internal error',
-    },
-  }
-})
-
-export const DetailVehicleRoute = createRoute({
-  method: 'get',
-  path: '/{id}',
-  tags,
-  security: [{
-    cookieAuth: [],
-  }],
-  request: {
-    params: ParamIdSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('kendaraan'), VehicleResponseSchema),
-        },
-      },
-      description: 'Retrieve detail vehicle',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
-        },
-      },
-      description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('kendaraan')),
-        },
-      },
-      description: 'Not Found',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -109,7 +67,7 @@ export const CreateVehicleRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successCreate('kendaraan'), VehicleResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Vehicle created',
@@ -117,7 +75,7 @@ export const CreateVehicleRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -125,7 +83,7 @@ export const CreateVehicleRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -133,7 +91,7 @@ export const CreateVehicleRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -162,7 +120,7 @@ export const UpdateVehicleRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successUpdate('kendaraan'), VehicleResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Vehicle updated',
@@ -170,7 +128,7 @@ export const UpdateVehicleRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -178,7 +136,7 @@ export const UpdateVehicleRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('kendaraan')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -186,7 +144,7 @@ export const UpdateVehicleRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -194,7 +152,7 @@ export const UpdateVehicleRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -216,7 +174,7 @@ export const DeleteVehicleRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDelete('kendaraan')),
+          schema: SuccessSchema,
         },
       },
       description: 'Vehicle deleted',
@@ -224,7 +182,7 @@ export const DeleteVehicleRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -232,7 +190,7 @@ export const DeleteVehicleRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('kendaraan')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -240,7 +198,7 @@ export const DeleteVehicleRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',

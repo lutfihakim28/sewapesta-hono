@@ -1,11 +1,13 @@
-import { messages } from '@/constatnts/messages'
-import { validationMessages } from '@/constatnts/validationMessages'
+import { BadRequestSchema } from '@/schemas/BadRequestSchema'
+import { NotFoundSchema } from '@/schemas/NotFoundSchema'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
-import { ResponseSchema } from '@/schemas/ResponseSchema'
-import { ExtendedOwnerResponseSchema } from '@/schemas/owners/ExtendedOwnerResponseSchema'
+import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
+import { SuccessSchema } from '@/schemas/SuccessSchema'
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
+import { OwnerDetailSchema } from '@/schemas/owners/OwnerDetailSchema'
 import { OwnerFilterSchema } from '@/schemas/owners/OwnerFilterScheme'
+import { OwnerListSchema } from '@/schemas/owners/OwnerListSchema'
 import { OwnerRequestSchema } from '@/schemas/owners/OwnerRequestSchema'
-import { OwnerResponseSchema } from '@/schemas/owners/OwnerResponseSchema'
 import { createRoute, z } from '@hono/zod-openapi'
 
 const tags = ['Owner']
@@ -24,7 +26,7 @@ export const ListOwnerRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successList('pemilik'), z.array(ExtendedOwnerResponseSchema), true),
+          schema: OwnerListSchema,
         },
       },
       description: 'Retrieve list owners',
@@ -32,7 +34,7 @@ export const ListOwnerRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -40,7 +42,7 @@ export const ListOwnerRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -62,7 +64,7 @@ export const DetailOwnerRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDetail('pemilik'), ExtendedOwnerResponseSchema),
+          schema: OwnerDetailSchema,
         },
       },
       description: 'Retrieve detail owner',
@@ -70,7 +72,7 @@ export const DetailOwnerRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -78,7 +80,7 @@ export const DetailOwnerRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('pemilik')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -86,7 +88,7 @@ export const DetailOwnerRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -114,7 +116,7 @@ export const CreateOwnerRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successCreate('pemilik'), OwnerResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Owner created',
@@ -122,7 +124,7 @@ export const CreateOwnerRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -130,7 +132,7 @@ export const CreateOwnerRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -138,7 +140,7 @@ export const CreateOwnerRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -167,7 +169,7 @@ export const UpdateOwnerRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successUpdate('pemilik'), OwnerResponseSchema),
+          schema: SuccessSchema,
         },
       },
       description: 'Owner updated',
@@ -175,7 +177,7 @@ export const UpdateOwnerRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -183,7 +185,7 @@ export const UpdateOwnerRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('pemilik')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -191,7 +193,7 @@ export const UpdateOwnerRoute = createRoute({
     422: {
       content: {
         'application/json': {
-          schema: ResponseSchema(422, validationMessages.required('Nama')),
+          schema: BadRequestSchema,
         },
       },
       description: 'Validation error',
@@ -199,7 +201,7 @@ export const UpdateOwnerRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
@@ -221,7 +223,7 @@ export const DeleteOwnerRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ResponseSchema(200, messages.successDelete('pemilik')),
+          schema: SuccessSchema,
         },
       },
       description: 'Owner deleted',
@@ -229,7 +231,7 @@ export const DeleteOwnerRoute = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ResponseSchema(401, messages.unauthorized),
+          schema: UnauthorizedSchema,
         },
       },
       description: 'Unauthorized',
@@ -237,7 +239,7 @@ export const DeleteOwnerRoute = createRoute({
     404: {
       content: {
         'application/json': {
-          schema: ResponseSchema(404, messages.errorNotFound('pemilik')),
+          schema: NotFoundSchema,
         },
       },
       description: 'Not Found',
@@ -245,7 +247,7 @@ export const DeleteOwnerRoute = createRoute({
     500: {
       content: {
         'application/json': {
-          schema: ResponseSchema(500, messages.errorServer),
+          schema: ServerErrorSchema,
         },
       },
       description: 'Internal error',
