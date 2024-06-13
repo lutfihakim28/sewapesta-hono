@@ -8,11 +8,18 @@ const ItemController = honoApp()
 ItemController.openapi(ListItemRoute, async (context) => {
   const query = context.req.valid('query');
   const items = await ItemService.getList(query);
+  const totalData = await ItemService.count(query);
+
 
   return context.json({
     code: 200,
-    messages: [messages.successList('barang')],
+    messages: messages.successList('barang'),
     data: items,
+    meta: {
+      page: Number(query.page),
+      limit: Number(query.limit),
+      totalPage: Math.ceil(totalData / Number(query.limit)),
+    }
   }, 200)
 })
 
@@ -23,7 +30,7 @@ ItemController.openapi(DetailItemRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successDetail('barang')],
+    messages: messages.successDetail('barang'),
     data: item,
   }, 200)
 })
@@ -31,12 +38,11 @@ ItemController.openapi(DetailItemRoute, async (context) => {
 ItemController.openapi(CreateItemRoute, async (context) => {
   const payload = context.req.valid('json');
 
-  const item = await ItemService.create(payload);
+  await ItemService.create(payload);
 
   return context.json({
     code: 200,
-    messages: [messages.successCreate('barang')],
-    data: item,
+    messages: messages.successCreate('barang'),
   }, 200)
 })
 
@@ -44,12 +50,11 @@ ItemController.openapi(UpdateItemRoute, async (context) => {
   const param = context.req.valid('param');
   const payload = context.req.valid('json');
 
-  const item = await ItemService.update(param, payload);
+  await ItemService.update(param, payload);
 
   return context.json({
     code: 200,
-    messages: [messages.successUpdate('barang')],
-    data: item,
+    messages: messages.successUpdate('barang'),
   }, 200)
 })
 
@@ -60,7 +65,7 @@ ItemController.openapi(DeleteItemRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successDelete('barang')],
+    messages: messages.successDelete('barang'),
   }, 200)
 })
 

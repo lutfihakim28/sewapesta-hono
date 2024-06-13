@@ -10,9 +10,4 @@ export const ItemDetailSchema = z.object({
     example: messages.successDetail('barang'),
   }),
   data: ItemSchema,
-  meta: z.object({
-    page: z.number().positive().openapi({ example: 1 }),
-    limit: z.number().positive().openapi({ example: 10 }),
-    totalPage: z.number().positive().openapi({ example: 15 }),
-  }),
 })

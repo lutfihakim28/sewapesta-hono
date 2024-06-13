@@ -4,12 +4,12 @@ import { vehiclesTable } from '@/db/schema/vehicles';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { VehicleRequest } from '@/schemas/vehicles/VehicleRequestSchema';
-import { VehicleResponse } from '@/schemas/vehicles/VehicleResponseSchema';
+import { Vehicle } from '@/schemas/vehicles/VehicleSchema';
 import dayjs from 'dayjs';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export abstract class VehicleService {
-  static async getList(): Promise<Array<VehicleResponse>> {
+  static async getList(): Promise<Array<Vehicle>> {
     const vehicles = db
       .select()
       .from(vehiclesTable)
@@ -19,7 +19,7 @@ export abstract class VehicleService {
     return vehicles;
   }
 
-  static async get(param: ParamId): Promise<VehicleResponse | undefined> {
+  static async get(param: ParamId): Promise<Vehicle> {
     const vehicle = db
       .select()
       .from(vehiclesTable)
@@ -36,39 +36,29 @@ export abstract class VehicleService {
     return vehicle
   }
 
-  static async create(request: VehicleRequest): Promise<VehicleResponse> {
+  static async create(request: VehicleRequest): Promise<void> {
     const createdAt = dayjs().unix();
-    const vehicle = db
+    await db
       .insert(vehiclesTable)
       .values({
         ...request,
         createdAt,
       })
-      .returning()
-      .get()
-
-    return vehicle;
   }
 
-  static async update(param: ParamId, request: VehicleRequest): Promise<VehicleResponse> {
+  static async update(param: ParamId, request: VehicleRequest): Promise<void> {
     const updatedAt = dayjs().unix();
-    const vehicle = await db.transaction(async (transaction) => {
+    await db.transaction(async (transaction) => {
       const existingVehicleId = await this.checkRecord(param);
 
-      const newVehicle = transaction
+      await transaction
         .update(vehiclesTable)
         .set({
           ...request,
           updatedAt,
         })
         .where(eq(vehiclesTable.id, existingVehicleId))
-        .returning()
-        .get()
-
-      return newVehicle;
     })
-
-    return vehicle;
   }
 
   static async delete(param: ParamId) {

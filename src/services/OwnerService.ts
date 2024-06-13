@@ -3,17 +3,17 @@ import { ParamId } from '@/schemas/ParamIdSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
-import { ExtendedOwnerResponse } from '@/schemas/owners/ExtendedOwnerResponseSchema';
 import { ownersTable } from '@/db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
-import { OwnerResponse } from '@/schemas/owners/OwnerResponseSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
 import { OwnerColumn, OwnerFilter } from '@/schemas/owners/OwnerFilterScheme';
 import { countOffset } from '@/utils/countOffset';
+import { Owner } from '@/schemas/owners/OwnerSchema';
+import { dateFormat } from '@/constatnts/dateFormat';
 
 export abstract class OwnerService {
-  static async getList(query: OwnerFilter): Promise<Array<ExtendedOwnerResponse>> {
+  static async getList(query: OwnerFilter): Promise<Array<Owner>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: OwnerColumn = 'id';
 
@@ -25,9 +25,21 @@ export abstract class OwnerService {
       sortBy = query.sortBy
     }
 
-    const owners = db.query.ownersTable.findMany({
+    const owners = await db.query.ownersTable.findMany({
+      columns: {
+        id: true,
+        name: true,
+        phone: true,
+      },
       with: {
-        account: true
+        account: {
+          columns: {
+            balance: true,
+            id: true,
+            name: true,
+            updatedAt: true,
+          }
+        }
       },
       where: and(
         isNull(ownersTable.deletedAt),
@@ -45,17 +57,38 @@ export abstract class OwnerService {
       offset: countOffset(query.page, query.limit)
     })
 
-    return owners;
+    return owners.map((owner) => ({
+      ...owner,
+      account: {
+        ...owner.account,
+        updatedAt: owner.account.updatedAt ? dayjs.unix(owner.account.updatedAt).format(dateFormat) : null,
+        owner: null,
+        employee: null,
+        user: null,
+      }
+    }));
   }
 
-  static async get(param: ParamId): Promise<ExtendedOwnerResponse | undefined> {
-    const owner = db.query.ownersTable.findFirst({
+  static async get(param: ParamId): Promise<Owner> {
+    const owner = await db.query.ownersTable.findFirst({
+      columns: {
+        id: true,
+        name: true,
+        phone: true,
+      },
       where: and(
         eq(ownersTable.id, Number(param.id)),
         isNull(ownersTable.deletedAt),
       ),
       with: {
-        account: true
+        account: {
+          columns: {
+            balance: true,
+            id: true,
+            name: true,
+            updatedAt: true,
+          }
+        }
       }
     })
 
@@ -63,32 +96,37 @@ export abstract class OwnerService {
       throw new NotFoundException(messages.errorNotFound('Pemilik'))
     }
 
-    return owner;
+    return {
+      ...owner,
+      account: {
+        ...owner.account,
+        updatedAt: owner.account.updatedAt ? dayjs.unix(owner.account.updatedAt).format(dateFormat) : null,
+        owner: null,
+        employee: null,
+        user: null,
+      }
+    };
   }
 
-  static async create(request: OwnerRequest): Promise<OwnerResponse> {
+  static async create(request: OwnerRequest): Promise<void> {
     const createdAt = dayjs().unix();
     const accountId = await AccountService.create({
       name: request.name,
     })
-    const owner = db
+    await db
       .insert(ownersTable)
       .values({
         ...request,
         accountId,
         createdAt,
       })
-      .returning()
-      .get()
-
-    return owner
   }
 
-  static async update(param: ParamId, request: OwnerRequest): Promise<OwnerResponse> {
+  static async update(param: ParamId, request: OwnerRequest): Promise<void> {
     const updatedAt = dayjs().unix();
-    const owner = await db.transaction(async (transaction) => {
+    await db.transaction(async (transaction) => {
       const existingOwnerId = await this.checkRecord(param);
-      const newOwner = transaction
+      await transaction
         .update(ownersTable)
         .set({
           ...request,
@@ -98,14 +136,7 @@ export abstract class OwnerService {
           eq(ownersTable.id, existingOwnerId),
           isNull(ownersTable.deletedAt),
         ))
-        .returning()
-        .get()
-
-      return newOwner;
     })
-
-
-    return owner;
   }
 
   static async delete(param: ParamId) {

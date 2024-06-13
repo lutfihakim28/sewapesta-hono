@@ -12,8 +12,7 @@ SubcategoryController.openapi(CreateSubcategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successCreate('subkategori')],
-    data: subcategory,
+    messages: messages.successCreate('subkategori'),
   }, 200)
 })
 
@@ -25,8 +24,7 @@ SubcategoryController.openapi(UpdateSubcategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successUpdate('subkategori')],
-    data: subcategory,
+    messages: messages.successUpdate('subkategori'),
   }, 200)
 })
 
@@ -37,7 +35,7 @@ SubcategoryController.openapi(DeleteSubcategoryRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successDelete('subkategori')]
+    messages: messages.successDelete('subkategori')
   }, 200)
 })
 

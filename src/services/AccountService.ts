@@ -1,3 +1,4 @@
+import { dateFormat } from '@/constatnts/dateFormat';
 import { messages } from '@/constatnts/messages';
 import { db } from '@/db';
 import { accountsTable } from '@/db/schema/accounts';
@@ -5,13 +6,13 @@ import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { AccountColumn, AccountFilter } from '@/schemas/accounts/AccountFilterSchema';
 import { AccountRequest, AccountUpdate } from '@/schemas/accounts/AccountRequestSchema';
-import { AccountResponse } from '@/schemas/accounts/AccountResponseSchema';
+import { Account } from '@/schemas/accounts/AccountSchema';
 import { countOffset } from '@/utils/countOffset';
 import dayjs from 'dayjs';
 import { and, asc, count, desc, eq, isNull, like } from 'drizzle-orm';
 
 export abstract class AccountService {
-  static async getList(query: AccountFilter): Promise<Array<AccountResponse>> {
+  static async getList(query: AccountFilter): Promise<Array<Account>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: AccountColumn = 'id';
 
@@ -24,12 +25,40 @@ export abstract class AccountService {
     }
 
     const accounts = await db.query.accountsTable.findMany({
+      columns: {
+        balance: true,
+        id: true,
+        name: true,
+        updatedAt: true,
+      },
       where: and(
         isNull(accountsTable.deletedAt),
         query.keyword
           ? like(accountsTable.name, `%${query.keyword}%`)
           : undefined
       ),
+      with: {
+        employee: {
+          columns: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+        owner: {
+          columns: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+        user: {
+          columns: {
+            id: true,
+            username: true,
+          },
+        },
+      },
       orderBy: sort === 'asc'
         ? asc(accountsTable[sortBy])
         : desc(accountsTable[sortBy]),
@@ -37,22 +66,72 @@ export abstract class AccountService {
       offset: countOffset(query.page, query.limit)
     })
 
-    return accounts
+    return accounts.map((account) => ({
+      ...account,
+      owner: account.owner ? {
+        ...account.owner,
+        account: null,
+      } : null,
+      employee: account.employee ? {
+        ...account.employee,
+        account: null,
+      } : null,
+      updatedAt: account.updatedAt ? dayjs.unix(account.updatedAt).format(dateFormat) : null,
+    }))
   }
 
-  static async get(param: ParamId): Promise<AccountResponse | undefined> {
+  static async get(param: ParamId): Promise<Account> {
     const account = await db.query.accountsTable.findFirst({
+      columns: {
+        balance: true,
+        id: true,
+        name: true,
+        updatedAt: true,
+      },
       where: and(
         eq(accountsTable.id, Number(param.id)),
         isNull(accountsTable.deletedAt),
       ),
+      with: {
+        employee: {
+          columns: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+        owner: {
+          columns: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+        user: {
+          columns: {
+            id: true,
+            username: true,
+          },
+        },
+      },
     })
 
     if (!account) {
       throw new NotFoundException(messages.errorNotFound('akun'))
     }
 
-    return account
+    return {
+      ...account,
+      owner: account.owner ? {
+        ...account.owner,
+        account: null,
+      } : null,
+      employee: account.employee ? {
+        ...account.employee,
+        account: null,
+      } : null,
+      updatedAt: account.updatedAt ? dayjs.unix(account.updatedAt).format(dateFormat) : null,
+    }
   }
 
   static async create(request: AccountRequest): Promise<number> {

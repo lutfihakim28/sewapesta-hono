@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserResponseSchema } from './UserSchema';
+import { UserSchema } from './UserSchema';
 import { validationMessages } from '@/constatnts/validationMessages';
 import { messages } from '@/constatnts/messages';
 
@@ -25,7 +25,7 @@ export const LoginResponseSchema = z.object({
     .openapi({
       example: 'eyJH*************',
     }),
-  user: UserResponseSchema
+  user: UserSchema
 }).openapi('LoginResponse');
 
 export const LogoutResponseSchema = z.object({

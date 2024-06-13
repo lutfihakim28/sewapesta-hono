@@ -1,7 +1,7 @@
 import { ownersTable } from '@/db/schema/owners';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { AccountSchema } from '../accounts/AccountSchema';
+import { Account, AccountSchema } from '../accounts/AccountSchema';
 
 const _OwnerSchema = createSelectSchema(ownersTable).pick({
   id: true,
@@ -9,8 +9,10 @@ const _OwnerSchema = createSelectSchema(ownersTable).pick({
   phone: true,
 })
 
-export const OwnerSchema = _OwnerSchema.merge(z.object({
-  account: AccountSchema
-}).partial()).openapi('Owner');
+export type Owner = z.infer<typeof _OwnerSchema> & {
+  account: Account | null;
+}
 
-export type Owner = z.infer<typeof OwnerSchema>
+export const OwnerSchema: z.ZodType<Owner> = _OwnerSchema.extend({
+  account: AccountSchema.nullable()
+}).openapi('Owner');

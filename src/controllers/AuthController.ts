@@ -34,7 +34,7 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successLogin],
+    messages: messages.successLogin,
     data: {
       token,
       user: {
@@ -51,7 +51,7 @@ AuthController.openapi(AuthLogoutRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successLogout]
+    messages: messages.successLogout
   }, 200)
 })
 

@@ -13,7 +13,7 @@ EmployeeController.openapi(ListEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successList('karyawan')],
+    messages: messages.successList('karyawan'),
     data: employees,
     meta: {
       page: Number(query.page),
@@ -30,7 +30,7 @@ EmployeeController.openapi(DetailEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successDetail('karyawan')],
+    messages: messages.successDetail('karyawan'),
     data: employee,
   }, 200)
 })
@@ -42,8 +42,7 @@ EmployeeController.openapi(CreateEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successCreate('karyawan')],
-    data: employee,
+    messages: messages.successCreate('karyawan'),
   }, 200)
 })
 
@@ -55,8 +54,7 @@ EmployeeController.openapi(UpdateEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successUpdate('karyawan')],
-    data: employee,
+    messages: messages.successUpdate('karyawan'),
   }, 200)
 })
 
@@ -67,7 +65,7 @@ EmployeeController.openapi(DeleteEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successDelete('karyawan')],
+    messages: messages.successDelete('karyawan'),
   }, 200)
 })
 

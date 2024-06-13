@@ -10,6 +10,7 @@ import { AccountMutationColumn, AccountMutationFilter } from '@/schemas/accountM
 import { AccountMutation } from '@/schemas/accountMutations/AccountMutationSchema';
 import { and, asc, between, desc, eq, count } from 'drizzle-orm';
 import { countOffset } from '@/utils/countOffset';
+import { dateFormat } from '@/constatnts/dateFormat';
 
 export abstract class AccountMutationService {
   static async getList(param: ParamId, query: AccountMutationFilter): Promise<Array<AccountMutation>> {
@@ -61,7 +62,7 @@ export abstract class AccountMutationService {
 
     return accountMutations.map((mutation) => ({
       ...mutation,
-      createdAt: dayjs.unix(mutation.createdAt).format('DD MMMM YYYY HH:mm:ss'),
+      createdAt: dayjs.unix(mutation.createdAt).format(dateFormat),
     }))
   }
 

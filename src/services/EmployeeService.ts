@@ -2,8 +2,6 @@ import { db } from '@/db';
 import { employeesTable } from '@/db/schema/employees';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { EmployeeRequest } from '@/schemas/employees/EmployeeRequestSchema';
-import { EmployeeResponse } from '@/schemas/employees/EmployeeResponseSchema';
-import { ExtendedEmployeeResponse } from '@/schemas/employees/ExtendedEmployeeResponseSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
@@ -11,9 +9,11 @@ import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
 import { EmployeeColumn, EmployeeFilter } from '@/schemas/employees/EmployeeFilterSchema';
 import { countOffset } from '@/utils/countOffset';
+import { Employee } from '@/schemas/employees/EmployeeSchema';
+import { dateFormat } from '@/constatnts/dateFormat';
 
 export abstract class EmployeeService {
-  static async getList(query: EmployeeFilter): Promise<Array<ExtendedEmployeeResponse>> {
+  static async getList(query: EmployeeFilter): Promise<Array<Employee>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: EmployeeColumn = 'id';
 
@@ -25,9 +25,21 @@ export abstract class EmployeeService {
       sortBy = query.sortBy
     }
 
-    const employees = db.query.employeesTable.findMany({
+    const employees = await db.query.employeesTable.findMany({
+      columns: {
+        id: true,
+        name: true,
+        phone: true,
+      },
       with: {
-        account: true
+        account: {
+          columns: {
+            balance: true,
+            id: true,
+            name: true,
+            updatedAt: true,
+          }
+        }
       },
       where: and(
         isNull(employeesTable.deletedAt),
@@ -45,51 +57,77 @@ export abstract class EmployeeService {
       offset: countOffset(query.page, query.limit)
     })
 
-    return employees;
+    return employees.map((employee) => ({
+      ...employee,
+      account: {
+        ...employee.account,
+        updatedAt: employee.account.updatedAt ? dayjs.unix(employee.account.updatedAt).format(dateFormat) : null,
+        owner: null,
+        user: null,
+        employee: null,
+      }
+    }));
   }
 
-  static async get(param: ParamId): Promise<ExtendedEmployeeResponse | undefined> {
-    const employee = db.query.employeesTable.findFirst({
+  static async get(param: ParamId): Promise<Employee> {
+    const employee = await db.query.employeesTable.findFirst({
+      columns: {
+        id: true,
+        name: true,
+        phone: true,
+      },
+      with: {
+        account: {
+          columns: {
+            balance: true,
+            id: true,
+            name: true,
+            updatedAt: true,
+          }
+        }
+      },
       where: and(
         eq(employeesTable.id, Number(param.id)),
         isNull(employeesTable.deletedAt),
       ),
-      with: {
-        account: true
-      }
     })
 
     if (!employee) {
       throw new NotFoundException(messages.errorNotFound('karyawan'))
     }
 
-    return employee;
+    return {
+      ...employee,
+      account: {
+        ...employee.account,
+        updatedAt: employee.account.updatedAt ? dayjs.unix(employee.account.updatedAt).format(dateFormat) : null,
+        owner: null,
+        user: null,
+        employee: null,
+      }
+    };
   }
 
-  static async create(request: EmployeeRequest): Promise<EmployeeResponse> {
+  static async create(request: EmployeeRequest): Promise<void> {
     const createdAt = dayjs().unix();
     const accountId = await AccountService.create({
       name: request.name,
     })
-    const employee = db
+    await db
       .insert(employeesTable)
       .values({
         ...request,
         accountId,
         createdAt,
       })
-      .returning()
-      .get()
-
-    return employee
   }
 
-  static async update(param: ParamId, request: EmployeeRequest): Promise<EmployeeResponse> {
+  static async update(param: ParamId, request: EmployeeRequest): Promise<void> {
     const updatedAt = dayjs().unix();
-    const employee = db.transaction(async (transaction) => {
+    await db.transaction(async (transaction) => {
       const existingEmployeeId = await this.checkRecord(param);
 
-      const newEmployee = transaction
+      await transaction
         .update(employeesTable)
         .set({
           ...request,
@@ -99,13 +137,7 @@ export abstract class EmployeeService {
           eq(employeesTable.id, existingEmployeeId),
           isNull(employeesTable.deletedAt),
         ))
-        .returning()
-        .get()
-
-      return newEmployee
     })
-
-    return employee;
   }
 
   static async delete(param: ParamId) {

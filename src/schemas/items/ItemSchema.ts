@@ -1,11 +1,11 @@
 import { itemsTable } from '@/db/schema/items';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { OwnerSchema } from '../owners/OwnerSchema';
-import { SubcategorySchema } from '../subcategories/SubcategorySchema';
-import { UnitSchema } from '../units/UnitSchema';
-import { DamagedItemSchema } from '../damagedItems/DamagedItemSchema';
-import { OrderedItemSchema } from '../orderedItems/OrderedItemSchema';
+import { Owner, OwnerSchema } from '../owners/OwnerSchema';
+import { Subcategory, SubcategorySchema } from '../subcategories/SubcategorySchema';
+import { Unit, UnitSchema } from '../units/UnitSchema';
+import { DamagedItem, DamagedItemSchema } from '../damagedItems/DamagedItemSchema';
+import { OrderedItem, OrderedItemSchema } from '../orderedItems/OrderedItemSchema';
 
 const _ItemSchema = createSelectSchema(itemsTable, {
   quantity: z.object({
@@ -21,12 +21,18 @@ const _ItemSchema = createSelectSchema(itemsTable, {
   quantity: true,
 });
 
-export const ItemSchema = _ItemSchema.merge(z.object({
-  owner: OwnerSchema,
-  subcategory: SubcategorySchema,
-  unit: UnitSchema,
+export type Item = z.infer<typeof _ItemSchema> & {
+  owner: Owner | null,
+  subcategory: Subcategory | null,
+  unit: Unit | null,
+  damaged: Array<DamagedItem> | null,
+  ordered: Array<OrderedItem> | null
+}
+
+export const ItemSchema: z.ZodType<Item> = _ItemSchema.extend({
+  owner: OwnerSchema.nullable(),
+  subcategory: SubcategorySchema.nullable(),
+  unit: UnitSchema.nullable(),
   damaged: z.array(DamagedItemSchema),
   ordered: z.array(OrderedItemSchema),
-}).partial()).openapi('Item');
-
-export type Item = z.infer<typeof ItemSchema>
+}).openapi('Item');

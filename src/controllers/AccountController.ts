@@ -15,7 +15,7 @@ AccountController.openapi(ListAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successList('akun')],
+    messages: messages.successList('akun'),
     data: accounts,
     meta: {
       page: Number(query.page),
@@ -32,7 +32,7 @@ AccountController.openapi(DetailAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successDetail('akun')],
+    messages: messages.successDetail('akun'),
     data: account,
   }, 200)
 })
@@ -50,7 +50,7 @@ AccountController.openapi(AccountMutationRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successList('mutasi akun')],
+    messages: messages.successList('mutasi akun'),
     data: mutations,
     meta: {
       page: Number(query.page),
@@ -71,7 +71,7 @@ AccountController.openapi(DepositAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successDeposit],
+    messages: messages.successDeposit,
   }, 200)
 })
 
@@ -86,7 +86,7 @@ AccountController.openapi(WithdrawAccountRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: [messages.successWithdraw],
+    messages: messages.successWithdraw,
   }, 200)
 })
 

@@ -1,21 +1,21 @@
 import { db } from '@/db';
 import { ParamId } from '@/schemas/ParamIdSchema';
-import { and, eq, isNull, gt, asc, desc, or, like, inArray } from 'drizzle-orm';
+import { and, eq, isNull, gt, asc, desc, or, like, inArray, count } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { itemsTable } from '@/db/schema/items';
 import { ItemRequest } from '@/schemas/items/ItemRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
 import { damagedItemsTable } from '@/db/schema/damagedItems';
-import { ItemList } from '@/schemas/items/ItemListSchema';
-import { ItemDetail } from '@/schemas/items/ItemDetailSchema';
 import { orderedItemsTable } from '@/db/schema/orderedItems';
 import { ItemColumn, ItemFilter } from '@/schemas/items/ItemFilterSchema';
 import { countOffset } from '@/utils/countOffset';
 import { ownersTable } from '@/db/schema/owners';
+import { Item } from '@/schemas/items/ItemSchema';
+import { dateFormat } from '@/constatnts/dateFormat';
 
 export abstract class ItemService {
-  static async getList(query: ItemFilter): Promise<ItemList> {
+  static async getList(query: ItemFilter): Promise<Array<Item>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: ItemColumn = 'id';
 
@@ -34,26 +34,6 @@ export abstract class ItemService {
         price: true,
         quantity: true,
       },
-      where: and(
-        isNull(itemsTable.deletedAt),
-        query.keyword
-          ? or(
-            like(itemsTable.name, `%${query.keyword}%`),
-            inArray(
-              itemsTable.ownerId,
-              db
-                .select({ id: ownersTable.id })
-                .from(ownersTable)
-                .where(like(ownersTable.name, `%${query.keyword}%`)),
-            )
-          )
-          : undefined
-      ),
-      orderBy: sort === 'asc'
-        ? asc(itemsTable[sortBy])
-        : desc(itemsTable[sortBy]),
-      limit: Number(query.limit || 5),
-      offset: countOffset(query.page, query.limit),
       with: {
         owner: {
           columns: {
@@ -92,7 +72,27 @@ export abstract class ItemService {
             quantity: true,
           }
         }
-      }
+      },
+      where: and(
+        isNull(itemsTable.deletedAt),
+        query.keyword
+          ? or(
+            like(itemsTable.name, `%${query.keyword}%`),
+            inArray(
+              itemsTable.ownerId,
+              db
+                .select({ id: ownersTable.id })
+                .from(ownersTable)
+                .where(like(ownersTable.name, `%${query.keyword}%`)),
+            )
+          )
+          : undefined
+      ),
+      orderBy: sort === 'asc'
+        ? asc(itemsTable[sortBy])
+        : desc(itemsTable[sortBy]),
+      limit: Number(query.limit || 5),
+      offset: countOffset(query.page, query.limit),
     })
 
     return items.map((item) => {
@@ -101,17 +101,23 @@ export abstract class ItemService {
       const available = item.quantity - (damaged + used)
       return {
         ...item,
+        owner: {
+          ...item.owner,
+          account: null,
+        },
         quantity: {
           damaged,
           used,
           available,
           total: item.quantity,
-        }
+        },
+        damaged: null,
+        ordered: null,
       }
     });
   }
 
-  static async get(param: ParamId): Promise<ItemDetail | undefined> {
+  static async get(param: ParamId): Promise<Item> {
     const item = await db.query.itemsTable.findFirst({
       where: and(
         eq(itemsTable.id, Number(param.id)),
@@ -133,11 +139,13 @@ export abstract class ItemService {
         },
         unit: {
           columns: {
+            id: true,
             name: true,
           }
         },
         subcategory: {
           columns: {
+            id: true,
             name: true,
           }
         },
@@ -171,14 +179,26 @@ export abstract class ItemService {
 
     return {
       ...item,
+      owner: {
+        ...item.owner,
+        account: null,
+      },
       quantity: {
         total: item.quantity,
         damaged,
         used,
         available,
       },
-      orderedItems: item.ordered,
-      damagedItems: item.damaged,
+      ordered: item.ordered.map((data) => ({
+        ...data,
+        createdAt: dayjs.unix(data.createdAt).format(dateFormat),
+        updatedAt: data.updatedAt ? dayjs.unix(data.updatedAt).format(dateFormat) : null,
+      })),
+      damaged: item.damaged.map((data) => ({
+        ...data,
+        createdAt: dayjs.unix(data.createdAt).format(dateFormat),
+        updatedAt: data.updatedAt ? dayjs.unix(data.updatedAt).format(dateFormat) : null,
+      })),
     };
   }
 
@@ -241,5 +261,29 @@ export abstract class ItemService {
     }
 
     return item.id
+  }
+
+  static async count(query: ItemFilter): Promise<number> {
+    const item = db
+      .select({ count: count() })
+      .from(itemsTable)
+      .where(and(
+        isNull(itemsTable.deletedAt),
+        query.keyword
+          ? or(
+            like(itemsTable.name, `%${query.keyword}%`),
+            inArray(
+              itemsTable.ownerId,
+              db
+                .select({ id: ownersTable.id })
+                .from(ownersTable)
+                .where(like(ownersTable.name, `%${query.keyword}%`)),
+            )
+          )
+          : undefined
+      ))
+      .get();
+
+    return item ? item.count : 0;
   }
 }

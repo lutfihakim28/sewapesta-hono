@@ -1,6 +1,6 @@
 import { z } from '@hono/zod-openapi'
 
-export const UserResponseSchema = z
+export const UserSchema = z
   .object({
     id: z.number().openapi({
       example: 1,
@@ -8,8 +8,9 @@ export const UserResponseSchema = z
     username: z.string().openapi({
       example: 'superadmin',
     }),
-    accountId: z.number().openapi({
-      example: 1,
-    }),
+  })
+  .pick({
+    username: true,
+    id: true,
   })
   .openapi('User');
