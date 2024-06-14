@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { PaginationSchema } from '../PaginationSchema';
 import { SortSchema } from '../SortSchema';
 import { SearchSchema } from '../SearchSchema';
-import { itemsTable } from '@/db/schema/items';
+import { itemsTable } from 'db/schema/items';
 
 export type ItemColumn = keyof typeof itemsTable.$inferSelect;
 

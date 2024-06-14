@@ -1,5 +1,5 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { employeesTable } from '@/db/schema/employees';
+import { employeesTable } from 'db/schema/employees';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

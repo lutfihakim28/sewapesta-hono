@@ -5,7 +5,7 @@ export const vehiclesTable = sqliteTable('vehicles', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   licenseNumber: text('license_number').notNull(),
-  vehicleType: text('vehicle_type', {
+  type: text('type', {
     enum: [
       VehicleTypeEnum.Pickup,
       VehicleTypeEnum.Truck,

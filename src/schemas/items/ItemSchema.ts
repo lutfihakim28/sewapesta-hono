@@ -1,4 +1,4 @@
-import { itemsTable } from '@/db/schema/items';
+import { itemsTable } from 'db/schema/items';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { Owner, OwnerSchema } from '../owners/OwnerSchema';
@@ -6,6 +6,7 @@ import { Subcategory, SubcategorySchema } from '../subcategories/SubcategorySche
 import { Unit, UnitSchema } from '../units/UnitSchema';
 import { DamagedItem, DamagedItemSchema } from '../damagedItems/DamagedItemSchema';
 import { OrderedItem, OrderedItemSchema } from '../orderedItems/OrderedItemSchema';
+import { Image, ImageSchema } from '../images/ImageSchema';
 
 const _ItemSchema = createSelectSchema(itemsTable, {
   quantity: z.object({
@@ -26,7 +27,8 @@ export type Item = z.infer<typeof _ItemSchema> & {
   subcategory: Subcategory | null,
   unit: Unit | null,
   damaged: Array<DamagedItem> | null,
-  ordered: Array<OrderedItem> | null
+  ordered: Array<OrderedItem> | null,
+  images: Array<Image> | null,
 }
 
 export const ItemSchema: z.ZodType<Item> = _ItemSchema.extend({
@@ -35,4 +37,5 @@ export const ItemSchema: z.ZodType<Item> = _ItemSchema.extend({
   unit: UnitSchema.nullable(),
   damaged: z.array(DamagedItemSchema),
   ordered: z.array(OrderedItemSchema),
+  images: z.array(ImageSchema)
 }).openapi('Item');

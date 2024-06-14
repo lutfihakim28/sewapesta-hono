@@ -1,5 +1,5 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { subcategoriesTable } from '@/db/schema/subcategories';
+import { subcategoriesTable } from 'db/schema/subcategories';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

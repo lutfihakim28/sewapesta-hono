@@ -6,6 +6,7 @@ import { sign } from 'hono/jwt';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
 import { messages } from '@/constatnts/messages';
 import { JWTPayload } from 'hono/utils/jwt/types';
+import dayjs from 'dayjs';
 
 const AuthController = honoApp()
 
@@ -21,6 +22,7 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
   const payload: JWTPayload = {
     id: user.id,
     username: user.username,
+    exp: dayjs().add(10, 'years'),
   };
 
   const secretKey = Bun.env.JWT_SECRET;

@@ -1,4 +1,4 @@
-import { accountMutationsTable } from '@/db/schema/accountMutations';
+import { accountMutationsTable } from 'db/schema/accountMutations';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

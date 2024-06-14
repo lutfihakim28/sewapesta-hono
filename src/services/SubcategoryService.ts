@@ -1,6 +1,6 @@
 import { and, eq, isNull } from 'drizzle-orm';
-import { db } from '@/db';
-import { subcategoriesTable } from '@/db/schema/subcategories';
+import { db } from 'db';
+import { subcategoriesTable } from 'db/schema/subcategories';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { SubcategoryRequest } from '@/schemas/subcategories/SubcategoryRequestSchema';
 import dayjs from 'dayjs';

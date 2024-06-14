@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import { employeesTable } from '@/db/schema/employees';
+import { db } from 'db';
+import { employeesTable } from 'db/schema/employees';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { EmployeeRequest } from '@/schemas/employees/EmployeeRequestSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
@@ -57,16 +57,7 @@ export abstract class EmployeeService {
       offset: countOffset(query.page, query.limit)
     })
 
-    return employees.map((employee) => ({
-      ...employee,
-      account: {
-        ...employee.account,
-        updatedAt: employee.account.updatedAt ? dayjs.unix(employee.account.updatedAt).format(dateFormat) : null,
-        owner: null,
-        user: null,
-        employee: null,
-      }
-    }));
+    return employees;
   }
 
   static async get(param: ParamId): Promise<Employee> {
@@ -75,16 +66,6 @@ export abstract class EmployeeService {
         id: true,
         name: true,
         phone: true,
-      },
-      with: {
-        account: {
-          columns: {
-            balance: true,
-            id: true,
-            name: true,
-            updatedAt: true,
-          }
-        }
       },
       where: and(
         eq(employeesTable.id, Number(param.id)),
@@ -96,16 +77,7 @@ export abstract class EmployeeService {
       throw new NotFoundException(messages.errorNotFound('karyawan'))
     }
 
-    return {
-      ...employee,
-      account: {
-        ...employee.account,
-        updatedAt: employee.account.updatedAt ? dayjs.unix(employee.account.updatedAt).format(dateFormat) : null,
-        owner: null,
-        user: null,
-        employee: null,
-      }
-    };
+    return employee;
   }
 
   static async create(request: EmployeeRequest): Promise<void> {

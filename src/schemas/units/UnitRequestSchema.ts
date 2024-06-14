@@ -1,5 +1,5 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { unitsTable } from '@/db/schema/units';
+import { unitsTable } from 'db/schema/units';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -10,3 +10,5 @@ export const UnitRequestSchema = createInsertSchema(unitsTable, {
 }).pick({
   name: true,
 }).openapi('UnitRequest')
+
+export type UnitRequest = z.infer<typeof UnitRequestSchema>

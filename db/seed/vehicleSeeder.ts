@@ -12,19 +12,19 @@ export async function seedVehicles() {
       createdAt: dayjs().unix(),
       licenseNumber: faker.vehicle.vrm(),
       name: faker.vehicle.vehicle(),
-      vehicleType: faker.helpers.enumValue(VehicleTypeEnum),
+      type: faker.helpers.enumValue(VehicleTypeEnum),
     },
     {
       createdAt: dayjs().unix(),
       licenseNumber: faker.vehicle.vrm(),
       name: faker.vehicle.vehicle(),
-      vehicleType: faker.helpers.enumValue(VehicleTypeEnum),
+      type: faker.helpers.enumValue(VehicleTypeEnum),
     },
     {
       createdAt: dayjs().unix(),
       licenseNumber: faker.vehicle.vrm(),
       name: faker.vehicle.vehicle(),
-      vehicleType: faker.helpers.enumValue(VehicleTypeEnum),
+      type: faker.helpers.enumValue(VehicleTypeEnum),
     },
   ])
 }

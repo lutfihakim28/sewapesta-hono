@@ -1,35 +1,31 @@
-import { BadRequestSchema } from '@/schemas/BadRequestSchema'
-import { NotFoundSchema } from '@/schemas/NotFoundSchema'
+import { createRoute, z } from '@hono/zod-openapi'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
+import { UnitRequestSchema } from '@/schemas/units/UnitRequestSchema'
+import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
 import { SuccessSchema } from '@/schemas/SuccessSchema'
-import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
-import { ItemDetailSchema } from '@/schemas/items/ItemDetailSchema'
-import { ItemFilterSchema } from '@/schemas/items/ItemFilterSchema'
-import { ItemListSchema } from '@/schemas/items/ItemListSchema'
-import { ItemCreateSchema, ItemUpdateSchema } from '@/schemas/items/ItemRequestSchema'
-import { createRoute, z } from '@hono/zod-openapi'
+import { BadRequestSchema } from '@/schemas/BadRequestSchema'
+import { NotFoundSchema } from '@/schemas/NotFoundSchema'
+import { UnitListSchema } from '@/schemas/units/UnitListSchema'
 
-const tags = ['Item']
+const tags = ['Unit']
 
-export const ListItemRoute = createRoute({
+// GET All
+export const ListUnitRoute = createRoute({
   method: 'get',
   path: '/',
   tags,
   security: [{
     cookieAuth: [],
   }],
-  request: {
-    query: ItemFilterSchema,
-  },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: ItemListSchema,
+          schema: UnitListSchema,
         },
       },
-      description: 'Retrieve list items',
+      description: 'Retrieve list units',
     },
     401: {
       content: {
@@ -50,53 +46,8 @@ export const ListItemRoute = createRoute({
   }
 })
 
-export const DetailItemRoute = createRoute({
-  method: 'get',
-  path: '/{id}',
-  tags,
-  security: [{
-    cookieAuth: [],
-  }],
-  request: {
-    params: ParamIdSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: ItemDetailSchema,
-        },
-      },
-      description: 'Retrieve detail item',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: NotFoundSchema,
-        },
-      },
-      description: 'Not Found',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
-})
-
-export const CreateItemRoute = createRoute({
+// POST
+export const CreateUnitRoute = createRoute({
   method: 'post',
   path: '/',
   tags,
@@ -106,8 +57,8 @@ export const CreateItemRoute = createRoute({
   request: {
     body: {
       content: {
-        "multipart/form-data": {
-          schema: ItemCreateSchema,
+        'application/json': {
+          schema: UnitRequestSchema,
         }
       }
     }
@@ -119,7 +70,7 @@ export const CreateItemRoute = createRoute({
           schema: SuccessSchema,
         },
       },
-      description: 'Item created',
+      description: 'Unit created',
     },
     401: {
       content: {
@@ -148,7 +99,8 @@ export const CreateItemRoute = createRoute({
   }
 })
 
-export const UpdateItemRoute = createRoute({
+// PUT
+export const UpdateUnitRoute = createRoute({
   method: 'put',
   path: '/{id}',
   tags,
@@ -159,8 +111,8 @@ export const UpdateItemRoute = createRoute({
     params: ParamIdSchema,
     body: {
       content: {
-        "multipart/form-data": {
-          schema: ItemUpdateSchema,
+        'application/json': {
+          schema: UnitRequestSchema
         }
       }
     }
@@ -172,7 +124,7 @@ export const UpdateItemRoute = createRoute({
           schema: SuccessSchema,
         },
       },
-      description: 'Item updated',
+      description: 'Unit updated',
     },
     401: {
       content: {
@@ -209,7 +161,8 @@ export const UpdateItemRoute = createRoute({
   }
 })
 
-export const DeleteItemRoute = createRoute({
+// Delete
+export const DeleteUnitRoute = createRoute({
   method: 'delete',
   path: '/{id}',
   tags,
@@ -217,7 +170,7 @@ export const DeleteItemRoute = createRoute({
     cookieAuth: [],
   }],
   request: {
-    params: ParamIdSchema
+    params: ParamIdSchema,
   },
   responses: {
     200: {
@@ -226,7 +179,7 @@ export const DeleteItemRoute = createRoute({
           schema: SuccessSchema,
         },
       },
-      description: 'Item deleted',
+      description: 'Unit deleted',
     },
     401: {
       content: {
@@ -243,6 +196,14 @@ export const DeleteItemRoute = createRoute({
         },
       },
       description: 'Not Found',
+    },
+    422: {
+      content: {
+        'application/json': {
+          schema: BadRequestSchema,
+        },
+      },
+      description: 'Validation error',
     },
     500: {
       content: {

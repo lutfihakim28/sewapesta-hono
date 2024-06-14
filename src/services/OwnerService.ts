@@ -1,9 +1,9 @@
-import { db } from '@/db';
+import { db } from 'db';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
-import { ownersTable } from '@/db/schema/owners';
+import { ownersTable } from 'db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
@@ -31,18 +31,11 @@ export abstract class OwnerService {
         name: true,
         phone: true,
       },
-      with: {
-        account: {
-          columns: {
-            balance: true,
-            id: true,
-            name: true,
-            updatedAt: true,
-          }
-        }
-      },
       where: and(
         isNull(ownersTable.deletedAt),
+        query.type
+          ? eq(ownersTable.type, query.type)
+          : undefined,
         query.keyword
           ? or(
             like(ownersTable.name, `%${query.keyword}%`),
@@ -57,16 +50,7 @@ export abstract class OwnerService {
       offset: countOffset(query.page, query.limit)
     })
 
-    return owners.map((owner) => ({
-      ...owner,
-      account: {
-        ...owner.account,
-        updatedAt: owner.account.updatedAt ? dayjs.unix(owner.account.updatedAt).format(dateFormat) : null,
-        owner: null,
-        employee: null,
-        user: null,
-      }
-    }));
+    return owners;
   }
 
   static async get(param: ParamId): Promise<Owner> {
@@ -80,32 +64,13 @@ export abstract class OwnerService {
         eq(ownersTable.id, Number(param.id)),
         isNull(ownersTable.deletedAt),
       ),
-      with: {
-        account: {
-          columns: {
-            balance: true,
-            id: true,
-            name: true,
-            updatedAt: true,
-          }
-        }
-      }
     })
 
     if (!owner) {
       throw new NotFoundException(messages.errorNotFound('Pemilik'))
     }
 
-    return {
-      ...owner,
-      account: {
-        ...owner.account,
-        updatedAt: owner.account.updatedAt ? dayjs.unix(owner.account.updatedAt).format(dateFormat) : null,
-        owner: null,
-        employee: null,
-        user: null,
-      }
-    };
+    return owner
   }
 
   static async create(request: OwnerRequest): Promise<void> {

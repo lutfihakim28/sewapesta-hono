@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PaginationSchema } from '../PaginationSchema';
 import { SortSchema } from '../SortSchema';
-import { accountsTable } from '@/db/schema/accounts';
+import { accountsTable } from 'db/schema/accounts';
 import { SearchSchema } from '../SearchSchema';
 
 export type AccountColumn = keyof typeof accountsTable.$inferSelect;

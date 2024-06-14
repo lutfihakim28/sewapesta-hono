@@ -3,6 +3,7 @@ import { accountsTable } from '../schema/accounts';
 import { faker } from '@faker-js/faker/locale/id_ID'
 import { ownersTable } from '../schema/owners';
 import dayjs from 'dayjs';
+import { OwnerTypeEnum } from '@/enums/OwnerTypeEnum';
 
 export async function seedOwners() {
   console.log('Seeding owners...')
@@ -13,6 +14,7 @@ export async function seedOwners() {
     return {
       name: names[index],
       phone: faker.phone.number(),
+      type: faker.helpers.enumValue(OwnerTypeEnum),
       accountId: account[index].id,
       createdAt: dayjs().unix(),
     }

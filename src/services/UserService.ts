@@ -1,6 +1,6 @@
 import { eq, getTableColumns } from 'drizzle-orm';
-import { db } from '@/db';
-import { usersTable } from '@/db/schema/users';
+import { db } from 'db';
+import { usersTable } from 'db/schema/users';
 import { LoginRequest } from '@/schemas/AuthSchema';
 
 export abstract class UserService {

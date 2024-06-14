@@ -1,4 +1,4 @@
-import { employeesTable } from '@/db/schema/employees';
+import { employeesTable } from 'db/schema/employees';
 import { SortSchema } from '../SortSchema';
 import { SearchSchema } from '../SearchSchema';
 import { PaginationSchema } from '../PaginationSchema';

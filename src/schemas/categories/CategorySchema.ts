@@ -1,4 +1,4 @@
-import { categoriesTable } from '@/db/schema/categories';
+import { categoriesTable } from 'db/schema/categories';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { Subcategory, SubcategorySchema } from '../subcategories/SubcategorySchema';

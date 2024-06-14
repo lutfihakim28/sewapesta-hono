@@ -1,4 +1,4 @@
-import { vehiclesTable } from '@/db/schema/vehicles';
+import { vehiclesTable } from 'db/schema/vehicles';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

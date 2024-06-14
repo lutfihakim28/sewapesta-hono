@@ -1,4 +1,4 @@
-import { accountsTable } from '@/db/schema/accounts';
+import { accountsTable } from 'db/schema/accounts';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { Employee, EmployeeSchema } from '../employees/EmployeeSchema';

@@ -1,7 +1,7 @@
 import { dateFormat } from '@/constatnts/dateFormat';
 import { messages } from '@/constatnts/messages';
-import { db } from '@/db';
-import { accountsTable } from '@/db/schema/accounts';
+import { db } from 'db';
+import { accountsTable } from 'db/schema/accounts';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { AccountColumn, AccountFilter } from '@/schemas/accounts/AccountFilterSchema';
@@ -68,14 +68,6 @@ export abstract class AccountService {
 
     return accounts.map((account) => ({
       ...account,
-      owner: account.owner ? {
-        ...account.owner,
-        account: null,
-      } : null,
-      employee: account.employee ? {
-        ...account.employee,
-        account: null,
-      } : null,
       updatedAt: account.updatedAt ? dayjs.unix(account.updatedAt).format(dateFormat) : null,
     }))
   }
@@ -122,14 +114,6 @@ export abstract class AccountService {
 
     return {
       ...account,
-      owner: account.owner ? {
-        ...account.owner,
-        account: null,
-      } : null,
-      employee: account.employee ? {
-        ...account.employee,
-        account: null,
-      } : null,
       updatedAt: account.updatedAt ? dayjs.unix(account.updatedAt).format(dateFormat) : null,
     }
   }

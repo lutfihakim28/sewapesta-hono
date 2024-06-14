@@ -5,6 +5,7 @@ import * as accounts from './schema/accounts';
 import * as categories from './schema/categories';
 import * as damagedItems from './schema/damagedItems';
 import * as employees from './schema/employees';
+import * as images from './schema/images';
 import * as items from './schema/items';
 import * as orderedItems from './schema/orderedItems';
 import * as owners from './schema/owners';
@@ -21,6 +22,7 @@ export const db = drizzle(connection, {
     ...categories,
     ...damagedItems,
     ...employees,
+    ...images,
     ...items,
     ...orderedItems,
     ...owners,

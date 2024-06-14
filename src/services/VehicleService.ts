@@ -1,6 +1,6 @@
 import { messages } from '@/constatnts/messages';
-import { db } from '@/db';
-import { vehiclesTable } from '@/db/schema/vehicles';
+import { db } from 'db';
+import { vehiclesTable } from 'db/schema/vehicles';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { VehicleRequest } from '@/schemas/vehicles/VehicleRequestSchema';

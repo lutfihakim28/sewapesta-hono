@@ -1,11 +1,18 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { accountsTable } from './accounts';
 import { relations } from 'drizzle-orm';
+import { OwnerTypeEnum } from '@/enums/OwnerTypeEnum';
 
 export const ownersTable = sqliteTable('owners', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   phone: text('phone').notNull(),
+  type: text('type', {
+    enum: [
+      OwnerTypeEnum.Corporation,
+      OwnerTypeEnum.Individu,
+    ]
+  }).default(OwnerTypeEnum.Individu),
   accountId: integer('account_id', { mode: 'number' }).notNull(),
   createdAt: integer('created_at', { mode: 'number' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'number' }),

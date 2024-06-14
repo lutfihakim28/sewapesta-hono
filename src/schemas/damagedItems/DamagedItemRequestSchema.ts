@@ -1,4 +1,4 @@
-import { damagedItemsTable } from '@/db/schema/damagedItems';
+import { damagedItemsTable } from 'db/schema/damagedItems';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { ParamIdSchema } from '../ParamIdSchema';

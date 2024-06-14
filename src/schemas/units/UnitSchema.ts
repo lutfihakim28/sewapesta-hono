@@ -1,4 +1,4 @@
-import { unitsTable } from '@/db/schema/units';
+import { unitsTable } from 'db/schema/units';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

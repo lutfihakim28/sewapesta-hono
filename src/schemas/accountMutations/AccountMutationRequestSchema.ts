@@ -1,5 +1,5 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { accountMutationsTable } from '@/db/schema/accountMutations';
+import { accountMutationsTable } from 'db/schema/accountMutations';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

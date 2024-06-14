@@ -1,5 +1,5 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { vehiclesTable } from '@/db/schema/vehicles';
+import { vehiclesTable } from 'db/schema/vehicles';
 import { VehicleTypeEnum } from '@/enums/VehicleTypeEnum';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';

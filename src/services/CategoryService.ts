@@ -1,7 +1,7 @@
 import { and, eq, isNull } from 'drizzle-orm';
-import { db } from '@/db';
-import { categoriesTable } from '@/db/schema/categories';
-import { subcategoriesTable } from '@/db/schema/subcategories';
+import { db } from 'db';
+import { categoriesTable } from 'db/schema/categories';
+import { subcategoriesTable } from 'db/schema/subcategories';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { CategoryRequest } from '@/schemas/categories/CategoryRequestSchema';
 import { SubcategoryService } from './SubcategoryService';

@@ -1,6 +1,6 @@
-import { db } from '@/db';
+import { db } from 'db';
 import { ItemService } from './ItemService';
-import { damagedItemsTable } from '@/db/schema/damagedItems';
+import { damagedItemsTable } from 'db/schema/damagedItems';
 import dayjs from 'dayjs';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { DamagedItemParam, DamagedItemRequest } from '@/schemas/damagedItems/DamagedItemRequestSchema';

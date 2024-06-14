@@ -1,4 +1,4 @@
-import { orderedItemsTable } from '@/db/schema/orderedItems';
+import { orderedItemsTable } from 'db/schema/orderedItems';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

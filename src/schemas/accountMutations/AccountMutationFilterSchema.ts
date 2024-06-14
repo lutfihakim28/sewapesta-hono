@@ -2,7 +2,7 @@ import { AccountMutationTypeEnum } from '@/enums/AccountMutationTypeEnum';
 import { z } from 'zod';
 import { DateRangeSchema } from '../DateRangeSchema';
 import { PaginationSchema } from '../PaginationSchema';
-import { accountMutationsTable } from '@/db/schema/accountMutations';
+import { accountMutationsTable } from 'db/schema/accountMutations';
 import { SortSchema } from '../SortSchema';
 
 export type AccountMutationColumn = keyof typeof accountMutationsTable.$inferSelect;

@@ -17,6 +17,8 @@ import OwnerController from './controllers/OwnerController'
 import SubcategoryController from './controllers/SubcategoryController'
 import VehicleController from './controllers/VehicleController'
 import { prettyJSON } from 'hono/pretty-json'
+import UnitController from './controllers/UnitController'
+import { serveStatic } from 'hono/bun'
 
 const app = honoApp()
 
@@ -95,6 +97,9 @@ app.use('/api/private/*', async (context, next) => {
 })
 app.use(logger(), prettyJSON())
 
+// STATIC
+app.use('/static/*', serveStatic({ root: './' }))
+
 // PUBLIC PATH
 app.route('/api/auth', AuthController)
 
@@ -104,6 +109,7 @@ app.route('/api/private/categories', CategoryController)
 app.route('/api/private/employees', EmployeeController)
 app.route('/api/private/items', ItemController)
 app.route('/api/private/owners', OwnerController)
+app.route('/api/private/units', UnitController)
 app.route('/api/private/subcategories', SubcategoryController)
 app.route('/api/private/vehicles', VehicleController)
 

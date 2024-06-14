@@ -1,8 +1,8 @@
 {
   "scripts": {
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "bun run src/db/migrate.ts",
-    "db:seed": "bun run src/db/seed/index.ts",
+    "db:migrate": "bun run db/migrate.ts",
+    "db:seed": "bun run db/seed/index.ts",
     "db:init": "bun db:generate && bun db:migrate",
     "db:drop": "drizzle-kit drop",
     "db:reset": "bun db:drop && rm -r sewapesta.db && bun db:generate && bun db:migrate && bun db:seed",

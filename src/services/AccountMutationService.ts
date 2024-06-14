@@ -1,7 +1,7 @@
-import { db } from '@/db';
+import { db } from 'db';
 import { AccountMutationRequest } from '@/schemas/accountMutations/AccountMutationRequestSchema';
 import { AccountService } from './AccountService';
-import { accountMutationsTable } from '@/db/schema/accountMutations';
+import { accountMutationsTable } from 'db/schema/accountMutations';
 import dayjs from 'dayjs';
 import { AccountMutationTypeEnum } from '@/enums/AccountMutationTypeEnum';
 import { BadRequestException } from '@/exceptions/BadRequestException';
