@@ -21,6 +21,7 @@
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
     "@types/bun": "latest",
+    "@types/formidable": "^3.4.5",
     "drizzle-kit": "^0.21.2"
   }
 }

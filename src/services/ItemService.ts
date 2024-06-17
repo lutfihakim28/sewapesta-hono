@@ -249,7 +249,9 @@ export abstract class ItemService {
     await db.transaction(async (transaction) => {
       const existingItemId = await this.checkRecord(param);
 
-      const deletedImages = (request.deletedImages as string[] | undefined) || []
+      const deletedImages = request.deletedImages
+        ? request.deletedImages.split(',')
+        : []
 
       await Promise.all(deletedImages.map((id) => ImageService.delete({ id })))
 
@@ -284,6 +286,12 @@ export abstract class ItemService {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const existingItemId = await this.checkRecord(param);
+
+      const images = await ImageService.getByReference({
+        reference: 'items',
+        referenceId: existingItemId,
+      })
+
       await transaction
         .update(itemsTable)
         .set({
@@ -293,6 +301,8 @@ export abstract class ItemService {
           eq(itemsTable.id, existingItemId),
           isNull(itemsTable.deletedAt),
         ))
+
+      await Promise.all(images.map((image) => ImageService.delete({ id: image.id.toString() })))
     })
   }
 

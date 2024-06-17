@@ -10,6 +10,10 @@ function checkFileType(type: string) {
 
 export const ImageRequestSchema = z.object({
   images: z.any()
+    .refine((file) => {
+      console.log(file);
+      return 'tes'
+    })
     .refine((file) => file.size < MAX_FILE_SIZE, "Ukuran maksimal 10MB.")
     .refine((file) => checkFileType(file.type), "Hanya mendukung format .png, .jpeg, atau .jpg.")
     .openapi({
@@ -17,14 +21,6 @@ export const ImageRequestSchema = z.object({
       items: { type: 'string', format: 'binary' },
       description: 'Hanya mendukung format .png, .jpeg, atau .jpg. Berukuran maksimal 10MB',
     })
-  // images: z.array(z.instanceof(Blob)
-  //   .refine((file) => file.size < MAX_FILE_SIZE, "Ukuran maksimal 10MB.")
-  //   .refine((file) => checkFileType(file.type), "Hanya mendukung format .png, .jpeg, atau .jpg.")
-  // ).openapi({
-  //   type: 'array',
-  //   items: { type: 'string', format: 'binary' },
-  //   description: 'Hanya mendukung format .png, .jpeg, atau .jpg. Berukuran maksimal 10MB',
-  // })
 });
 
 export type ImageRequest = {

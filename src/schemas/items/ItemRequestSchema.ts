@@ -25,12 +25,13 @@ export const ItemCreateSchema = createInsertSchema(itemsTable, {
 }).merge(ImageRequestSchema).openapi('ItemCreate');
 
 export const ItemUpdateSchema = ItemCreateSchema.merge(z.object({
-  deletedImages: z.any().openapi({
-    required: false,
+  deletedImages: z.string().optional().openapi({
+    example: '1,2,3,4',
+    description: 'Array like string without brackets.'
   })
 })).openapi('ItemUpdate')
 
 export type ItemCreate = z.infer<typeof ItemCreateSchema>
 export type ItemUpdate = z.infer<typeof ItemUpdateSchema> & {
-  deletedImages: string[]
+  deletedImages: string
 }

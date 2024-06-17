@@ -7,12 +7,14 @@ import dayjs from 'dayjs';
 import { db } from 'db';
 import { imagesTable } from 'db/schema/images';
 import { eq } from 'drizzle-orm';
+import { unlink } from "node:fs/promises";
 
 export abstract class ImageService {
   static async getByReference(request: ImageFilter): Promise<Array<Image>> {
     const images = await db.query.imagesTable.findMany({
       columns: {
         id: true,
+        url: true,
         path: true,
       },
       where: (table, { eq, and }) => and(
@@ -33,7 +35,8 @@ export abstract class ImageService {
       await Bun.write(`static/images/${name}`, image);
       return {
         createdAt,
-        path: `http://localhost:3000/static/images/${name}`,
+        path: `static/images/${name}`,
+        url: `http://localhost:3000/static/images/${name}`,
         reference: request.reference,
         referenceId: request.referenceId,
       };
@@ -44,15 +47,18 @@ export abstract class ImageService {
 
   static async delete(param: ParamId) {
     await db.transaction(async (transaction) => {
-      const imageId = await this.checkRecord(param);
+      const image = await this.checkRecord(param);
 
-      await transaction.delete(imagesTable).where(eq(imagesTable.id, imageId))
+      await unlink(image.path);
+
+      await transaction.delete(imagesTable).where(eq(imagesTable.id, image.id))
+
     })
   }
 
   static async checkRecord(param: ParamId) {
     const image = db
-      .select({ id: imagesTable.id })
+      .select({ id: imagesTable.id, path: imagesTable.path })
       .from(imagesTable)
       .where(eq(imagesTable.id, Number(param.id)))
       .get();
@@ -62,6 +68,9 @@ export abstract class ImageService {
       throw new NotFoundException('Gambar tidak ditemukan.')
     }
 
-    return image.id
+    return {
+      id: image.id,
+      path: image.path,
+    }
   }
 }

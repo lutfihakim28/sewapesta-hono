@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const ImageSchema = createSelectSchema(imagesTable).pick({
   id: true,
-  path: true,
+  url: true,
 }).openapi('Image')
 
 export type Image = z.infer<typeof ImageSchema>

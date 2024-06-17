@@ -37,7 +37,6 @@ ItemController.openapi(DetailItemRoute, async (context) => {
 })
 
 ItemController.openapi(CreateItemRoute, async (context) => {
-  // const payload = context.req.valid('form');
   const payload = await context.req.parseBody({ all: true }) as unknown as ItemCreate;
 
   await ItemService.create(payload);
@@ -50,7 +49,6 @@ ItemController.openapi(CreateItemRoute, async (context) => {
 
 ItemController.openapi(UpdateItemRoute, async (context) => {
   const param = context.req.valid('param');
-  // const payload = context.req.valid('form');
   const payload = await context.req.parseBody({ all: true }) as unknown as ItemUpdate;
 
   await ItemService.update(param, payload);
