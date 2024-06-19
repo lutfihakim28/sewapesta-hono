@@ -135,4 +135,8 @@ app.doc31('/docs', {
   },
 })
 
+// const worker = new Worker('src/worker.ts');
+
+// worker.postMessage('start')
+
 export default app

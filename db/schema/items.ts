@@ -12,6 +12,7 @@ export const itemsTable = sqliteTable('items', {
   quantity: integer('quantity', { mode: 'number' }).notNull().default(1),
   unitId: integer('unit').notNull(),
   price: real('price').notNull(),
+  hasOvertime: integer('has_overtime', { mode: 'boolean' }).notNull().default(false),
   subcategoryId: integer('subcategory_id', { mode: 'number' }).notNull(),
   ownerId: integer('owner_id', { mode: 'number' }).notNull(),
   createdAt: integer('created_at', { mode: 'number' }).notNull(),

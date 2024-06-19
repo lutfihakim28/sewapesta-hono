@@ -8,8 +8,11 @@ import { accountMutationsTable } from './accountMutations';
 export const accountsTable = sqliteTable('accounts', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name', { length: 100 }).notNull(),
-  createdAt: integer('created_at', { mode: 'number' }).notNull(),
   balance: real('balance').notNull().default(0),
+  bank: text('bank'),
+  number: text('number'),
+  isPayment: integer('is_payment', { mode: 'boolean' }).notNull().default(false),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'number' }),
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
