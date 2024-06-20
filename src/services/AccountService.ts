@@ -5,7 +5,7 @@ import { accountsTable } from 'db/schema/accounts';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { AccountColumn, AccountFilter } from '@/schemas/accounts/AccountFilterSchema';
-import { AccountRequest, AccountUpdate } from '@/schemas/accounts/AccountRequestSchema';
+import { AccountCreate, AccountPaymentRequest, AccountUpdate } from '@/schemas/accounts/AccountRequestSchema';
 import { Account } from '@/schemas/accounts/AccountSchema';
 import { countOffset } from '@/utils/countOffset';
 import dayjs from 'dayjs';
@@ -118,7 +118,32 @@ export abstract class AccountService {
     }
   }
 
-  static async create(request: AccountRequest): Promise<number> {
+  static async createPaymentAccount(request: AccountPaymentRequest) {
+    const createdAt = dayjs().unix();
+    await db
+      .insert(accountsTable)
+      .values({
+        ...request,
+        isPayment: true,
+        createdAt,
+      })
+  }
+
+  static async updatePaymentAccount(param: ParamId, request: AccountPaymentRequest) {
+    const updatedAt = dayjs().unix();
+    await db.transaction(async (transaction) => {
+      const existingAccount = await this.checkRecord(param);
+      await transaction
+        .update(accountsTable)
+        .set({
+          ...request,
+          updatedAt,
+        })
+        .where(eq(accountsTable.id, existingAccount.id))
+    })
+  }
+
+  static async create(request: AccountCreate): Promise<number> {
     const createdAt = dayjs().unix();
     const account = db
       .insert(accountsTable)
@@ -132,7 +157,7 @@ export abstract class AccountService {
     return account.id;
   }
 
-  static async update(accountId: number, request: AccountUpdate) {
+  static async updateBalance(accountId: number, request: AccountUpdate) {
     const updatedAt = dayjs().unix();
     await db
       .update(accountsTable)

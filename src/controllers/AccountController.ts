@@ -1,7 +1,13 @@
 import { messages } from '@/constatnts/messages';
 import { BadRequestException } from '@/exceptions/BadRequestException';
 import { honoApp } from '@/lib/hono';
-import { ListAccountRoute, DetailAccountRoute, DepositAccountRoute, WithdrawAccountRoute, AccountMutationRoute } from '@/routes/AccountRoute';
+import { AccountMutationRoute } from '@/routes/accounts/AccountMutationRoute';
+import { CreateAccountRoute } from '@/routes/accounts/CreateAccountRoute';
+import { DepositAccountRoute } from '@/routes/accounts/DepositAccountRoute';
+import { DetailAccountRoute } from '@/routes/accounts/DetailAccountRoute';
+import { ListAccountRoute } from '@/routes/accounts/ListAccountRoute';
+import { UpdateAccountRoute } from '@/routes/accounts/UpdateAccountRoute';
+import { WithdrawAccountRoute } from '@/routes/accounts/WithdrawAccountRoute';
 import { AccountMutationService } from '@/services/AccountMutationService';
 import { AccountService } from '@/services/AccountService';
 
@@ -34,6 +40,29 @@ AccountController.openapi(DetailAccountRoute, async (context) => {
     code: 200,
     messages: messages.successDetail('akun'),
     data: account,
+  }, 200)
+})
+
+AccountController.openapi(CreateAccountRoute, async (context) => {
+  const payload = context.req.valid('json');
+
+  await AccountService.createPaymentAccount(payload)
+
+  return context.json({
+    code: 200,
+    messages: messages.successCreate('akun'),
+  }, 200)
+})
+
+AccountController.openapi(UpdateAccountRoute, async (context) => {
+  const param = context.req.valid('param');
+  const payload = context.req.valid('json');
+
+  await AccountService.updatePaymentAccount(param, payload);
+
+  return context.json({
+    code: 200,
+    messages: messages.successUpdate('akun')
   }, 200)
 })
 

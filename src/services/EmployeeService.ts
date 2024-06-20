@@ -97,7 +97,7 @@ export abstract class EmployeeService {
   static async update(param: ParamId, request: EmployeeRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingEmployeeId = await this.checkRecord(param);
+      const existingEmployee = await this.checkRecord(param);
 
       await transaction
         .update(employeesTable)
@@ -106,7 +106,7 @@ export abstract class EmployeeService {
           updatedAt,
         })
         .where(and(
-          eq(employeesTable.id, existingEmployeeId),
+          eq(employeesTable.id, existingEmployee.id),
           isNull(employeesTable.deletedAt),
         ))
     })
@@ -115,7 +115,7 @@ export abstract class EmployeeService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingEmployeeId = await this.checkRecord(param)
+      const existingEmployee = await this.checkRecord(param)
       await AccountService.delete(param)
       await transaction
         .update(employeesTable)
@@ -123,7 +123,7 @@ export abstract class EmployeeService {
           deletedAt,
         })
         .where(and(
-          eq(employeesTable.id, existingEmployeeId),
+          eq(employeesTable.id, existingEmployee.id),
           isNull(employeesTable.deletedAt),
         ))
     })
@@ -144,7 +144,7 @@ export abstract class EmployeeService {
       throw new NotFoundException(messages.errorNotFound('karyawan'))
     }
 
-    return employee.id
+    return employee
   }
 
   static async count(query: EmployeeFilter): Promise<number> {

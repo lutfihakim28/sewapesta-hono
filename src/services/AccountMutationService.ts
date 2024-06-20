@@ -79,7 +79,7 @@ export abstract class AccountMutationService {
           type: AccountMutationTypeEnum.Debit,
         })
 
-      await AccountService.update(account.id, {
+      await AccountService.updateBalance(account.id, {
         balance: account.balance + request.amount,
       })
     })
@@ -102,7 +102,7 @@ export abstract class AccountMutationService {
           type: AccountMutationTypeEnum.Credit,
         })
 
-      await AccountService.update(account.id, {
+      await AccountService.updateBalance(account.id, {
         balance: account.balance - request.amount,
       })
     })

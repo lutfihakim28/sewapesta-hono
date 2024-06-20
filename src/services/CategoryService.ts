@@ -70,21 +70,21 @@ export abstract class CategoryService {
   static async update(param: ParamId, request: CategoryRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingCategoryId = await this.checkRecord(param);
+      const existingCategory = await this.checkRecord(param);
       await transaction
         .update(categoriesTable)
         .set({
           ...request,
           updatedAt,
         })
-        .where(eq(categoriesTable.id, existingCategoryId))
+        .where(eq(categoriesTable.id, existingCategory.id))
     })
   }
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingCategoryId = await this.checkRecord(param);
+      const existingCategory = await this.checkRecord(param);
 
       await SubcategoryService.delete(param)
 
@@ -92,7 +92,7 @@ export abstract class CategoryService {
         .set({
           deletedAt,
         })
-        .where(eq(categoriesTable.id, existingCategoryId))
+        .where(eq(categoriesTable.id, existingCategory.id))
     })
   }
 
@@ -111,6 +111,6 @@ export abstract class CategoryService {
       throw new NotFoundException(messages.errorNotFound('kategori'))
     }
 
-    return category.id
+    return category
   }
 }

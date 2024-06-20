@@ -21,7 +21,7 @@ export abstract class SubcategoryService {
   static async update(param: ParamId, request: SubcategoryRequest): Promise<void> {
     const updatedAt = dayjs().unix()
     await db.transaction(async (transaction) => {
-      const existingSubcategoryId = await this.checkRecord(param);
+      const existingSubcategory = await this.checkRecord(param);
       await transaction
         .update(subcategoriesTable)
         .set({
@@ -29,7 +29,7 @@ export abstract class SubcategoryService {
           updatedAt,
         })
         .where(and(
-          eq(subcategoriesTable.id, existingSubcategoryId),
+          eq(subcategoriesTable.id, existingSubcategory.id),
           isNull(subcategoriesTable.deletedAt)
         ))
     })
@@ -38,13 +38,13 @@ export abstract class SubcategoryService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingSubcategoryId = await this.checkRecord(param);
+      const existingSubcategory = await this.checkRecord(param);
       await transaction.update(subcategoriesTable)
         .set({
           deletedAt,
         })
         .where(and(
-          eq(subcategoriesTable.id, existingSubcategoryId),
+          eq(subcategoriesTable.id, existingSubcategory.id),
           isNull(subcategoriesTable.deletedAt)
         ))
     })
@@ -65,6 +65,6 @@ export abstract class SubcategoryService {
       throw new NotFoundException(messages.errorNotFound('subkategori'))
     }
 
-    return subcategory.id
+    return subcategory
   }
 }

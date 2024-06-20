@@ -1,6 +1,7 @@
 import { orderedItemsTable } from 'db/schema/orderedItems';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { UnitSchema } from '../units/UnitSchema';
 
 const _OrderedItemSchema = createSelectSchema(orderedItemsTable, {
   createdAt: z.string().openapi({
@@ -14,13 +15,14 @@ const _OrderedItemSchema = createSelectSchema(orderedItemsTable, {
 }).pick({
   createdAt: true,
   id: true,
-  quantity: true,
+  baseQuantity: true,
+  orderedQuantity: true,
   updatedAt: true,
 });
 
 export const OrderedItemSchema = _OrderedItemSchema
   .merge(z.object({
-    // TODO: add order relations
+    orderedUnit: UnitSchema,
   }).partial())
   .openapi('OrderedItem')
 

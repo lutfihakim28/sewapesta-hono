@@ -12,13 +12,13 @@ import { BadRequestException } from '@/exceptions/BadRequestException';
 export abstract class DamagedItemService {
   static async create(param: ParamId, request: DamagedItemRequest) {
     const damagedItem = db.transaction(async (transaction) => {
-      const existingItemId = await ItemService.checkRecord(param);
+      const existingItem = await ItemService.checkRecord(param);
 
       const _damagedItem = transaction
         .insert(damagedItemsTable)
         .values({
           ...request,
-          itemId: existingItemId,
+          itemId: existingItem.id,
           createdAt: dayjs().unix(),
         })
         .returning()
@@ -32,7 +32,7 @@ export abstract class DamagedItemService {
 
   static async update(param: DamagedItemParam, request: DamagedItemRequest) {
     const damagedItem = db.transaction(async (transaction) => {
-      const existingItemId = await ItemService.checkRecord(param);
+      const existingItem = await ItemService.checkRecord(param);
       const existingDamagedItem = await this.checkRecord(param);
 
       const remainingQuantity = existingDamagedItem.quantity - request.quantity;
@@ -50,7 +50,7 @@ export abstract class DamagedItemService {
         })
         .where(and(
           eq(damagedItemsTable.id, existingDamagedItem.id),
-          eq(damagedItemsTable.itemId, existingItemId),
+          eq(damagedItemsTable.itemId, existingItem.id),
           isNull(damagedItemsTable.deletedAt),
         ))
         .returning()

@@ -68,10 +68,10 @@ export abstract class ItemService {
           ordered: {
             where: and(
               isNull(orderedItemsTable.deletedAt),
-              gt(orderedItemsTable.quantity, 0)
+              gt(orderedItemsTable.baseQuantity, 0)
             ),
             columns: {
-              quantity: true,
+              baseQuantity: true,
             }
           }
         },
@@ -104,7 +104,7 @@ export abstract class ItemService {
         })
 
         const damaged = item.damaged.reduce((a, b) => a + b.quantity, 0)
-        const used = item.ordered.reduce((a, b) => a + b.quantity, 0)
+        const used = item.ordered.reduce((a, b) => a + b.baseQuantity, 0)
         const available = item.quantity - (damaged + used)
 
         return {
@@ -173,8 +173,17 @@ export abstract class ItemService {
             columns: {
               createdAt: true,
               id: true,
-              quantity: true,
+              baseQuantity: true,
+              orderedQuantity: true,
               updatedAt: true,
+            },
+            with: {
+              orderedUnit: {
+                columns: {
+                  id: true,
+                  name: true,
+                }
+              }
             }
           }
         }
@@ -185,7 +194,7 @@ export abstract class ItemService {
       }
 
       const damaged = _item.damaged.reduce((a, b) => a + b.quantity, 0)
-      const used = _item.ordered.reduce((a, b) => a + b.quantity, 0)
+      const used = _item.ordered.reduce((a, b) => a + b.baseQuantity, 0)
       const available = _item.quantity - (damaged + used)
 
       const images = await ImageService.getByReference({
@@ -247,7 +256,7 @@ export abstract class ItemService {
   static async update(param: ParamId, request: ItemUpdate): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingItemId = await this.checkRecord(param);
+      const existingItem = await this.checkRecord(param);
 
       const deletedImages = request.deletedImages
         ? request.deletedImages.split(',')
@@ -267,7 +276,7 @@ export abstract class ItemService {
           updatedAt,
         })
         .where(and(
-          eq(itemsTable.id, existingItemId),
+          eq(itemsTable.id, existingItem.id),
           isNull(itemsTable.deletedAt),
         ))
         .returning({
@@ -285,11 +294,11 @@ export abstract class ItemService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingItemId = await this.checkRecord(param);
+      const existingItem = await this.checkRecord(param);
 
       const images = await ImageService.getByReference({
         reference: 'items',
-        referenceId: existingItemId,
+        referenceId: existingItem.id,
       })
 
       await transaction
@@ -298,7 +307,7 @@ export abstract class ItemService {
           deletedAt,
         })
         .where(and(
-          eq(itemsTable.id, existingItemId),
+          eq(itemsTable.id, existingItem.id),
           isNull(itemsTable.deletedAt),
         ))
 
@@ -321,7 +330,7 @@ export abstract class ItemService {
       throw new NotFoundException(messages.errorNotFound('barang'))
     }
 
-    return item.id
+    return item
   }
 
   static async count(query: ItemFilter): Promise<number> {

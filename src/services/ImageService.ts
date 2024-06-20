@@ -68,9 +68,6 @@ export abstract class ImageService {
       throw new NotFoundException('Gambar tidak ditemukan.')
     }
 
-    return {
-      id: image.id,
-      path: image.path,
-    }
+    return image
   }
 }

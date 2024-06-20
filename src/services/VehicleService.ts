@@ -49,7 +49,7 @@ export abstract class VehicleService {
   static async update(param: ParamId, request: VehicleRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingVehicleId = await this.checkRecord(param);
+      const existingVehicle = await this.checkRecord(param);
 
       await transaction
         .update(vehiclesTable)
@@ -57,7 +57,7 @@ export abstract class VehicleService {
           ...request,
           updatedAt,
         })
-        .where(eq(vehiclesTable.id, existingVehicleId))
+        .where(eq(vehiclesTable.id, existingVehicle.id))
     })
   }
 
@@ -65,19 +65,19 @@ export abstract class VehicleService {
     const deletedAt = dayjs().unix()
 
     await db.transaction(async (transaction) => {
-      const existingVehicleId = await this.checkRecord(param);
+      const existingVehicle = await this.checkRecord(param);
 
       await transaction
         .update(vehiclesTable)
         .set({
           deletedAt
         })
-        .where(eq(vehiclesTable.id, existingVehicleId))
+        .where(eq(vehiclesTable.id, existingVehicle.id))
     })
   }
 
   static async checkRecord(param: ParamId) {
-    const category = db
+    const vehicle = db
       .select({ id: vehiclesTable.id })
       .from(vehiclesTable)
       .where(and(
@@ -87,10 +87,10 @@ export abstract class VehicleService {
       .get();
 
 
-    if (!category) {
+    if (!vehicle) {
       throw new NotFoundException(messages.errorNotFound('kategori'))
     }
 
-    return category.id
+    return vehicle
   }
 }

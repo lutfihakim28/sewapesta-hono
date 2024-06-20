@@ -90,7 +90,7 @@ export abstract class OwnerService {
   static async update(param: ParamId, request: OwnerRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingOwnerId = await this.checkRecord(param);
+      const existingOwner = await this.checkRecord(param);
       await transaction
         .update(ownersTable)
         .set({
@@ -98,7 +98,7 @@ export abstract class OwnerService {
           updatedAt,
         })
         .where(and(
-          eq(ownersTable.id, existingOwnerId),
+          eq(ownersTable.id, existingOwner.id),
           isNull(ownersTable.deletedAt),
         ))
     })
@@ -107,7 +107,7 @@ export abstract class OwnerService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingOwnerId = await this.checkRecord(param);
+      const existingOwner = await this.checkRecord(param);
       await AccountService.delete(param)
       await transaction
         .update(ownersTable)
@@ -115,7 +115,7 @@ export abstract class OwnerService {
           deletedAt,
         })
         .where(and(
-          eq(ownersTable.id, existingOwnerId),
+          eq(ownersTable.id, existingOwner.id),
           isNull(ownersTable.deletedAt),
         ))
     })
@@ -136,7 +136,7 @@ export abstract class OwnerService {
       throw new NotFoundException('Pemilik tidak ditemukan.')
     }
 
-    return owner.id
+    return owner
   }
 
   static async count(query: OwnerFilter): Promise<number> {

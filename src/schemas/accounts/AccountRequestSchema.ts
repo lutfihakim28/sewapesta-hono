@@ -3,7 +3,29 @@ import { accountsTable } from 'db/schema/accounts';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const AccountRequestSchema = createInsertSchema(accountsTable, {
+export const AccountPaymentRequestSchema = createInsertSchema(accountsTable, {
+  name: z.string({
+    message: validationMessages.required('Nama'),
+  }).openapi({
+    example: 'Budi',
+  }),
+  number: z.string({
+    message: validationMessages.required('Nomor Rekening'),
+  }).openapi({
+    example: '1892382022',
+  }),
+  bank: z.string({
+    message: validationMessages.required('Nama Bank'),
+  }).openapi({
+    example: 'BCA',
+  })
+}).pick({
+  name: true,
+  number: true,
+  bank: true,
+})
+
+export const AccountCreateSchema = createInsertSchema(accountsTable, {
   name: z.string({
     message: validationMessages.required('Nama'),
   }).openapi({
@@ -17,5 +39,6 @@ export const AccountUpdateSchema = createInsertSchema(accountsTable, {
   })
 }).pick({ balance: true }).openapi('AccountUpdate')
 
-export type AccountRequest = z.infer<typeof AccountRequestSchema>
+export type AccountPaymentRequest = z.infer<typeof AccountPaymentRequestSchema>
+export type AccountCreate = z.infer<typeof AccountCreateSchema>
 export type AccountUpdate = z.infer<typeof AccountUpdateSchema>

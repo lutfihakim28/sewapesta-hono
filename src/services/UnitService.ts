@@ -31,29 +31,29 @@ export abstract class UnitService {
 
   static async update(param: ParamId, request: UnitRequest) {
     await db.transaction(async (transaction) => {
-      const unitId = await this.checkRecord(param);
+      const unit = await this.checkRecord(param);
 
       await transaction
         .update(unitsTable)
         .set(request)
-        .where(eq(unitsTable.id, unitId))
+        .where(eq(unitsTable.id, unit.id))
     })
   }
 
   static async delete(param: ParamId) {
     await db.transaction(async (transaction) => {
-      const unitId = await this.checkRecord(param);
+      const unit = await this.checkRecord(param);
 
       await transaction
         .update(unitsTable)
         .set({
           deletedAt: dayjs().unix(),
         })
-        .where(eq(unitsTable.id, unitId))
+        .where(eq(unitsTable.id, unit.id))
     })
   }
 
-  static async checkRecord(param: ParamId): Promise<number> {
+  static async checkRecord(param: ParamId) {
     const unit = db
       .select({
         id: unitsTable.id,
@@ -69,6 +69,6 @@ export abstract class UnitService {
       throw new NotFoundException(messages.errorNotFound('satuan'))
     }
 
-    return unit.id
+    return unit
   }
 }
