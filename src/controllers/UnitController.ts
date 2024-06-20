@@ -1,6 +1,9 @@
 import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
-import { CreateUnitRoute, DeleteUnitRoute, ListUnitRoute, UpdateUnitRoute } from '@/routes/UnitRoute';
+import { CreateUnitRoute } from '@/routes/units/CreateUnitRoute';
+import { DeleteUnitRoute } from '@/routes/units/DeleteUnitRoute';
+import { ListUnitRoute } from '@/routes/units/ListUnitRoute';
+import { UpdateUnitRoute } from '@/routes/units/UpdateUnitRoute';
 import { UnitService } from '@/services/UnitService';
 
 const UnitController = honoApp();

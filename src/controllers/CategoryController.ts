@@ -1,6 +1,9 @@
 import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
-import { CreateCategoryRoute, DeleteCategoryRoute, ListCategoryRoute, UpdateCategoryRoute } from '@/routes/CategoryRoute';
+import { CreateCategoryRoute } from '@/routes/categories/CreateCategoryRoute';
+import { DeleteCategoryRoute } from '@/routes/categories/DeleteCategoryRoute';
+import { ListCategoryRoute } from '@/routes/categories/ListCategoryRoute';
+import { UpdateCategoryRoute } from '@/routes/categories/UpdateCategoryRoute';
 import { CategoryService } from '@/services/CategoryService';
 
 const CategoryController = honoApp()

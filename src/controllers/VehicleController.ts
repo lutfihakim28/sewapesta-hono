@@ -1,6 +1,9 @@
 import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
-import { CreateVehicleRoute, DeleteVehicleRoute, ListVehicleRoute, UpdateVehicleRoute } from '@/routes/VehicleRoute';
+import { CreateVehicleRoute } from '@/routes/vehicles/CreateVehicleRoute';
+import { DeleteVehicleRoute } from '@/routes/vehicles/DeleteVehicleRoute';
+import { ListVehicleRoute } from '@/routes/vehicles/ListVehicleRoute';
+import { UpdateVehicleRoute } from '@/routes/vehicles/UpdateVehicleRoute';
 import { VehicleService } from '@/services/VehicleService';
 
 const VehicleController = honoApp()
@@ -16,7 +19,7 @@ VehicleController.openapi(ListVehicleRoute, async (context) => {
 
 VehicleController.openapi(CreateVehicleRoute, async (context) => {
   const payload = context.req.valid('json');
-  const vehicle = await VehicleService.create(payload);
+  await VehicleService.create(payload);
   return context.json({
     code: 200,
     messages: messages.successCreate('kendaraan'),
@@ -26,7 +29,7 @@ VehicleController.openapi(CreateVehicleRoute, async (context) => {
 VehicleController.openapi(UpdateVehicleRoute, async (context) => {
   const param = context.req.valid('param');
   const payload = context.req.valid('json');
-  const vehicle = await VehicleService.update(param, payload);
+  await VehicleService.update(param, payload);
   return context.json({
     code: 200,
     messages: messages.successUpdate('kendaraan'),

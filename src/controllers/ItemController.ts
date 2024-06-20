@@ -1,6 +1,10 @@
 import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
-import { CreateItemRoute, DeleteItemRoute, DetailItemRoute, ListItemRoute, UpdateItemRoute } from '@/routes/ItemRoute';
+import { CreateItemRoute } from '@/routes/items/CreateItemRoute';
+import { DeleteItemRoute } from '@/routes/items/DeleteItemRoute';
+import { DetailItemRoute } from '@/routes/items/DetailItemRoute';
+import { ListItemRoute } from '@/routes/items/ListItemRoute';
+import { UpdateItemRoute } from '@/routes/items/UpdateItemRoute';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
 import { ItemService } from '@/services/ItemService';
 

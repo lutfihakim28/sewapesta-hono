@@ -1,12 +1,13 @@
 import { deleteCookie, setCookie } from 'hono/cookie';
 import { honoApp } from '@/lib/hono';
-import { AuthLoginRoute, AuthLogoutRoute } from '@/routes/AuthRoute';
 import { UserService } from '@/services/UserService';
 import { sign } from 'hono/jwt';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
 import { messages } from '@/constatnts/messages';
 import { JWTPayload } from 'hono/utils/jwt/types';
 import dayjs from 'dayjs';
+import { AuthLoginRoute } from '@/routes/auths/AuthLoginRoute';
+import { AuthLogoutRoute } from '@/routes/auths/AuthLogoutRoute';
 
 const AuthController = honoApp()
 

@@ -1,6 +1,10 @@
 import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
-import { CreateEmployeeRoute, DeleteEmployeeRoute, DetailEmployeeRoute, ListEmployeeRoute, UpdateEmployeeRoute } from '@/routes/EmployeeRoute';
+import { CreateEmployeeRoute } from '@/routes/employees/CreateEmployeeRoute';
+import { DeleteEmployeeRoute } from '@/routes/employees/DeleteEmployeeRoute';
+import { DetailEmployeeRoute } from '@/routes/employees/DetailEmployeeRoute';
+import { ListEmployeeRoute } from '@/routes/employees/ListEmployeeRoute';
+import { UpdateEmployeeRoute } from '@/routes/employees/UpdateEmployeeRoute';
 import { EmployeeService } from '@/services/EmployeeService';
 
 const EmployeeController = honoApp()
@@ -37,8 +41,7 @@ EmployeeController.openapi(DetailEmployeeRoute, async (context) => {
 
 EmployeeController.openapi(CreateEmployeeRoute, async (context) => {
   const payload = context.req.valid('json');
-
-  const employee = await EmployeeService.create(payload);
+  await EmployeeService.create(payload);
 
   return context.json({
     code: 200,
@@ -49,8 +52,7 @@ EmployeeController.openapi(CreateEmployeeRoute, async (context) => {
 EmployeeController.openapi(UpdateEmployeeRoute, async (context) => {
   const param = context.req.valid('param');
   const payload = context.req.valid('json');
-
-  const employee = await EmployeeService.update(param, payload);
+  await EmployeeService.update(param, payload);
 
   return context.json({
     code: 200,

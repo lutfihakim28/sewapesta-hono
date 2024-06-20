@@ -1,6 +1,10 @@
 import { messages } from '@/constatnts/messages';
 import { honoApp } from '@/lib/hono';
-import { CreateOwnerRoute, DeleteOwnerRoute, DetailOwnerRoute, ListOwnerRoute, UpdateOwnerRoute } from '@/routes/OwnerRoute';
+import { CreateOwnerRoute } from '@/routes/owners/CreateOwnerRoute';
+import { DeleteOwnerRoute } from '@/routes/owners/DeleteOwnerRoute';
+import { DetailOwnerRoute } from '@/routes/owners/DetailOwnerRoute';
+import { ListOwnerRoute } from '@/routes/owners/ListOwnerRoute';
+import { UpdateOwnerRoute } from '@/routes/owners/UpdateOwnerRoute';
 import { OwnerService } from '@/services/OwnerService';
 
 const OwnerController = honoApp()
@@ -38,12 +42,11 @@ OwnerController.openapi(DetailOwnerRoute, async (context) => {
 OwnerController.openapi(CreateOwnerRoute, async (context) => {
   const payload = context.req.valid('json');
 
-  const owner = await OwnerService.create(payload);
+  await OwnerService.create(payload);
 
   return context.json({
     code: 200,
     messages: messages.successCreate('pemilik'),
-    data: owner,
   }, 200)
 })
 
