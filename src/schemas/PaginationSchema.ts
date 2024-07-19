@@ -6,7 +6,7 @@ export const PaginationSchema = z.object({
     .optional()
     .default('1')
     .openapi({ example: '1' }),
-  limit: z
+  pageSize: z
     .string()
     .optional()
     .default('10')

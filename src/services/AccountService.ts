@@ -62,8 +62,8 @@ export abstract class AccountService {
       orderBy: sort === 'asc'
         ? asc(accountsTable[sortBy])
         : desc(accountsTable[sortBy]),
-      limit: Number(query.limit || 5),
-      offset: countOffset(query.page, query.limit)
+      limit: Number(query.pageSize || 5),
+      offset: countOffset(query.page, query.pageSize)
     })
 
     return accounts.map((account) => ({

@@ -14,11 +14,14 @@ import { ownersTable } from 'db/schema/owners';
 import { Item } from '@/schemas/items/ItemSchema';
 import { dateFormat } from '@/constatnts/dateFormat';
 import { ImageService } from './ImageService';
+import { subcategoriesTable } from 'db/schema/subcategories';
+import { ItemPatchOvertime } from '@/schemas/items/ItemPatchOvertimeSchema';
 
 export abstract class ItemService {
   static async getList(query: ItemFilter): Promise<Array<Item>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: ItemColumn = 'id';
+    let subcategories: Array<number> | undefined = undefined;
 
     if (query.sort) {
       sort = query.sort
@@ -28,6 +31,10 @@ export abstract class ItemService {
       sortBy = query.sortBy
     }
 
+    if (query.subcategories) {
+      subcategories = query.subcategories.split('-').map((id) => Number(id));
+    }
+
     const items = await db.transaction(async (transaction) => {
       const __items = await transaction.query.itemsTable.findMany({
         columns: {
@@ -35,6 +42,7 @@ export abstract class ItemService {
           name: true,
           price: true,
           quantity: true,
+          hasOvertime: true,
         },
         with: {
           owner: {
@@ -42,6 +50,7 @@ export abstract class ItemService {
               id: true,
               name: true,
               phone: true,
+              type: true,
             }
           },
           subcategory: {
@@ -77,6 +86,12 @@ export abstract class ItemService {
         },
         where: and(
           isNull(itemsTable.deletedAt),
+          subcategories
+            ? inArray(
+              itemsTable.subcategoryId,
+              subcategories
+            )
+            : undefined,
           query.keyword
             ? or(
               like(itemsTable.name, `%${query.keyword}%`),
@@ -88,13 +103,13 @@ export abstract class ItemService {
                   .where(like(ownersTable.name, `%${query.keyword}%`)),
               )
             )
-            : undefined
+            : undefined,
         ),
         orderBy: sort === 'asc'
           ? asc(itemsTable[sortBy])
           : desc(itemsTable[sortBy]),
-        limit: Number(query.limit || 5),
-        offset: countOffset(query.page, query.limit),
+        limit: Number(query.pageSize || 5),
+        offset: countOffset(query.page, query.pageSize),
       })
 
       const _items = await Promise.all(__items.map(async (item) => {
@@ -139,6 +154,7 @@ export abstract class ItemService {
           name: true,
           price: true,
           quantity: true,
+          hasOvertime: true,
         },
         with: {
           owner: {
@@ -146,6 +162,7 @@ export abstract class ItemService {
               id: true,
               name: true,
               phone: true,
+              type: true,
             }
           },
           unit: {
@@ -288,6 +305,27 @@ export abstract class ItemService {
         referenceId: item[0].id,
         images: request.images,
       })
+    })
+  }
+
+  static async patchOvertime(param: ParamId, request: ItemPatchOvertime): Promise<void> {
+    const updatedAt = dayjs().unix();
+    await db.transaction(async (transaction) => {
+      const existingItem = await this.checkRecord(param);
+
+      await transaction
+        .update(itemsTable)
+        .set({
+          ...request,
+          updatedAt,
+        })
+        .where(and(
+          eq(itemsTable.id, existingItem.id),
+          isNull(itemsTable.deletedAt),
+        ))
+        .returning({
+          id: itemsTable.id,
+        })
     })
   }
 

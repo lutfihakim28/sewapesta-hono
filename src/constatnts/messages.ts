@@ -12,5 +12,6 @@ export const messages = {
   successDetail: (data: string) => `Berhasil mengambil detail ${data}.`,
   successCreate: (data: string) => `Berhasil menambah ${data}.`,
   successUpdate: (data: string) => `Berhasil memperbarui ${data}.`,
+  successPatch: (data: string, field: string) => `Berhasil memperbarui ${field} ${data}.`,
   successDelete: (data: string) => `Berhasil menghapus ${data}.`,
 }

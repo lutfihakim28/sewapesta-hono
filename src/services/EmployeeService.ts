@@ -53,8 +53,8 @@ export abstract class EmployeeService {
       orderBy: sort === 'asc'
         ? asc(employeesTable[sortBy])
         : desc(employeesTable[sortBy]),
-      limit: Number(query.limit || 5),
-      offset: countOffset(query.page, query.limit)
+      limit: Number(query.pageSize || 5),
+      offset: countOffset(query.page, query.pageSize)
     })
 
     return employees;

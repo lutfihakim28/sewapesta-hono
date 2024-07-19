@@ -30,6 +30,7 @@ export abstract class OwnerService {
         id: true,
         name: true,
         phone: true,
+        type: true,
       },
       where: and(
         isNull(ownersTable.deletedAt),
@@ -46,8 +47,8 @@ export abstract class OwnerService {
       orderBy: sort === 'asc'
         ? asc(ownersTable[sortBy])
         : desc(ownersTable[sortBy]),
-      limit: Number(query.limit || 5),
-      offset: countOffset(query.page, query.limit)
+      limit: Number(query.pageSize || 5),
+      offset: countOffset(query.page, query.pageSize)
     })
 
     return owners;
@@ -59,6 +60,7 @@ export abstract class OwnerService {
         id: true,
         name: true,
         phone: true,
+        type: true,
       },
       where: and(
         eq(ownersTable.id, Number(param.id)),

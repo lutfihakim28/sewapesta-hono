@@ -17,18 +17,10 @@ export abstract class AccountMutationService {
     const accountMutations = await db.transaction(async (transaction) => {
       const account = await AccountService.checkRecord({ id: param.id });
 
-      let startAt: number = 0;
-      let endAt: number = 0;
+      let startAt: number = Number(query.startAt || 0);
+      let endAt: number = Number(query.endAt || 0);
       let sort: 'asc' | 'desc' = 'asc';
       let sortBy: AccountMutationColumn = 'id';
-
-      if (query.startAt) {
-        startAt = dayjs(query.startAt).startOf('day').unix();
-      }
-
-      if (query.endAt) {
-        endAt = dayjs(query.endAt).endOf('day').unix();
-      }
 
       if (query.sort) {
         sort = query.sort
@@ -53,8 +45,8 @@ export abstract class AccountMutationService {
             : undefined,
         ))
         .orderBy(sort === 'asc' ? asc(accountMutationsTable[sortBy]) : desc(accountMutationsTable[sortBy]))
-        .limit(Number(query.limit || 5))
-        .offset(countOffset(query.page, query.limit))
+        .limit(Number(query.pageSize || 5))
+        .offset(countOffset(query.page, query.pageSize))
         .all();
 
       return mutations;

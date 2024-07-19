@@ -4,6 +4,7 @@ import { CreateItemRoute } from '@/routes/items/CreateItemRoute';
 import { DeleteItemRoute } from '@/routes/items/DeleteItemRoute';
 import { DetailItemRoute } from '@/routes/items/DetailItemRoute';
 import { ListItemRoute } from '@/routes/items/ListItemRoute';
+import { PatchItemOvertimeRoute } from '@/routes/items/PatchItemOvertimeRoute';
 import { UpdateItemRoute } from '@/routes/items/UpdateItemRoute';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
 import { ItemService } from '@/services/ItemService';
@@ -22,8 +23,8 @@ ItemController.openapi(ListItemRoute, async (context) => {
     data: items,
     meta: {
       page: Number(query.page),
-      limit: Number(query.limit),
-      totalPage: Math.ceil(totalData / Number(query.limit)),
+      pageSize: Number(query.pageSize),
+      pageCount: Math.ceil(totalData / Number(query.pageSize)),
     }
   }, 200)
 })
@@ -60,6 +61,18 @@ ItemController.openapi(UpdateItemRoute, async (context) => {
   return context.json({
     code: 200,
     messages: messages.successUpdate('barang'),
+  }, 200)
+})
+
+ItemController.openapi(PatchItemOvertimeRoute, async (context) => {
+  const param = context.req.valid('param');
+  const payload = context.req.valid('json');;
+
+  await ItemService.patchOvertime(param, payload);
+
+  return context.json({
+    code: 200,
+    messages: messages.successPatch('barang', 'ketersediaan lembur'),
   }, 200)
 })
 

@@ -25,8 +25,8 @@ AccountController.openapi(ListAccountRoute, async (context) => {
     data: accounts,
     meta: {
       page: Number(query.page),
-      limit: Number(query.limit),
-      totalPage: Math.ceil(totalData / Number(query.limit)),
+      pageSize: Number(query.pageSize),
+      pageCount: Math.ceil(totalData / Number(query.pageSize)),
     }
   }, 200)
 })
@@ -83,8 +83,8 @@ AccountController.openapi(AccountMutationRoute, async (context) => {
     data: mutations,
     meta: {
       page: Number(query.page),
-      limit: Number(query.limit),
-      totalPage: Math.ceil(totalData / Number(query.limit)),
+      pageSize: Number(query.pageSize),
+      pageCount: Math.ceil(totalData / Number(query.pageSize)),
     }
   }, 200)
 })

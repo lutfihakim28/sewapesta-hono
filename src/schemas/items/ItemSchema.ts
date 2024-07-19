@@ -20,6 +20,7 @@ const _ItemSchema = createSelectSchema(itemsTable, {
   name: true,
   price: true,
   quantity: true,
+  hasOvertime: true,
 });
 
 export type Item = z.infer<typeof _ItemSchema> & {

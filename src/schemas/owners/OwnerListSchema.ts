@@ -12,7 +12,7 @@ export const OwnerListSchema = z.object({
   data: z.array(OwnerSchema),
   meta: z.object({
     page: z.number().positive().openapi({ example: 1 }),
-    limit: z.number().positive().openapi({ example: 10 }),
-    totalPage: z.number().positive().openapi({ example: 15 }),
+    pageSize: z.number().positive().openapi({ example: 10 }),
+    pageCount: z.number().positive().openapi({ example: 15 }),
   }),
 })

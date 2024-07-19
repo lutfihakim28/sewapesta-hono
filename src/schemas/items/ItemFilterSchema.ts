@@ -10,10 +10,11 @@ const _SortSchema = SortSchema<ItemColumn>([
   'id',
   'name',
   'quantity',
+  'price',
 ] as const);
 
 export const ItemFilterSchema = z.object({
-  subcategory: z.string()
+  subcategories: z.string().openapi({ example: '1-2-10', description: 'subcategory id, can be multiple id separated by dash (-)' })
 }).partial()
   .merge(_SortSchema)
   .merge(SearchSchema)

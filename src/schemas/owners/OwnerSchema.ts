@@ -6,6 +6,7 @@ export const OwnerSchema = createSelectSchema(ownersTable).pick({
   id: true,
   name: true,
   phone: true,
+  type: true,
 }).openapi('Owner')
 
 export type Owner = z.infer<typeof OwnerSchema>

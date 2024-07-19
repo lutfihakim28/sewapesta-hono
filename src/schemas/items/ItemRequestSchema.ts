@@ -22,6 +22,7 @@ export const ItemCreateSchema = createInsertSchema(itemsTable, {
   subcategoryId: true,
   ownerId: true,
   unitId: true,
+  hasOvertime: true,
 }).merge(ImageRequestSchema).openapi('ItemCreate');
 
 export const ItemUpdateSchema = ItemCreateSchema.merge(z.object({
