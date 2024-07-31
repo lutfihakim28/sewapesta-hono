@@ -1,5 +1,4 @@
 import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
-import { OrderTypeEnum } from '@/enums/OrderTypeEnum';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const ordersTable = sqliteTable('orders', {
@@ -16,12 +15,6 @@ export const ordersTable = sqliteTable('orders', {
       OrderStatusEnum.Event,
       OrderStatusEnum.Loading,
       OrderStatusEnum.Unloading,
-    ],
-  }),
-  type: text('type', {
-    enum: [
-      OrderTypeEnum.Event,
-      OrderTypeEnum.Party,
     ],
   }),
   startDate: integer('start_date', { mode: 'number' }).notNull(),

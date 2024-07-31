@@ -1,27 +1,23 @@
 import { db } from 'db';
 import { ParamId } from '@/schemas/ParamIdSchema';
-import { and, eq, isNull, gt, asc, desc, or, like, inArray, count } from 'drizzle-orm';
+import { and, eq, isNull, asc, desc, or, like, inArray, count } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { itemsTable } from 'db/schema/items';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
-import { damagedItemsTable } from 'db/schema/damagedItems';
-import { orderedItemsTable } from 'db/schema/orderedItems';
 import { ItemColumn, ItemFilter } from '@/schemas/items/ItemFilterSchema';
 import { countOffset } from '@/utils/countOffset';
 import { ownersTable } from 'db/schema/owners';
 import { Item } from '@/schemas/items/ItemSchema';
-import { dateFormat } from '@/constatnts/dateFormat';
 import { ImageService } from './ImageService';
-import { subcategoriesTable } from 'db/schema/subcategories';
 import { ItemPatchOvertime } from '@/schemas/items/ItemPatchOvertimeSchema';
 
 export abstract class ItemService {
   static async getList(query: ItemFilter): Promise<Array<Item>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: ItemColumn = 'id';
-    let subcategories: Array<number> | undefined = undefined;
+    let categories: Array<number> | undefined = undefined;
 
     if (query.sort) {
       sort = query.sort
@@ -31,8 +27,8 @@ export abstract class ItemService {
       sortBy = query.sortBy
     }
 
-    if (query.subcategories) {
-      subcategories = query.subcategories.split('-').map((id) => Number(id));
+    if (query.categories) {
+      categories = query.categories.split('-').map((id) => Number(id));
     }
 
     const items = await db.transaction(async (transaction) => {
@@ -40,9 +36,7 @@ export abstract class ItemService {
         columns: {
           id: true,
           name: true,
-          price: true,
           quantity: true,
-          hasOvertime: true,
         },
         with: {
           owner: {
@@ -53,7 +47,7 @@ export abstract class ItemService {
               type: true,
             }
           },
-          subcategory: {
+          category: {
             columns: {
               id: true,
               name: true,
@@ -65,31 +59,13 @@ export abstract class ItemService {
               name: true,
             }
           },
-          damaged: {
-            where: and(
-              isNull(damagedItemsTable.deletedAt),
-              gt(damagedItemsTable.quantity, 0)
-            ),
-            columns: {
-              quantity: true,
-            }
-          },
-          ordered: {
-            where: and(
-              isNull(orderedItemsTable.deletedAt),
-              gt(orderedItemsTable.baseQuantity, 0)
-            ),
-            columns: {
-              baseQuantity: true,
-            }
-          }
         },
         where: and(
           isNull(itemsTable.deletedAt),
-          subcategories
+          categories
             ? inArray(
-              itemsTable.subcategoryId,
-              subcategories
+              itemsTable.categoryId,
+              categories
             )
             : undefined,
           query.keyword
@@ -118,21 +94,9 @@ export abstract class ItemService {
           referenceId: item.id,
         })
 
-        const damaged = item.damaged.reduce((a, b) => a + b.quantity, 0)
-        const used = item.ordered.reduce((a, b) => a + b.baseQuantity, 0)
-        const available = item.quantity - (damaged + used)
-
         return {
           ...item,
           images,
-          quantity: {
-            damaged,
-            used,
-            available,
-            total: item.quantity,
-          },
-          damaged: null,
-          ordered: null,
         }
       }))
 
@@ -152,9 +116,7 @@ export abstract class ItemService {
         columns: {
           id: true,
           name: true,
-          price: true,
           quantity: true,
-          hasOvertime: true,
         },
         with: {
           owner: {
@@ -171,48 +133,18 @@ export abstract class ItemService {
               name: true,
             }
           },
-          subcategory: {
+          category: {
             columns: {
               id: true,
               name: true,
             }
           },
-          damaged: {
-            columns: {
-              createdAt: true,
-              description: true,
-              id: true,
-              quantity: true,
-              updatedAt: true,
-            }
-          },
-          ordered: {
-            columns: {
-              createdAt: true,
-              id: true,
-              baseQuantity: true,
-              orderedQuantity: true,
-              updatedAt: true,
-            },
-            with: {
-              orderedUnit: {
-                columns: {
-                  id: true,
-                  name: true,
-                }
-              }
-            }
-          }
         }
       })
 
       if (!_item) {
         throw new NotFoundException(messages.errorNotFound('barang'))
       }
-
-      const damaged = _item.damaged.reduce((a, b) => a + b.quantity, 0)
-      const used = _item.ordered.reduce((a, b) => a + b.baseQuantity, 0)
-      const available = _item.quantity - (damaged + used)
 
       const images = await ImageService.getByReference({
         reference: 'items',
@@ -222,22 +154,6 @@ export abstract class ItemService {
       return {
         ..._item,
         images,
-        quantity: {
-          total: _item.quantity,
-          damaged,
-          used,
-          available,
-        },
-        ordered: _item.ordered.map((data) => ({
-          ...data,
-          createdAt: dayjs.unix(data.createdAt).format(dateFormat),
-          updatedAt: data.updatedAt ? dayjs.unix(data.updatedAt).format(dateFormat) : null,
-        })),
-        damaged: _item.damaged.map((data) => ({
-          ...data,
-          createdAt: dayjs.unix(data.createdAt).format(dateFormat),
-          updatedAt: data.updatedAt ? dayjs.unix(data.updatedAt).format(dateFormat) : null,
-        })),
       };
     });
 
@@ -252,8 +168,7 @@ export abstract class ItemService {
         .values({
           ...request,
           quantity: Number(request.quantity),
-          price: Number(request.price),
-          subcategoryId: Number(request.subcategoryId),
+          categoryId: Number(request.categoryId),
           ownerId: Number(request.ownerId),
           unitId: Number(request.unitId),
           createdAt,
@@ -286,8 +201,7 @@ export abstract class ItemService {
         .set({
           ...request,
           quantity: Number(request.quantity),
-          price: Number(request.price),
-          subcategoryId: Number(request.subcategoryId),
+          categoryId: Number(request.categoryId),
           ownerId: Number(request.ownerId),
           unitId: Number(request.unitId),
           updatedAt,
@@ -352,6 +266,10 @@ export abstract class ItemService {
       await Promise.all(images.map((image) => ImageService.delete({ id: image.id.toString() })))
     })
   }
+
+  // static async getOrderedItems(param: ParamId): Promise<OrderedItem> {
+
+  // }
 
   static async checkRecord(param: ParamId) {
     const item = db

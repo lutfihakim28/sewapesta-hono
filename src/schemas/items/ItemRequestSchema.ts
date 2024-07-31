@@ -9,20 +9,15 @@ export const ItemCreateSchema = createInsertSchema(itemsTable, {
   quantity: z
     .string({ message: validationMessages.required('Kuantitas barang') })
     .openapi({ example: '10' }),
-  price: z
-    .string({ message: validationMessages.required('Harga sewa') })
-    .openapi({ example: '100000' }),
-  subcategoryId: z.string({ message: validationMessages.required('Subkategori') }).openapi({ example: '1' }),
+  categoryId: z.string({ message: validationMessages.required('Subkategori') }).openapi({ example: '1' }),
   ownerId: z.string({ message: validationMessages.required('Pemilik barang') }).openapi({ example: '1' }),
   unitId: z.string({ message: validationMessages.required('Satuan barang') }).openapi({ example: '1' }),
 }).pick({
   name: true,
   quantity: true,
-  price: true,
-  subcategoryId: true,
+  categoryId: true,
   ownerId: true,
   unitId: true,
-  hasOvertime: true,
 }).merge(ImageRequestSchema).openapi('ItemCreate');
 
 export const ItemUpdateSchema = ItemCreateSchema.merge(z.object({

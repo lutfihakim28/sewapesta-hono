@@ -12,7 +12,6 @@ import * as orderedItems from './schema/orderedItems';
 import * as orders from './schema/orders';
 import * as owners from './schema/owners';
 import * as payments from './schema/payments';
-import * as subcategories from './schema/subcategories';
 import * as units from './schema/units';
 import * as users from './schema/users';
 import * as vehicles from './schema/vehicles';
@@ -32,7 +31,6 @@ export const db = drizzle(connection, {
     ...orders,
     ...owners,
     ...payments,
-    ...subcategories,
     ...units,
     ...users,
     ...vehicles,
