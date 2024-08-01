@@ -1,17 +1,14 @@
 import { Database } from 'bun:sqlite';
 import { drizzle } from 'drizzle-orm/bun-sqlite'
-import * as accountMutations from './schema/accountMutations';
-import * as accounts from './schema/accounts';
 import * as categories from './schema/categories';
-import * as damagedItems from './schema/damagedItems';
 import * as employees from './schema/employees';
-import * as events from './schema/events';
 import * as images from './schema/images';
 import * as items from './schema/items';
-import * as orderedItems from './schema/orderedItems';
+import * as orderedPackages from './schema/orderedPackages';
 import * as orders from './schema/orders';
 import * as owners from './schema/owners';
-import * as payments from './schema/payments';
+import * as packageItems from './schema/packageItems';
+import * as packages from './schema/packages';
 import * as units from './schema/units';
 import * as users from './schema/users';
 import * as vehicles from './schema/vehicles';
@@ -19,18 +16,15 @@ import * as vehicles from './schema/vehicles';
 const connection = new Database('sewapesta.db')
 export const db = drizzle(connection, {
   schema: {
-    ...accountMutations,
-    ...accounts,
     ...categories,
-    ...damagedItems,
     ...employees,
-    ...events,
     ...images,
     ...items,
-    ...orderedItems,
+    ...orderedPackages,
     ...orders,
     ...owners,
-    ...payments,
+    ...packageItems,
+    ...packages,
     ...units,
     ...users,
     ...vehicles,

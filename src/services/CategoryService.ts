@@ -1,10 +1,8 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import { db } from 'db';
 import { categoriesTable } from 'db/schema/categories';
-import { subcategoriesTable } from 'db/schema/subcategories';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { CategoryRequest } from '@/schemas/categories/CategoryRequestSchema';
-import { SubcategoryService } from './SubcategoryService';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
@@ -18,15 +16,6 @@ export abstract class CategoryService {
         name: true,
       },
       where: isNull(categoriesTable.deletedAt),
-      with: {
-        subcategories: {
-          columns: {
-            id: true,
-            name: true,
-          },
-          where: isNull(subcategoriesTable.deletedAt),
-        },
-      }
     })
 
     return categories
@@ -39,15 +28,6 @@ export abstract class CategoryService {
         name: true,
       },
       where: and(eq(categoriesTable.id, Number(param.id)), isNull(categoriesTable.deletedAt)),
-      with: {
-        subcategories: {
-          columns: {
-            id: true,
-            name: true,
-          },
-          where: isNull(subcategoriesTable.deletedAt)
-        },
-      }
     })
 
     if (!category) {
@@ -85,9 +65,6 @@ export abstract class CategoryService {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const existingCategory = await this.checkRecord(param);
-
-      await SubcategoryService.delete(param)
-
       await transaction.update(categoriesTable)
         .set({
           deletedAt,

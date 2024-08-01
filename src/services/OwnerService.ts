@@ -1,7 +1,6 @@
 import { db } from 'db';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
-import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
 import { ownersTable } from 'db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
@@ -10,7 +9,6 @@ import { messages } from '@/constatnts/messages';
 import { OwnerColumn, OwnerFilter } from '@/schemas/owners/OwnerFilterScheme';
 import { countOffset } from '@/utils/countOffset';
 import { Owner } from '@/schemas/owners/OwnerSchema';
-import { dateFormat } from '@/constatnts/dateFormat';
 
 export abstract class OwnerService {
   static async getList(query: OwnerFilter): Promise<Array<Owner>> {
@@ -77,14 +75,10 @@ export abstract class OwnerService {
 
   static async create(request: OwnerRequest): Promise<void> {
     const createdAt = dayjs().unix();
-    const accountId = await AccountService.create({
-      name: request.name,
-    })
     await db
       .insert(ownersTable)
       .values({
         ...request,
-        accountId,
         createdAt,
       })
   }
@@ -110,7 +104,6 @@ export abstract class OwnerService {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const existingOwner = await this.checkRecord(param);
-      await AccountService.delete(param)
       await transaction
         .update(ownersTable)
         .set({

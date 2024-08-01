@@ -8,7 +8,6 @@ import { messages } from './constatnts/messages'
 import { swaggerUI } from '@hono/swagger-ui'
 import { UnauthorizedException } from './exceptions/UnauthorizedException'
 import { verify } from 'hono/jwt'
-import AccountController from './controllers/AccountController'
 import AuthController from './controllers/AuthController'
 import CategoryController from './controllers/CategoryController'
 import EmployeeController from './controllers/EmployeeController'
@@ -103,7 +102,6 @@ app.use('/static/*', serveStatic({ root: './' }))
 app.route('/api/auth', AuthController)
 
 // PRIVATE PATH
-app.route('/api/private/accounts', AccountController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/employees', EmployeeController)
 app.route('/api/private/items', ItemController)

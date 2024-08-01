@@ -1,7 +1,6 @@
 import { employeesTable } from 'db/schema/employees';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { Account, AccountSchema } from '../accounts/AccountSchema';
 
 export const EmployeeSchema = createSelectSchema(employeesTable)
   .pick({

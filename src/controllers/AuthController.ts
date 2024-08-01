@@ -43,7 +43,6 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
       user: {
         id: user.id,
         username: user.username,
-        accountId: user.accountId,
       }
     }
   }, 200)

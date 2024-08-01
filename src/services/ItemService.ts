@@ -37,6 +37,7 @@ export abstract class ItemService {
           id: true,
           name: true,
           quantity: true,
+          code: true,
         },
         with: {
           owner: {
@@ -117,6 +118,7 @@ export abstract class ItemService {
           id: true,
           name: true,
           quantity: true,
+          code: true,
         },
         with: {
           owner: {

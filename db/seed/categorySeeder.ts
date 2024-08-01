@@ -6,15 +6,27 @@ export async function seedCategories() {
   console.log('Seeding categories...')
   await db.insert(categoriesTable).values([
     {
-      name: 'Sound System',
+      name: 'Kain',
       createdAt: dayjs().unix(),
     },
     {
-      name: 'Dekorasi',
+      name: 'Tenda',
       createdAt: dayjs().unix(),
     },
     {
-      name: 'Penunjang',
+      name: 'Lagan',
+      createdAt: dayjs().unix(),
+    },
+    {
+      name: 'Rigging',
+      createdAt: dayjs().unix(),
+    },
+    {
+      name: 'Sound',
+      createdAt: dayjs().unix(),
+    },
+    {
+      name: 'Lainnya',
       createdAt: dayjs().unix(),
     },
   ])

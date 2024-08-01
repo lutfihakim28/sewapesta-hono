@@ -1,16 +1,16 @@
-import { orderedItemsTable } from 'db/schema/orderedItems';
+import { orderedPackagesTable } from 'db/schema/orderedPackages';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const OrderedItemRequestSchema = createInsertSchema(orderedItemsTable, {
+export const OrderedPackageRequestSchema = createInsertSchema(orderedPackagesTable, {
   // quantity: z
   //   .number({ message: 'Kuantitas barang rusak harus diisi.' })
   //   .positive({ message: 'Kuantitas harus positif.' }),
 }).pick({
   baseQuantity: true,
-  itemId: true,
+  packageId: true,
   orderedQuantity: true,
 
 }).openapi('OrderedItemRequest')
 
-export type OrderedItemRequest = z.infer<typeof OrderedItemRequestSchema>
+export type OrderedPackageRequest = z.infer<typeof OrderedPackageRequestSchema>

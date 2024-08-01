@@ -3,7 +3,6 @@ import { employeesTable } from 'db/schema/employees';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { EmployeeRequest } from '@/schemas/employees/EmployeeRequestSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
-import { AccountService } from './AccountService';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
@@ -82,14 +81,10 @@ export abstract class EmployeeService {
 
   static async create(request: EmployeeRequest): Promise<void> {
     const createdAt = dayjs().unix();
-    const accountId = await AccountService.create({
-      name: request.name,
-    })
     await db
       .insert(employeesTable)
       .values({
         ...request,
-        accountId,
         createdAt,
       })
   }
@@ -116,7 +111,6 @@ export abstract class EmployeeService {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const existingEmployee = await this.checkRecord(param)
-      await AccountService.delete(param)
       await transaction
         .update(employeesTable)
         .set({

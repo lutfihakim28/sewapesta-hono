@@ -10,7 +10,6 @@ const _SortSchema = SortSchema<ItemColumn>([
   'id',
   'name',
   'quantity',
-  'price',
 ] as const);
 
 export const ItemFilterSchema = z.object({

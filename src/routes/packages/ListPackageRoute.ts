@@ -1,28 +1,26 @@
-import { NotFoundSchema } from '@/schemas/NotFoundSchema'
-import { ParamIdSchema } from '@/schemas/ParamIdSchema'
+import { PackageListSchema } from '@/schemas/packages/PackageListSchema'
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
-import { AccountDetailSchema } from '@/schemas/accounts/AccountDetailSchema'
 import { createRoute } from '@hono/zod-openapi'
 
-export const DetailAccountRoute = createRoute({
+export const ListPackageRoute = createRoute({
   method: 'get',
-  path: '/{id}',
-  tags: ['Account'],
+  path: '/',
+  tags: ['Item'],
   security: [{
     cookieAuth: [],
   }],
-  request: {
-    params: ParamIdSchema,
-  },
+  // request: {
+  //   query: ItemFilterSchema,
+  // },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: AccountDetailSchema,
+          schema: PackageListSchema,
         },
       },
-      description: 'Retrieve detail account',
+      description: 'Retrieve list items',
     },
     401: {
       content: {
@@ -31,14 +29,6 @@ export const DetailAccountRoute = createRoute({
         },
       },
       description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: NotFoundSchema,
-        },
-      },
-      description: 'Not Found',
     },
     500: {
       content: {

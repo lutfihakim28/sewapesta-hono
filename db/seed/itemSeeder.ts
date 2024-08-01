@@ -5,16 +5,51 @@ import { faker } from '@faker-js/faker/locale/id_ID'
 
 export async function seedItems() {
   console.log('Seeding items...')
-  await db.insert(itemsTable).values(new Array(20).fill('').map(() => ({
-    quantity: faker.number.int({ min: 1, max: 10 }),
-    name: faker.word.noun(),
-    ownerId: faker.helpers.arrayElement([1, 2, 3]),
-    unitId: faker.helpers.arrayElement([1, 2]),
-    price: faker.number.int({
-      min: 20000,
-      max: 500000,
-    }),
-    subcategoryId: faker.helpers.arrayElement([1, 2, 3, 4, 5]),
-    createdAt: dayjs().unix(),
-  })))
+  await db.insert(itemsTable).values([
+    {
+      quantity: faker.number.int({ min: 1, max: 10 }),
+      name: 'Sound System Event',
+      code: 'SSE',
+      ownerId: faker.helpers.arrayElement([1, 2, 3]),
+      unitId: 1,
+      categoryId: 5,
+      createdAt: dayjs().unix(),
+    },
+    {
+      quantity: faker.number.int({ min: 1, max: 10 }),
+      name: 'Sound System Hajatan',
+      code: 'SSH',
+      ownerId: faker.helpers.arrayElement([1, 2, 3]),
+      unitId: 1,
+      categoryId: 5,
+      createdAt: dayjs().unix(),
+    },
+    {
+      quantity: faker.number.int({ min: 1, max: 10 }),
+      name: 'Generator 10000Watt',
+      code: 'GE10K',
+      ownerId: faker.helpers.arrayElement([1, 2, 3]),
+      unitId: 1,
+      categoryId: 6,
+      createdAt: dayjs().unix(),
+    },
+    {
+      quantity: faker.number.int({ min: 1, max: 10 }),
+      name: 'Generator 15000Watt',
+      code: 'GE15K',
+      ownerId: faker.helpers.arrayElement([1, 2, 3]),
+      unitId: 1,
+      categoryId: 6,
+      createdAt: dayjs().unix(),
+    },
+    {
+      quantity: faker.number.int({ min: 1, max: 10 }),
+      name: 'Generator 20000Watt',
+      code: 'GE20K',
+      ownerId: faker.helpers.arrayElement([1, 2, 3]),
+      unitId: 1,
+      categoryId: 6,
+      createdAt: dayjs().unix(),
+    },
+  ])
 }

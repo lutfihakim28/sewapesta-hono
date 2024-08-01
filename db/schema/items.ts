@@ -1,14 +1,14 @@
-import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { ownersTable } from './owners';
 import { relations } from 'drizzle-orm';
-import { damagedItemsTable } from './damagedItems';
-import { orderedItemsTable } from './orderedItems';
+import { orderedPackagesTable } from './orderedPackages';
 import { unitsTable } from './units';
 import { categoriesTable } from './categories';
 
 export const itemsTable = sqliteTable('items', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
+  code: text('code').unique().notNull(),
   quantity: integer('quantity', { mode: 'number' }).notNull().default(1),
   unitId: integer('unit').notNull(),
   categoryId: integer('category_id', { mode: 'number' }).notNull(),
@@ -34,10 +34,7 @@ export const itemsRelations = relations(itemsTable, ({ one, many }) => ({
     references: [unitsTable.id],
     relationName: 'unit.item',
   }),
-  damaged: many(damagedItemsTable, {
-    relationName: 'item.damagedItems'
-  }),
-  ordered: many(orderedItemsTable, {
+  ordered: many(orderedPackagesTable, {
     relationName: 'item.orderedItems'
   })
 }))

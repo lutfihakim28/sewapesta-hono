@@ -6,6 +6,7 @@ import { ImageRequestSchema } from '../images/ImageRequestSchema';
 
 export const ItemCreateSchema = createInsertSchema(itemsTable, {
   name: z.string({ message: validationMessages.required('Nama barang') }).openapi({ example: 'Lampu' }),
+  code: z.string({ message: validationMessages.required('Kode barang') }).openapi({ example: 'SSE' }),
   quantity: z
     .string({ message: validationMessages.required('Kuantitas barang') })
     .openapi({ example: '10' }),
@@ -14,6 +15,7 @@ export const ItemCreateSchema = createInsertSchema(itemsTable, {
   unitId: z.string({ message: validationMessages.required('Satuan barang') }).openapi({ example: '1' }),
 }).pick({
   name: true,
+  code: true,
   quantity: true,
   categoryId: true,
   ownerId: true,

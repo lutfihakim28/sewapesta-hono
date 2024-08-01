@@ -1,25 +1,22 @@
 import { BadRequestSchema } from '@/schemas/BadRequestSchema'
-import { NotFoundSchema } from '@/schemas/NotFoundSchema'
-import { ParamIdSchema } from '@/schemas/ParamIdSchema'
+import { PackageCreateSchema } from '@/schemas/packages/PackageCreateSchema'
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
 import { SuccessSchema } from '@/schemas/SuccessSchema'
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
-import { AccountPaymentRequestSchema } from '@/schemas/accounts/AccountRequestSchema'
 import { createRoute } from '@hono/zod-openapi'
 
-export const UpdateAccountRoute = createRoute({
-  method: 'put',
-  path: '/{id}',
-  tags: ['Account'],
+export const CreatePackageRoute = createRoute({
+  method: 'post',
+  path: '/',
+  tags: ['Package'],
   security: [{
     cookieAuth: [],
   }],
   request: {
-    params: ParamIdSchema,
     body: {
       content: {
-        'application/json': {
-          schema: AccountPaymentRequestSchema
+        "multipart/form-data": {
+          schema: PackageCreateSchema,
         }
       }
     }
@@ -31,7 +28,7 @@ export const UpdateAccountRoute = createRoute({
           schema: SuccessSchema,
         },
       },
-      description: 'Update account success',
+      description: 'Item created',
     },
     401: {
       content: {
@@ -40,14 +37,6 @@ export const UpdateAccountRoute = createRoute({
         },
       },
       description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: NotFoundSchema,
-        },
-      },
-      description: 'Not Found',
     },
     422: {
       content: {
