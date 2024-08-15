@@ -1,8 +1,8 @@
-import { categoriesTable } from 'db/schema/categories';
+import { categories } from 'db/schema/categories';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-const _CategorySchema = createSelectSchema(categoriesTable).pick({
+const _CategorySchema = createSelectSchema(categories).pick({
   id: true,
   name: true,
 })

@@ -1,6 +1,6 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const imagesTable = sqliteTable('images', {
+export const images = sqliteTable('images', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   path: text('path').notNull().unique(),
   url: text('url').notNull().unique(),

@@ -8,7 +8,7 @@ export const ParamIdSchema = z.object({
         name: 'id',
         in: 'path',
       },
-      example: '28',
+      example: '1',
     }),
 }).openapi('ParamId')
 

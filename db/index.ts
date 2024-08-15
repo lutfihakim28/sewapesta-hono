@@ -4,11 +4,13 @@ import * as categories from './schema/categories';
 import * as employees from './schema/employees';
 import * as images from './schema/images';
 import * as items from './schema/items';
-import * as orderedPackages from './schema/orderedPackages';
+import * as orderedProducts from './schema/orderedProducts';
 import * as orders from './schema/orders';
 import * as owners from './schema/owners';
-import * as packageItems from './schema/packageItems';
-import * as packages from './schema/packages';
+import * as productEmployeeAssignments from './schema/productEmployeeAssignments';
+import * as productItems from './schema/productItems';
+import * as products from './schema/products';
+import * as stockMutations from './schema/stockMutations';
 import * as units from './schema/units';
 import * as users from './schema/users';
 import * as vehicles from './schema/vehicles';
@@ -20,11 +22,13 @@ export const db = drizzle(connection, {
     ...employees,
     ...images,
     ...items,
-    ...orderedPackages,
+    ...orderedProducts,
     ...orders,
     ...owners,
-    ...packageItems,
-    ...packages,
+    ...productEmployeeAssignments,
+    ...productItems,
+    ...products,
+    ...stockMutations,
     ...units,
     ...users,
     ...vehicles,

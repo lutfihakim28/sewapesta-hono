@@ -2,7 +2,7 @@ import { db } from 'db';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
-import { ownersTable } from 'db/schema/owners';
+import { owners } from 'db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
@@ -23,7 +23,7 @@ export abstract class OwnerService {
       sortBy = query.sortBy
     }
 
-    const owners = await db.query.ownersTable.findMany({
+    const _owners = await db.query.owners.findMany({
       columns: {
         id: true,
         name: true,
@@ -31,29 +31,29 @@ export abstract class OwnerService {
         type: true,
       },
       where: and(
-        isNull(ownersTable.deletedAt),
+        isNull(owners.deletedAt),
         query.type
-          ? eq(ownersTable.type, query.type)
+          ? eq(owners.type, query.type)
           : undefined,
         query.keyword
           ? or(
-            like(ownersTable.name, `%${query.keyword}%`),
-            like(ownersTable.phone, `%${query.keyword}%`)
+            like(owners.name, `%${query.keyword}%`),
+            like(owners.phone, `%${query.keyword}%`)
           )
           : undefined,
       ),
       orderBy: sort === 'asc'
-        ? asc(ownersTable[sortBy])
-        : desc(ownersTable[sortBy]),
+        ? asc(owners[sortBy])
+        : desc(owners[sortBy]),
       limit: Number(query.pageSize || 5),
       offset: countOffset(query.page, query.pageSize)
     })
 
-    return owners;
+    return _owners;
   }
 
   static async get(param: ParamId): Promise<Owner> {
-    const owner = await db.query.ownersTable.findFirst({
+    const owner = await db.query.owners.findFirst({
       columns: {
         id: true,
         name: true,
@@ -61,8 +61,8 @@ export abstract class OwnerService {
         type: true,
       },
       where: and(
-        eq(ownersTable.id, Number(param.id)),
-        isNull(ownersTable.deletedAt),
+        eq(owners.id, Number(param.id)),
+        isNull(owners.deletedAt),
       ),
     })
 
@@ -76,7 +76,7 @@ export abstract class OwnerService {
   static async create(request: OwnerRequest): Promise<void> {
     const createdAt = dayjs().unix();
     await db
-      .insert(ownersTable)
+      .insert(owners)
       .values({
         ...request,
         createdAt,
@@ -86,16 +86,16 @@ export abstract class OwnerService {
   static async update(param: ParamId, request: OwnerRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingOwner = await this.checkRecord(param);
+      const existingOwner = await this.get(param);
       await transaction
-        .update(ownersTable)
+        .update(owners)
         .set({
           ...request,
           updatedAt,
         })
         .where(and(
-          eq(ownersTable.id, existingOwner.id),
-          isNull(ownersTable.deletedAt),
+          eq(owners.id, existingOwner.id),
+          isNull(owners.deletedAt),
         ))
     })
   }
@@ -103,47 +103,29 @@ export abstract class OwnerService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingOwner = await this.checkRecord(param);
+      const existingOwner = await this.get(param);
       await transaction
-        .update(ownersTable)
+        .update(owners)
         .set({
           deletedAt,
         })
         .where(and(
-          eq(ownersTable.id, existingOwner.id),
-          isNull(ownersTable.deletedAt),
+          eq(owners.id, existingOwner.id),
+          isNull(owners.deletedAt),
         ))
     })
-  }
-
-  static async checkRecord(param: ParamId) {
-    const owner = db
-      .select({ id: ownersTable.id })
-      .from(ownersTable)
-      .where(and(
-        eq(ownersTable.id, Number(param.id)),
-        isNull(ownersTable.deletedAt)
-      ))
-      .get();
-
-
-    if (!owner) {
-      throw new NotFoundException('Pemilik tidak ditemukan.')
-    }
-
-    return owner
   }
 
   static async count(query: OwnerFilter): Promise<number> {
     const owner = db
       .select({ count: count() })
-      .from(ownersTable)
+      .from(owners)
       .where(and(
-        isNull(ownersTable.deletedAt),
+        isNull(owners.deletedAt),
         query.keyword
           ? or(
-            like(ownersTable.name, `%${query.keyword}%`),
-            like(ownersTable.phone, `%${query.keyword}%`)
+            like(owners.name, `%${query.keyword}%`),
+            like(owners.phone, `%${query.keyword}%`)
           )
           : undefined,
       ))

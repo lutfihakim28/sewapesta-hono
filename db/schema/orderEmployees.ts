@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm';
 import { integer, sqliteTable } from 'drizzle-orm/sqlite-core';
-import { ordersTable } from './orders';
-import { employeesTable } from './employees';
+import { orders } from './orders';
+import { employees } from './employees';
 
-export const orderEmployeesTable = sqliteTable('order_employees', {
+export const orderEmployees = sqliteTable('order_employees', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   orderId: integer('order_id').notNull(),
   employeeId: integer('employee_id').notNull(),
@@ -12,15 +12,15 @@ export const orderEmployeesTable = sqliteTable('order_employees', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-export const orderEmployeesRelations = relations(orderEmployeesTable, ({ one }) => ({
-  order: one(ordersTable, {
-    fields: [orderEmployeesTable.orderId],
-    references: [ordersTable.id],
+export const orderEmployeesRelations = relations(orderEmployees, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderEmployees.orderId],
+    references: [orders.id],
     relationName: 'order.orderEmployees',
   }),
-  employee: one(employeesTable, {
-    fields: [orderEmployeesTable.employeeId],
-    references: [employeesTable.id],
+  employee: one(employees, {
+    fields: [orderEmployees.employeeId],
+    references: [employees.id],
     relationName: 'employee.orderEmployees',
   }),
 }))

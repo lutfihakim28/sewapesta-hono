@@ -1,5 +1,5 @@
 import { db } from 'db';
-import { employeesTable } from 'db/schema/employees';
+import { employees } from 'db/schema/employees';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { EmployeeRequest } from '@/schemas/employees/EmployeeRequestSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
@@ -9,7 +9,6 @@ import { messages } from '@/constatnts/messages';
 import { EmployeeColumn, EmployeeFilter } from '@/schemas/employees/EmployeeFilterSchema';
 import { countOffset } from '@/utils/countOffset';
 import { Employee } from '@/schemas/employees/EmployeeSchema';
-import { dateFormat } from '@/constatnts/dateFormat';
 
 export abstract class EmployeeService {
   static async getList(query: EmployeeFilter): Promise<Array<Employee>> {
@@ -24,7 +23,7 @@ export abstract class EmployeeService {
       sortBy = query.sortBy
     }
 
-    const employees = await db.query.employeesTable.findMany({
+    const _employees = await db.query.employees.findMany({
       columns: {
         id: true,
         name: true,
@@ -41,34 +40,34 @@ export abstract class EmployeeService {
         }
       },
       where: and(
-        isNull(employeesTable.deletedAt),
+        isNull(employees.deletedAt),
         query.keyword
           ? or(
-            like(employeesTable.name, `%${query.keyword}%`),
-            like(employeesTable.phone, `%${query.keyword}%`)
+            like(employees.name, `%${query.keyword}%`),
+            like(employees.phone, `%${query.keyword}%`)
           )
           : undefined,
       ),
       orderBy: sort === 'asc'
-        ? asc(employeesTable[sortBy])
-        : desc(employeesTable[sortBy]),
+        ? asc(employees[sortBy])
+        : desc(employees[sortBy]),
       limit: Number(query.pageSize || 5),
       offset: countOffset(query.page, query.pageSize)
     })
 
-    return employees;
+    return _employees;
   }
 
   static async get(param: ParamId): Promise<Employee> {
-    const employee = await db.query.employeesTable.findFirst({
+    const employee = await db.query.employees.findFirst({
       columns: {
         id: true,
         name: true,
         phone: true,
       },
       where: and(
-        eq(employeesTable.id, Number(param.id)),
-        isNull(employeesTable.deletedAt),
+        eq(employees.id, Number(param.id)),
+        isNull(employees.deletedAt),
       ),
     })
 
@@ -82,7 +81,7 @@ export abstract class EmployeeService {
   static async create(request: EmployeeRequest): Promise<void> {
     const createdAt = dayjs().unix();
     await db
-      .insert(employeesTable)
+      .insert(employees)
       .values({
         ...request,
         createdAt,
@@ -92,17 +91,17 @@ export abstract class EmployeeService {
   static async update(param: ParamId, request: EmployeeRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingEmployee = await this.checkRecord(param);
+      const existingEmployee = await this.get(param);
 
       await transaction
-        .update(employeesTable)
+        .update(employees)
         .set({
           ...request,
           updatedAt,
         })
         .where(and(
-          eq(employeesTable.id, existingEmployee.id),
-          isNull(employeesTable.deletedAt),
+          eq(employees.id, existingEmployee.id),
+          isNull(employees.deletedAt),
         ))
     })
   }
@@ -110,47 +109,29 @@ export abstract class EmployeeService {
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingEmployee = await this.checkRecord(param)
+      const existingEmployee = await this.get(param)
       await transaction
-        .update(employeesTable)
+        .update(employees)
         .set({
           deletedAt,
         })
         .where(and(
-          eq(employeesTable.id, existingEmployee.id),
-          isNull(employeesTable.deletedAt),
+          eq(employees.id, existingEmployee.id),
+          isNull(employees.deletedAt),
         ))
     })
-  }
-
-  static async checkRecord(param: ParamId) {
-    const employee = db
-      .select({ id: employeesTable.id })
-      .from(employeesTable)
-      .where(and(
-        eq(employeesTable.id, Number(param.id)),
-        isNull(employeesTable.deletedAt)
-      ))
-      .get();
-
-
-    if (!employee) {
-      throw new NotFoundException(messages.errorNotFound('karyawan'))
-    }
-
-    return employee
   }
 
   static async count(query: EmployeeFilter): Promise<number> {
     const employee = db
       .select({ count: count() })
-      .from(employeesTable)
+      .from(employees)
       .where(and(
-        isNull(employeesTable.deletedAt),
+        isNull(employees.deletedAt),
         query.keyword
           ? or(
-            like(employeesTable.name, `%${query.keyword}%`),
-            like(employeesTable.phone, `%${query.keyword}%`)
+            like(employees.name, `%${query.keyword}%`),
+            like(employees.phone, `%${query.keyword}%`)
           )
           : undefined,
       ))

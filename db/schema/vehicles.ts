@@ -1,7 +1,7 @@
 import { VehicleTypeEnum } from '@/enums/VehicleTypeEnum';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const vehiclesTable = sqliteTable('vehicles', {
+export const vehicles = sqliteTable('vehicles', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   licenseNumber: text('license_number').notNull(),

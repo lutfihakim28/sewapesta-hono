@@ -1,7 +1,7 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
-export const employeesTable = sqliteTable('employees', {
+export const employees = sqliteTable('employees', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name', { length: 100 }).notNull(),
   phone: text('phone', { length: 14 }).notNull(),
@@ -10,5 +10,5 @@ export const employeesTable = sqliteTable('employees', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-export const employeesRelations = relations(employeesTable, ({ one }) => ({
+export const employeesRelations = relations(employees, ({ one }) => ({
 }))

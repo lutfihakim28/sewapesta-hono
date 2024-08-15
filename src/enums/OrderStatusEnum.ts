@@ -4,4 +4,5 @@ export enum OrderStatusEnum {
   Event = 'Event',
   Unloading = 'Unloading',
   Done = 'Done',
+  Cancel = 'Cancel',
 }

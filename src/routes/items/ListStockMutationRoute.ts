@@ -1,34 +1,27 @@
-import { BadRequestSchema } from '@/schemas/BadRequestSchema'
-import { PackageCreateSchema } from '@/schemas/packages/PackageCreateSchema'
+import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
-import { SuccessSchema } from '@/schemas/SuccessSchema'
+import { StockMutationListSchema } from '@/schemas/stockMutations/StockMutationListSchema'
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
 import { createRoute } from '@hono/zod-openapi'
 
-export const CreatePackageRoute = createRoute({
-  method: 'post',
-  path: '/',
-  tags: ['Package'],
+export const ListStockMutationRoute = createRoute({
+  method: 'get',
+  path: '/{id}/stock-mutations',
+  tags: ['Item'],
   security: [{
     cookieAuth: [],
   }],
   request: {
-    body: {
-      content: {
-        "multipart/form-data": {
-          schema: PackageCreateSchema,
-        }
-      }
-    }
+    params: ParamIdSchema
   },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: SuccessSchema,
+          schema: StockMutationListSchema,
         },
       },
-      description: 'Item created',
+      description: 'Retrieve list stock mutations',
     },
     401: {
       content: {
@@ -37,14 +30,6 @@ export const CreatePackageRoute = createRoute({
         },
       },
       description: 'Unauthorized',
-    },
-    422: {
-      content: {
-        'application/json': {
-          schema: BadRequestSchema,
-        },
-      },
-      description: 'Validation error',
     },
     500: {
       content: {

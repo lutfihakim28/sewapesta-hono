@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 import { db } from '..'
-import { categoriesTable } from '../schema/categories'
+import { categories } from '../schema/categories'
 
 export async function seedCategories() {
   console.log('Seeding categories...')
-  await db.insert(categoriesTable).values([
+  await db.insert(categories).values([
     {
       name: 'Kain',
       createdAt: dayjs().unix(),

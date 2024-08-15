@@ -1,8 +1,8 @@
-import { vehiclesTable } from 'db/schema/vehicles';
+import { vehicles } from 'db/schema/vehicles';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const VehicleSchema = createSelectSchema(vehiclesTable).pick({
+export const VehicleSchema = createSelectSchema(vehicles).pick({
   id: true,
   licenseNumber: true,
   name: true,

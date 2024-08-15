@@ -1,6 +1,6 @@
 import { messages } from '@/constatnts/messages';
 import { db } from 'db';
-import { vehiclesTable } from 'db/schema/vehicles';
+import { vehicles } from 'db/schema/vehicles';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { VehicleRequest } from '@/schemas/vehicles/VehicleRequestSchema';
@@ -10,22 +10,22 @@ import { and, eq, isNull } from 'drizzle-orm';
 
 export abstract class VehicleService {
   static async getList(): Promise<Array<Vehicle>> {
-    const vehicles = db
+    const _vehicles = db
       .select()
-      .from(vehiclesTable)
-      .where(isNull(vehiclesTable.deletedAt))
+      .from(vehicles)
+      .where(isNull(vehicles.deletedAt))
       .all()
 
-    return vehicles;
+    return _vehicles;
   }
 
   static async get(param: ParamId): Promise<Vehicle> {
     const vehicle = db
       .select()
-      .from(vehiclesTable)
+      .from(vehicles)
       .where(and(
-        isNull(vehiclesTable.deletedAt),
-        eq(vehiclesTable.id, Number(param.id))
+        isNull(vehicles.deletedAt),
+        eq(vehicles.id, Number(param.id))
       ))
       .get()
 
@@ -39,7 +39,7 @@ export abstract class VehicleService {
   static async create(request: VehicleRequest): Promise<void> {
     const createdAt = dayjs().unix();
     await db
-      .insert(vehiclesTable)
+      .insert(vehicles)
       .values({
         ...request,
         createdAt,
@@ -49,15 +49,15 @@ export abstract class VehicleService {
   static async update(param: ParamId, request: VehicleRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingVehicle = await this.checkRecord(param);
+      const existingVehicle = await this.get(param);
 
       await transaction
-        .update(vehiclesTable)
+        .update(vehicles)
         .set({
           ...request,
           updatedAt,
         })
-        .where(eq(vehiclesTable.id, existingVehicle.id))
+        .where(eq(vehicles.id, existingVehicle.id))
     })
   }
 
@@ -65,32 +65,14 @@ export abstract class VehicleService {
     const deletedAt = dayjs().unix()
 
     await db.transaction(async (transaction) => {
-      const existingVehicle = await this.checkRecord(param);
+      const existingVehicle = await this.get(param);
 
       await transaction
-        .update(vehiclesTable)
+        .update(vehicles)
         .set({
           deletedAt
         })
-        .where(eq(vehiclesTable.id, existingVehicle.id))
+        .where(eq(vehicles.id, existingVehicle.id))
     })
-  }
-
-  static async checkRecord(param: ParamId) {
-    const vehicle = db
-      .select({ id: vehiclesTable.id })
-      .from(vehiclesTable)
-      .where(and(
-        eq(vehiclesTable.id, Number(param.id)),
-        isNull(vehiclesTable.deletedAt)
-      ))
-      .get();
-
-
-    if (!vehicle) {
-      throw new NotFoundException(messages.errorNotFound('kategori'))
-    }
-
-    return vehicle
   }
 }

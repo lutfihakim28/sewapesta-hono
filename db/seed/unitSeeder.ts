@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 import { db } from '..'
-import { unitsTable } from '../schema/units'
+import { units } from '../schema/units'
 
 export async function seedUnits() {
   console.log('Seeding units...')
-  await db.insert(unitsTable).values([
+  await db.insert(units).values([
     {
       name: 'Pcs',
       createdAt: dayjs().unix(),

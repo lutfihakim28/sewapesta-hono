@@ -5,31 +5,31 @@ import { Image } from '@/schemas/images/ImageSchema';
 import { ImageUpload } from '@/schemas/images/ImageUploadSchema';
 import dayjs from 'dayjs';
 import { db } from 'db';
-import { imagesTable } from 'db/schema/images';
-import { eq } from 'drizzle-orm';
+import { images } from 'db/schema/images';
+import { eq, and } from 'drizzle-orm';
 import { unlink } from "node:fs/promises";
 
 export abstract class ImageService {
   static async getByReference(request: ImageFilter): Promise<Array<Image>> {
-    const images = await db.query.imagesTable.findMany({
+    const _images = await db.query.images.findMany({
       columns: {
         id: true,
         url: true,
         path: true,
       },
-      where: (table, { eq, and }) => and(
-        eq(table.reference, request.reference),
-        eq(table.referenceId, request.referenceId)
+      where: and(
+        eq(images.reference, request.reference),
+        eq(images.referenceId, request.referenceId)
       )
     })
 
-    return images;
+    return _images;
   }
 
   static async upload(request: ImageUpload) {
     const createdAt = dayjs().unix();
     const formatedDate = dayjs().format('YYYYMMDD');
-    const images = await Promise.all((request.images as Blob[]).map(async (image, id) => {
+    const _images = await Promise.all((request.images as Blob[]).map(async (image, id) => {
       const ext = image.name.split('.')[1];
       const name = `${request.reference}_${request.referenceId}_${formatedDate}_${id}.${ext}`;
       await Bun.write(`static/images/${name}`, image);
@@ -42,7 +42,7 @@ export abstract class ImageService {
       };
     }))
 
-    await db.insert(imagesTable).values(images);
+    await db.insert(images).values(_images);
   }
 
   static async delete(param: ParamId) {
@@ -51,16 +51,16 @@ export abstract class ImageService {
 
       await unlink(image.path);
 
-      await transaction.delete(imagesTable).where(eq(imagesTable.id, image.id))
+      await transaction.delete(images).where(eq(images.id, image.id))
 
     })
   }
 
   static async checkRecord(param: ParamId) {
     const image = db
-      .select({ id: imagesTable.id, path: imagesTable.path })
-      .from(imagesTable)
-      .where(eq(imagesTable.id, Number(param.id)))
+      .select({ id: images.id, path: images.path })
+      .from(images)
+      .where(eq(images.id, Number(param.id)))
       .get();
 
 

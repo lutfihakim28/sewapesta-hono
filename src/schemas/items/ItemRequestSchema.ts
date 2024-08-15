@@ -1,10 +1,10 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { itemsTable } from 'db/schema/items';
+import { items } from 'db/schema/items';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { ImageRequestSchema } from '../images/ImageRequestSchema';
 
-export const ItemCreateSchema = createInsertSchema(itemsTable, {
+export const ItemCreateSchema = createInsertSchema(items, {
   name: z.string({ message: validationMessages.required('Nama barang') }).openapi({ example: 'Lampu' }),
   code: z.string({ message: validationMessages.required('Kode barang') }).openapi({ example: 'SSE' }),
   quantity: z

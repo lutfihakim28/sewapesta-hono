@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 export const DateRangeSchema = z.object({
   startAt: z.string().date().openapi({
-    example: '2022-01-01',
+    description: 'YYYY-MM-DD',
   }),
   endAt: z.string().date().openapi({
-    example: '2022-01-31',
+    description: 'YYYY-MM-DD',
   }),
 }).partial().openapi('DateRange')

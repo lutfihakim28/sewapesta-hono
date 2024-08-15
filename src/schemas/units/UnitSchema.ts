@@ -1,8 +1,8 @@
-import { unitsTable } from 'db/schema/units';
+import { units } from 'db/schema/units';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const UnitSchema = createSelectSchema(unitsTable).pick({
+export const UnitSchema = createSelectSchema(units).pick({
   id: true,
   name: true,
 }).openapi('Unit')

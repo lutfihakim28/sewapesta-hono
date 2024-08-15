@@ -1,33 +1,34 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import { db } from 'db';
-import { categoriesTable } from 'db/schema/categories';
+import { categories } from 'db/schema/categories';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { CategoryRequest } from '@/schemas/categories/CategoryRequestSchema';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
 import { Category } from '@/schemas/categories/CategorySchema';
+import { items } from 'db/schema/items';
 
 export abstract class CategoryService {
   static async getList(): Promise<Array<Category>> {
-    const categories = await db.query.categoriesTable.findMany({
+    const _categories = await db.query.categories.findMany({
       columns: {
         id: true,
         name: true,
       },
-      where: isNull(categoriesTable.deletedAt),
+      where: isNull(categories.deletedAt),
     })
 
-    return categories
+    return _categories
   }
 
-  static async get(param: ParamId): Promise<Category | undefined> {
-    const category = await db.query.categoriesTable.findFirst({
+  static async get(param: ParamId): Promise<Category> {
+    const category = await db.query.categories.findFirst({
       columns: {
         id: true,
         name: true,
       },
-      where: and(eq(categoriesTable.id, Number(param.id)), isNull(categoriesTable.deletedAt)),
+      where: and(eq(categories.id, Number(param.id)), isNull(categories.deletedAt)),
     })
 
     if (!category) {
@@ -40,7 +41,7 @@ export abstract class CategoryService {
   static async create(request: CategoryRequest): Promise<void> {
     const createdAt = dayjs().unix();
     await db
-      .insert(categoriesTable)
+      .insert(categories)
       .values({
         ...request,
         createdAt,
@@ -50,44 +51,32 @@ export abstract class CategoryService {
   static async update(param: ParamId, request: CategoryRequest): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingCategory = await this.checkRecord(param);
+      const existingCategory = await this.get(param);
       await transaction
-        .update(categoriesTable)
+        .update(categories)
         .set({
           ...request,
           updatedAt,
         })
-        .where(eq(categoriesTable.id, existingCategory.id))
+        .where(eq(categories.id, existingCategory.id))
     })
   }
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingCategory = await this.checkRecord(param);
-      await transaction.update(categoriesTable)
+      const existingCategory = await this.get(param);
+      await transaction.update(categories)
         .set({
           deletedAt,
         })
-        .where(eq(categoriesTable.id, existingCategory.id))
+        .where(eq(categories.id, existingCategory.id))
+
+      await transaction.update(items)
+        .set({
+          categoryId: null,
+        })
+        .where(eq(items.categoryId, existingCategory.id))
     })
-  }
-
-  static async checkRecord(param: ParamId) {
-    const category = db
-      .select({ id: categoriesTable.id })
-      .from(categoriesTable)
-      .where(and(
-        eq(categoriesTable.id, Number(param.id)),
-        isNull(categoriesTable.deletedAt)
-      ))
-      .get();
-
-
-    if (!category) {
-      throw new NotFoundException(messages.errorNotFound('kategori'))
-    }
-
-    return category
   }
 }

@@ -1,8 +1,8 @@
-import { imagesTable } from 'db/schema/images';
+import { images } from 'db/schema/images';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const ImageSchema = createSelectSchema(imagesTable).pick({
+export const ImageSchema = createSelectSchema(images).pick({
   id: true,
   url: true,
 }).openapi('Image')

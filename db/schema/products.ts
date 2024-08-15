@@ -1,8 +1,8 @@
 import { relations } from 'drizzle-orm';
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { packageItemsTable } from './packageItems';
+import { productItems } from './productItems';
 
-export const packagesTable = sqliteTable('prices', {
+export const products = sqliteTable('products', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   code: text('code').unique().notNull(),
@@ -13,8 +13,8 @@ export const packagesTable = sqliteTable('prices', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-export const packagesRelations = relations(packagesTable, ({ many }) => ({
-  packageItems: many(packageItemsTable, {
-    relationName: 'package.packageItems'
+export const productsRelations = relations(products, ({ many }) => ({
+  productItems: many(productItems, {
+    relationName: 'product.productItems'
   })
 }))

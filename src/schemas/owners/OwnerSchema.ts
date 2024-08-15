@@ -1,8 +1,8 @@
-import { ownersTable } from 'db/schema/owners';
+import { owners } from 'db/schema/owners';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const OwnerSchema = createSelectSchema(ownersTable).pick({
+export const OwnerSchema = createSelectSchema(owners).pick({
   id: true,
   name: true,
   phone: true,

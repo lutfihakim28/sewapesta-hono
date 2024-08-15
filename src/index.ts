@@ -17,6 +17,9 @@ import VehicleController from './controllers/VehicleController'
 import { prettyJSON } from 'hono/pretty-json'
 import UnitController from './controllers/UnitController'
 import { serveStatic } from 'hono/bun'
+import ProductController from './controllers/ProductController'
+import SQLTestController from './controllers/SQLTestController'
+import OrderController from './controllers/OrderController'
 
 const app = honoApp()
 
@@ -77,6 +80,7 @@ app.use('/api/auth/logout', async (context, next) => {
   await next()
 })
 
+// TODO: uncomment ketika test
 app.use('/api/private/*', async (context, next) => {
   const token = getCookie(context, 'token');
   const secretKey = Bun.env.JWT_SECRET;
@@ -100,12 +104,15 @@ app.use('/static/*', serveStatic({ root: './' }))
 
 // PUBLIC PATH
 app.route('/api/auth', AuthController)
+app.route('/api/test', SQLTestController)
 
 // PRIVATE PATH
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/employees', EmployeeController)
 app.route('/api/private/items', ItemController)
+app.route('/api/private/orders', OrderController)
 app.route('/api/private/owners', OwnerController)
+app.route('/api/private/products', ProductController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/vehicles', VehicleController)
 

@@ -1,15 +1,15 @@
 import { messages } from '@/constatnts/messages';
 import { z } from 'zod';
-import { PackageSchema } from './PackageSchema';
+import { OrderSchema } from './OrderSchema';
 
-export const PackageListSchema = z.object({
+export const OrderListSchema = z.object({
   code: z.number().openapi({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: messages.successList('pemilik'),
+    example: messages.successList('pesanan'),
   }),
-  data: z.array(PackageSchema),
+  data: z.array(OrderSchema),
   meta: z.object({
     page: z.number().positive().openapi({ example: 1 }),
     pageSize: z.number().positive().openapi({ example: 10 }),

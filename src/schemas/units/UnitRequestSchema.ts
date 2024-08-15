@@ -1,9 +1,9 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { unitsTable } from 'db/schema/units';
+import { units } from 'db/schema/units';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const UnitRequestSchema = createInsertSchema(unitsTable, {
+export const UnitRequestSchema = createInsertSchema(units, {
   name: z.string({
     message: validationMessages.required('Nama satuan')
   })

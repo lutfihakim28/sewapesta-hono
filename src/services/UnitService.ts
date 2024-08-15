@@ -1,6 +1,6 @@
 import { messages } from '@/constatnts/messages';
 import { db } from 'db';
-import { unitsTable } from 'db/schema/units';
+import { units } from 'db/schema/units';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { UnitRequest } from '@/schemas/units/UnitRequestSchema';
@@ -10,20 +10,20 @@ import { and, eq, isNull } from 'drizzle-orm';
 
 export abstract class UnitService {
   static async getList(): Promise<Array<Unit>> {
-    const units = db.query.unitsTable.findMany({
+    const _units = db.query.units.findMany({
       columns: {
         id: true,
         name: true,
       },
-      where: (table, { isNull }) => isNull(table.deletedAt),
+      where: isNull(units.deletedAt),
     })
 
-    return units
+    return _units
   }
 
   static async create(request: UnitRequest) {
     const createdAt = dayjs().unix();
-    await db.insert(unitsTable).values({
+    await db.insert(units).values({
       ...request,
       createdAt
     })
@@ -34,9 +34,9 @@ export abstract class UnitService {
       const unit = await this.checkRecord(param);
 
       await transaction
-        .update(unitsTable)
+        .update(units)
         .set(request)
-        .where(eq(unitsTable.id, unit.id))
+        .where(eq(units.id, unit.id))
     })
   }
 
@@ -45,23 +45,23 @@ export abstract class UnitService {
       const unit = await this.checkRecord(param);
 
       await transaction
-        .update(unitsTable)
+        .update(units)
         .set({
           deletedAt: dayjs().unix(),
         })
-        .where(eq(unitsTable.id, unit.id))
+        .where(eq(units.id, unit.id))
     })
   }
 
   static async checkRecord(param: ParamId) {
     const unit = db
       .select({
-        id: unitsTable.id,
+        id: units.id,
       })
-      .from(unitsTable)
+      .from(units)
       .where(and(
-        isNull(unitsTable.deletedAt),
-        eq(unitsTable.id, Number(param.id))
+        isNull(units.deletedAt),
+        eq(units.id, Number(param.id))
       ))
       .get();
 

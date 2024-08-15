@@ -2,11 +2,11 @@ import { SortSchema } from '../SortSchema';
 import { SearchSchema } from '../SearchSchema';
 import { PaginationSchema } from '../PaginationSchema';
 import { z } from 'zod';
-import { ownersTable } from 'db/schema/owners';
+import { owners } from 'db/schema/owners';
 import { OwnerTypeEnum } from '@/enums/OwnerTypeEnum';
 import { validationMessages } from '@/constatnts/validationMessages';
 
-export type OwnerColumn = keyof typeof ownersTable.$inferSelect;
+export type OwnerColumn = keyof typeof owners.$inferSelect;
 
 const _SortSchema = SortSchema<OwnerColumn>([
   'createdAt',

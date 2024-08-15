@@ -1,8 +1,8 @@
-import { imagesTable } from 'db/schema/images';
+import { images } from 'db/schema/images';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const ImageFilterSchema = createSelectSchema(imagesTable).pick({
+export const ImageFilterSchema = createSelectSchema(images).pick({
   reference: true,
   referenceId: true,
 })

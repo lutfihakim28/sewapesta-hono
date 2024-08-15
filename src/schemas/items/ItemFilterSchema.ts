@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { PaginationSchema } from '../PaginationSchema';
 import { SortSchema } from '../SortSchema';
 import { SearchSchema } from '../SearchSchema';
-import { itemsTable } from 'db/schema/items';
+import { items } from 'db/schema/items';
 
-export type ItemColumn = keyof typeof itemsTable.$inferSelect;
+export type ItemColumn = keyof typeof items.$inferSelect;
 
 const _SortSchema = SortSchema<ItemColumn>([
   'id',

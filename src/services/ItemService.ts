@@ -2,16 +2,20 @@ import { db } from 'db';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { and, eq, isNull, asc, desc, or, like, inArray, count } from 'drizzle-orm';
 import dayjs from 'dayjs';
-import { itemsTable } from 'db/schema/items';
+import { items } from 'db/schema/items';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
 import { ItemColumn, ItemFilter } from '@/schemas/items/ItemFilterSchema';
 import { countOffset } from '@/utils/countOffset';
-import { ownersTable } from 'db/schema/owners';
+import { owners } from 'db/schema/owners';
 import { Item } from '@/schemas/items/ItemSchema';
 import { ImageService } from './ImageService';
 import { ItemPatchOvertime } from '@/schemas/items/ItemPatchOvertimeSchema';
+import { StockMutationService } from './StockMutationService';
+import { StockMutationTypeEnum } from '@/enums/StockMutationTypeEnum';
+import { products } from 'db/schema/products';
+import { productItems } from 'db/schema/productItems';
 
 export abstract class ItemService {
   static async getList(query: ItemFilter): Promise<Array<Item>> {
@@ -31,8 +35,8 @@ export abstract class ItemService {
       categories = query.categories.split('-').map((id) => Number(id));
     }
 
-    const items = await db.transaction(async (transaction) => {
-      const __items = await transaction.query.itemsTable.findMany({
+    const allItems = await db.transaction(async (transaction) => {
+      const __items = await transaction.query.items.findMany({
         columns: {
           id: true,
           name: true,
@@ -52,7 +56,7 @@ export abstract class ItemService {
             columns: {
               id: true,
               name: true,
-            }
+            },
           },
           unit: {
             columns: {
@@ -62,29 +66,29 @@ export abstract class ItemService {
           },
         },
         where: and(
-          isNull(itemsTable.deletedAt),
+          isNull(items.deletedAt),
           categories
             ? inArray(
-              itemsTable.categoryId,
+              items.categoryId,
               categories
             )
             : undefined,
           query.keyword
             ? or(
-              like(itemsTable.name, `%${query.keyword}%`),
+              like(items.name, `%${query.keyword}%`),
               inArray(
-                itemsTable.ownerId,
+                items.ownerId,
                 db
-                  .select({ id: ownersTable.id })
-                  .from(ownersTable)
-                  .where(like(ownersTable.name, `%${query.keyword}%`)),
+                  .select({ id: owners.id })
+                  .from(owners)
+                  .where(like(owners.name, `%${query.keyword}%`)),
               )
             )
             : undefined,
         ),
         orderBy: sort === 'asc'
-          ? asc(itemsTable[sortBy])
-          : desc(itemsTable[sortBy]),
+          ? asc(items[sortBy])
+          : desc(items[sortBy]),
         limit: Number(query.pageSize || 5),
         offset: countOffset(query.page, query.pageSize),
       })
@@ -104,15 +108,15 @@ export abstract class ItemService {
       return _items;
     })
 
-    return items;
+    return allItems;
   }
 
   static async get(param: ParamId): Promise<Item> {
     const item = await db.transaction(async (transaction) => {
-      const _item = await transaction.query.itemsTable.findFirst({
+      const _item = await transaction.query.items.findFirst({
         where: and(
-          eq(itemsTable.id, Number(param.id)),
-          isNull(itemsTable.deletedAt),
+          eq(items.id, Number(param.id)),
+          isNull(items.deletedAt),
         ),
         columns: {
           id: true,
@@ -133,6 +137,7 @@ export abstract class ItemService {
             columns: {
               id: true,
               name: true,
+
             }
           },
           category: {
@@ -166,7 +171,7 @@ export abstract class ItemService {
     const createdAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const item = await transaction
-        .insert(itemsTable)
+        .insert(items)
         .values({
           ...request,
           quantity: Number(request.quantity),
@@ -176,7 +181,7 @@ export abstract class ItemService {
           createdAt,
         })
         .returning({
-          id: itemsTable.id,
+          id: items.id,
         })
 
       await ImageService.upload({
@@ -190,7 +195,7 @@ export abstract class ItemService {
   static async update(param: ParamId, request: ItemUpdate): Promise<void> {
     const updatedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingItem = await this.checkRecord(param);
+      const existingItem = await this.get(param);
 
       const deletedImages = request.deletedImages
         ? request.deletedImages.split(',')
@@ -199,7 +204,7 @@ export abstract class ItemService {
       await Promise.all(deletedImages.map((id) => ImageService.delete({ id })))
 
       const item = await transaction
-        .update(itemsTable)
+        .update(items)
         .set({
           ...request,
           quantity: Number(request.quantity),
@@ -209,11 +214,11 @@ export abstract class ItemService {
           updatedAt,
         })
         .where(and(
-          eq(itemsTable.id, existingItem.id),
-          isNull(itemsTable.deletedAt),
+          eq(items.id, existingItem.id),
+          isNull(items.deletedAt),
         ))
         .returning({
-          id: itemsTable.id,
+          id: items.id,
         })
 
       await ImageService.upload({
@@ -224,31 +229,24 @@ export abstract class ItemService {
     })
   }
 
-  static async patchOvertime(param: ParamId, request: ItemPatchOvertime): Promise<void> {
-    const updatedAt = dayjs().unix();
-    await db.transaction(async (transaction) => {
-      const existingItem = await this.checkRecord(param);
+  static async getItemsByProducts(productIds: Array<number>) {
+    const _items = await db
+      .select({
+        id: items.id,
+        productId: products.id,
+      })
+      .from(items)
+      .leftJoin(productItems, eq(productItems.itemId, items.id))
+      .leftJoin(products, eq(productItems.productId, products.id))
+      .where(inArray(products.id, productIds))
 
-      await transaction
-        .update(itemsTable)
-        .set({
-          ...request,
-          updatedAt,
-        })
-        .where(and(
-          eq(itemsTable.id, existingItem.id),
-          isNull(itemsTable.deletedAt),
-        ))
-        .returning({
-          id: itemsTable.id,
-        })
-    })
+    return _items
   }
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
-      const existingItem = await this.checkRecord(param);
+      const existingItem = await this.get(param);
 
       const images = await ImageService.getByReference({
         reference: 'items',
@@ -256,56 +254,34 @@ export abstract class ItemService {
       })
 
       await transaction
-        .update(itemsTable)
+        .update(items)
         .set({
           deletedAt,
         })
         .where(and(
-          eq(itemsTable.id, existingItem.id),
-          isNull(itemsTable.deletedAt),
+          eq(items.id, existingItem.id),
+          isNull(items.deletedAt),
         ))
 
       await Promise.all(images.map((image) => ImageService.delete({ id: image.id.toString() })))
     })
   }
 
-  // static async getOrderedItems(param: ParamId): Promise<OrderedItem> {
-
-  // }
-
-  static async checkRecord(param: ParamId) {
-    const item = db
-      .select({ id: itemsTable.id })
-      .from(itemsTable)
-      .where(and(
-        eq(itemsTable.id, Number(param.id)),
-        isNull(itemsTable.deletedAt)
-      ))
-      .get();
-
-
-    if (!item) {
-      throw new NotFoundException(messages.errorNotFound('barang'))
-    }
-
-    return item
-  }
-
   static async count(query: ItemFilter): Promise<number> {
     const item = db
       .select({ count: count() })
-      .from(itemsTable)
+      .from(items)
       .where(and(
-        isNull(itemsTable.deletedAt),
+        isNull(items.deletedAt),
         query.keyword
           ? or(
-            like(itemsTable.name, `%${query.keyword}%`),
+            like(items.name, `%${query.keyword}%`),
             inArray(
-              itemsTable.ownerId,
+              items.ownerId,
               db
-                .select({ id: ownersTable.id })
-                .from(ownersTable)
-                .where(like(ownersTable.name, `%${query.keyword}%`)),
+                .select({ id: owners.id })
+                .from(owners)
+                .where(like(owners.name, `%${query.keyword}%`)),
             )
           )
           : undefined

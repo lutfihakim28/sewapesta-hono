@@ -1,26 +1,34 @@
-import { PackageListSchema } from '@/schemas/packages/PackageListSchema'
+import { BadRequestSchema } from '@/schemas/BadRequestSchema'
+import { ProductCreateSchema } from '@/schemas/products/ProductCreateSchema'
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
+import { SuccessSchema } from '@/schemas/SuccessSchema'
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
 import { createRoute } from '@hono/zod-openapi'
 
-export const ListPackageRoute = createRoute({
-  method: 'get',
+export const CreateProductRoute = createRoute({
+  method: 'post',
   path: '/',
-  tags: ['Item'],
+  tags: ['Product'],
   security: [{
     cookieAuth: [],
   }],
-  // request: {
-  //   query: ItemFilterSchema,
-  // },
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: ProductCreateSchema,
+        }
+      }
+    }
+  },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: PackageListSchema,
+          schema: SuccessSchema,
         },
       },
-      description: 'Retrieve list items',
+      description: 'Package created',
     },
     401: {
       content: {
@@ -29,6 +37,14 @@ export const ListPackageRoute = createRoute({
         },
       },
       description: 'Unauthorized',
+    },
+    422: {
+      content: {
+        'application/json': {
+          schema: BadRequestSchema,
+        },
+      },
+      description: 'Validation error',
     },
     500: {
       content: {
