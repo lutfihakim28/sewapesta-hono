@@ -1,4 +1,4 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { db } from 'db';
 import { categories } from 'db/schema/categories';
 import { ParamId } from '@/schemas/ParamIdSchema';
@@ -11,14 +11,21 @@ import { items } from 'db/schema/items';
 
 export abstract class CategoryService {
   static async getList(): Promise<Array<Category>> {
-    const _categories = await db.query.categories.findMany({
-      columns: {
-        id: true,
-        name: true,
-      },
-      where: isNull(categories.deletedAt),
-    })
-
+    const _categories = db
+      .select({
+        id: categories.id,
+        name: categories.name,
+        itemsCount: sql<number>`COUNT(
+          CASE WHEN ${items.id} IS NOT NULL THEN 1 END
+        )`
+      })
+      .from(categories)
+      .leftJoin(items, eq(items.categoryId, categories.id))
+      .where(and(
+        isNull(categories.deletedAt),
+        isNull(items.deletedAt),
+      ))
+      .groupBy(categories.id)
     return _categories
   }
 

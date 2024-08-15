@@ -11,9 +11,6 @@ import { countOffset } from '@/utils/countOffset';
 import { owners } from 'db/schema/owners';
 import { Item } from '@/schemas/items/ItemSchema';
 import { ImageService } from './ImageService';
-import { ItemPatchOvertime } from '@/schemas/items/ItemPatchOvertimeSchema';
-import { StockMutationService } from './StockMutationService';
-import { StockMutationTypeEnum } from '@/enums/StockMutationTypeEnum';
 import { products } from 'db/schema/products';
 import { productItems } from 'db/schema/productItems';
 
@@ -41,7 +38,6 @@ export abstract class ItemService {
           id: true,
           name: true,
           quantity: true,
-          code: true,
         },
         with: {
           owner: {
@@ -122,7 +118,6 @@ export abstract class ItemService {
           id: true,
           name: true,
           quantity: true,
-          code: true,
         },
         with: {
           owner: {
@@ -170,6 +165,7 @@ export abstract class ItemService {
   static async create(request: ItemCreate): Promise<void> {
     const createdAt = dayjs().unix();
     await db.transaction(async (transaction) => {
+
       const item = await transaction
         .insert(items)
         .values({

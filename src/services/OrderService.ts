@@ -247,7 +247,6 @@ export abstract class OrderService {
         product: {
           columns: {
             id: true,
-            code: true,
             createdAt: true,
             name: true,
             price: true,
@@ -263,7 +262,6 @@ export abstract class OrderService {
                 item: {
                   columns: {
                     id: true,
-                    code: true,
                     name: true,
                   },
                   with: {
@@ -302,7 +300,6 @@ export abstract class OrderService {
         json_group_array(json_object(
           'id', products.id,
           'name', products.name,
-          'code', products.code
         )) AS 'products'
       FROM employees
       LEFT JOIN product_employee_assignments ON product_employee_assignments.employee_id = employees.id

@@ -42,7 +42,6 @@ export abstract class ProductService {
           query.keyword
             ? or(
               like(products.name, `%${query.keyword}%`),
-              like(products.code, `%${query.keyword}%`),
               inArray(
                 products.id,
                 db
@@ -54,10 +53,7 @@ export abstract class ProductService {
                       db
                         .select({ id: items.id })
                         .from(items)
-                        .where(or(
-                          like(items.name, `%${query.keyword}%`),
-                          like(items.code, `%${query.keyword}%`),
-                        )),
+                        .where(like(items.name, `%${query.keyword}%`)),
                     )
                   ),
               )
@@ -85,7 +81,6 @@ export abstract class ProductService {
           isNull(products.deletedAt)
         ),
         columns: {
-          code: true,
           createdAt: true,
           id: true,
           name: true,
@@ -103,7 +98,6 @@ export abstract class ProductService {
               item: {
                 columns: {
                   id: true,
-                  code: true,
                   name: true,
                 }
               }
@@ -220,7 +214,6 @@ export abstract class ProductService {
         query.keyword
           ? or(
             like(products.name, `%${query.keyword}%`),
-            like(products.code, `%${query.keyword}%`),
             inArray(
               products.id,
               db
@@ -232,10 +225,7 @@ export abstract class ProductService {
                     db
                       .select({ id: items.id })
                       .from(items)
-                      .where(or(
-                        like(items.name, `%${query.keyword}%`),
-                        like(items.code, `%${query.keyword}%`),
-                      )),
+                      .where(like(items.name, `%${query.keyword}%`)),
                   )
                 ),
             )
@@ -261,8 +251,8 @@ export abstract class ProductService {
       .having(eq(count(productItems.itemId), itemIds.length));
 
     if (_products.length > 0) {
-      const existingPackageCode = _products[0].products.code;
-      throw new BadRequestException([`Barang yang dipilih sudah memiliki produk dengan kode ${existingPackageCode}.`])
+      const existingPackageName = _products[0].products.name;
+      throw new BadRequestException([`Barang yang dipilih sudah memiliki produk dengan nama ${existingPackageName}.`])
     }
     return true
   }

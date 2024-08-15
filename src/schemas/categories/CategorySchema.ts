@@ -7,6 +7,10 @@ const _CategorySchema = createSelectSchema(categories).pick({
   name: true,
 })
 
-export type Category = z.infer<typeof _CategorySchema>
+export type Category = z.infer<typeof _CategorySchema> & {
+  itemsCount?: number
+}
 
-export const CategorySchema: z.ZodType<Category> = _CategorySchema.openapi('Category')
+export const CategorySchema: z.ZodType<Category> = _CategorySchema.extend({
+  itemsCount: z.number().optional()
+}).openapi('Category')

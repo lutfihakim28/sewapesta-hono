@@ -9,7 +9,6 @@ import { productItems } from './productItems';
 export const items = sqliteTable('items', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
-  code: text('code').unique().notNull(),
   quantity: integer('quantity', { mode: 'number' }).notNull().default(1),
   unitId: integer('unit').notNull(),
   categoryId: integer('category_id', { mode: 'number' }),

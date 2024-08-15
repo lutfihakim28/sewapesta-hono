@@ -10,7 +10,6 @@ const _ItemSchema = createSelectSchema(items).pick({
   id: true,
   name: true,
   quantity: true,
-  code: true,
 });
 
 export type Item = z.infer<typeof _ItemSchema> & {

@@ -5,7 +5,6 @@ import { productItems } from './productItems';
 export const products = sqliteTable('products', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
-  code: text('code').unique().notNull(),
   overtimeRatio: real('overtime_ratio'),
   price: real('price').notNull().default(0),
   createdAt: integer('created_at', { mode: 'number' }).notNull(),
