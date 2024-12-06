@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { db } from 'db';
 import { orderedProducts } from 'db/schema/orderedProducts';
 import { orders } from 'db/schema/orders';
-import { and, asc, between, count, desc, eq, inArray, isNull, like, or, sql } from 'drizzle-orm';
+import { and, asc, between, count, desc, eq, inArray, isNull, like, not, or, sql } from 'drizzle-orm';
 import { ItemService } from './ItemService';
 import { StockMutationCreate } from '@/schemas/stockMutations/StockMutationCreateSchema';
 import { StockMutationTypeEnum } from '@/enums/StockMutationTypeEnum';
@@ -22,6 +22,8 @@ import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
 import { OrderedProduct } from '@/schemas/orderedProducts/OrderedProductSchema';
 import { AssignedEmployee } from '@/schemas/productEmployeeAssignments/AssignedEmployeeSchema';
 import { OrderPatch } from '@/schemas/orders/OrderPatchSchema';
+import { productItems } from 'db/schema/productItems';
+import { products } from 'db/schema/products';
 
 export abstract class OrderService {
   static async getList(query: OrderFilter): Promise<Array<Order>> {
@@ -124,6 +126,10 @@ export abstract class OrderService {
             employeeId,
           })))
       }))
+
+      if (request.status === OrderStatusEnum.Done) {
+        return order;
+      }
 
       const productIds = request.orderedProducts.map((_order) => _order.productId)
 
@@ -325,8 +331,8 @@ export abstract class OrderService {
         throw new BadRequestException(['Pesanan ini sudah selesai.'])
       }
 
-      if (existingOrder.status === OrderStatusEnum.Cancel && request.status && request.status !== OrderStatusEnum.Created) {
-        throw new BadRequestException(["Status pesanan yang sudah dibatalkan hanya bisa diubah ke 'Dibuat'."])
+      if (existingOrder.status === OrderStatusEnum.Cancel) {
+        throw new BadRequestException(['Status pesanan yang sudah dibatalkan tidak bisa diubah status. Silakan buat pesanan baru.'])
       }
 
       await transaction
@@ -336,33 +342,6 @@ export abstract class OrderService {
           updatedAt,
         })
         .where(eq(orders.id, Number(param.id)));
-
-      if (existingOrder.status === OrderStatusEnum.Cancel && request.status === OrderStatusEnum.Created) {
-        const _orderedProducts = transaction
-          .select({
-            id: orderedProducts.id,
-            quantity: orderedProducts.baseQuantity,
-            productId: orderedProducts.productId
-          })
-          .from(orderedProducts)
-          .where(eq(orderedProducts.orderId, Number(param.id)))
-          .all();
-
-        const _items = await ItemService.getItemsByProducts(_orderedProducts.map((product) => product.productId))
-        const mutations: Array<StockMutationCreate> = _items.map((item) => {
-          const quantity = _orderedProducts.find((_order) => _order.productId === item.productId)?.quantity || 0;
-          return {
-            itemId: item.id,
-            note: 'Dipeasn',
-            type: StockMutationTypeEnum.Reduction,
-            orderId: Number(param.id),
-            quantity,
-          }
-        })
-
-        await StockMutationService.create(mutations)
-        return
-      }
 
       if (request.status && [OrderStatusEnum.Cancel, OrderStatusEnum.Done].includes(request.status)) {
         const _orderedProducts = transaction
@@ -483,5 +462,23 @@ export abstract class OrderService {
     }
 
     return `ORDER/${now}/001`
+  }
+
+  static async countByItem(itemId: number): Promise<number> {
+    const result = await db
+      .select({
+        count: count(),
+      })
+      .from(orders)
+      .leftJoin(orderedProducts, eq(orderedProducts.orderId, orders.id))
+      .leftJoin(products, eq(products.id, orderedProducts.productId))
+      .leftJoin(productItems, eq(productItems.productId, products.id))
+      .where(and(
+        eq(productItems.itemId, itemId),
+        not(inArray(orders.status, [OrderStatusEnum.Cancel, OrderStatusEnum.Done]))
+      ))
+      .groupBy(orders.id)
+
+    return result[0].count;
   }
 }

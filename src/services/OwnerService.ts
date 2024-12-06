@@ -9,6 +9,7 @@ import { messages } from '@/constatnts/messages';
 import { OwnerColumn, OwnerFilter } from '@/schemas/owners/OwnerFilterScheme';
 import { countOffset } from '@/utils/countOffset';
 import { Owner } from '@/schemas/owners/OwnerSchema';
+import { Option, OptionQuery } from '@/schemas/OptionSchema';
 
 export abstract class OwnerService {
   static async getList(query: OwnerFilter): Promise<Array<Owner>> {
@@ -114,6 +115,23 @@ export abstract class OwnerService {
           isNull(owners.deletedAt),
         ))
     })
+  }
+
+  static async getOptions(query: OptionQuery): Promise<Array<Option>> {
+    const options = await db
+      .select({
+        label: owners.name,
+        value: owners.id,
+      })
+      .from(owners)
+      .where(and(
+        isNull(owners.deletedAt),
+        query.keyword
+          ? like(owners.name, `%${query.keyword}%`)
+          : undefined
+      ))
+
+    return options;
   }
 
   static async count(query: OwnerFilter): Promise<number> {

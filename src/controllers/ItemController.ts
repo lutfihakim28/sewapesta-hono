@@ -3,6 +3,8 @@ import { honoApp } from '@/lib/hono';
 import { CreateItemRoute } from '@/routes/items/CreateItemRoute';
 import { DeleteItemRoute } from '@/routes/items/DeleteItemRoute';
 import { DetailItemRoute } from '@/routes/items/DetailItemRoute';
+import { ListItemOrderStatRoute } from '@/routes/items/ListItemOrderStatRoute';
+import { ListItemProductRoute } from '@/routes/items/ListItemProductRoute';
 import { ListItemRoute } from '@/routes/items/ListItemRoute';
 import { ListStockMutationRoute } from '@/routes/items/ListStockMutationRoute';
 import { PatchItemOvertimeRoute } from '@/routes/items/PatchItemOvertimeRoute';
@@ -84,6 +86,31 @@ ItemController.openapi(ListStockMutationRoute, async (context) => {
   return context.json({
     code: 200,
     messages: messages.successList('mutasi stok'),
+    data
+  }, 200)
+})
+
+ItemController.openapi(ListItemProductRoute, async (context) => {
+  const param = context.req.param()
+
+  const data = await ItemService.getProductByItem(param)
+
+  return context.json({
+    code: 200,
+    messages: messages.successList('produk'),
+    data
+  }, 200)
+})
+
+ItemController.openapi(ListItemOrderStatRoute, async (context) => {
+  const param = context.req.param()
+  const query = context.req.valid('query')
+
+  const data = await ItemService.getItemOrderStats(param, query)
+
+  return context.json({
+    code: 200,
+    messages: messages.successList('statistik pemesanan'),
     data
   }, 200)
 })

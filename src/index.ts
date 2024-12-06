@@ -81,22 +81,22 @@ app.use('/api/auth/logout', async (context, next) => {
 })
 
 // TODO: uncomment ketika test
-// app.use('/api/private/*', async (context, next) => {
-//   const token = getCookie(context, 'token');
-//   const secretKey = Bun.env.JWT_SECRET;
+app.use('/api/private/*', async (context, next) => {
+  const token = getCookie(context, 'token');
+  const secretKey = Bun.env.JWT_SECRET;
 
-//   if (!token) {
-//     throw new UnauthorizedException(messages.tokenNotFound)
-//   }
+  if (!token) {
+    throw new UnauthorizedException(messages.tokenNotFound)
+  }
 
-//   const payload = await verify(token, secretKey);
+  const payload = await verify(token, secretKey);
 
-//   if (!payload) {
-//     throw new UnauthorizedException(messages.tokenNotFound)
-//   }
+  if (!payload) {
+    throw new UnauthorizedException(messages.tokenNotFound)
+  }
 
-//   await next()
-// })
+  await next()
+})
 app.use(logger(), prettyJSON())
 
 // STATIC

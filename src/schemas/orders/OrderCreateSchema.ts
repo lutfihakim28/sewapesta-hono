@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { OrderedProductRequest, OrderedProductRequestSchema } from '../orderedProducts/OrderedProductRequestSchema';
 import { orders } from 'db/schema/orders';
 import dayjs from 'dayjs';
+import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
 
 const _OrderCreateSchema = createInsertSchema(orders, {
   customerAddress: z.string({ message: validationMessages.required('Alamat pelanggan') }).openapi({ example: 'Jl. Jalan' }),
@@ -13,6 +14,7 @@ const _OrderCreateSchema = createInsertSchema(orders, {
   startDate: z.number({ message: validationMessages.requiredNumber('Tanggal mulai') }).openapi({ example: dayjs().add(1, 'day').unix() }),
   note: z.string().nullable().openapi({ example: 'Catatan' }),
   middleman: z.boolean().nullable().openapi({ example: false }),
+  status: z.nativeEnum(OrderStatusEnum).nullable(),
 }).pick({
   customerAddress: true,
   customerName: true,
@@ -21,6 +23,7 @@ const _OrderCreateSchema = createInsertSchema(orders, {
   note: true,
   startDate: true,
   middleman: true,
+  status: true,
 })
 
 export type OrderCreate = z.infer<typeof _OrderCreateSchema> & {

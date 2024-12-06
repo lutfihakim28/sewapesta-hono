@@ -1,3 +1,4 @@
+import { OrderStatusEnum } from '@/enums/OrderStatusEnum'
 import { OrderCreate } from '@/schemas/orders/OrderCreateSchema'
 import { OrderService } from '@/services/OrderService'
 import { faker } from '@faker-js/faker/locale/id_ID'
@@ -9,18 +10,22 @@ export async function seedOrders() {
 }
 
 async function recursiveCreate(n: number) {
-  if (n >= 10) {
+  if (n >= 128) {
     return;
   }
+
+  const startDate = dayjs().add(faker.number.int({ min: -10, max: 1 }), 'month')
+  const endDate = startDate.add(faker.number.int({ min: 1, max: 2 }), 'day').unix();
 
   const data: OrderCreate = {
     customerAddress: faker.location.streetAddress(),
     customerName: faker.person.fullName(),
     customerPhone: faker.phone.number(),
     note: faker.lorem.sentence(5),
-    startDate: dayjs().add(faker.number.int({ min: 1, max: 2 }), 'day').unix(),
-    endDate: dayjs().add(faker.number.int({ min: 2, max: 3 }), 'day').unix(),
+    startDate: startDate.unix(),
     middleman: faker.datatype.boolean(),
+    status: dayjs().unix() >= endDate ? OrderStatusEnum.Done : OrderStatusEnum.Created,
+    endDate,
     orderedProducts: new Array(faker.number.int({ min: 1, max: 3 })).fill(0).map(() => {
       return {
         baseQuantity: faker.number.int({ min: 1, max: 2 }),

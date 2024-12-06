@@ -29,20 +29,35 @@ export abstract class ImageService {
   static async upload(request: ImageUpload) {
     const createdAt = dayjs().unix();
     const formatedDate = dayjs().format('YYYYMMDD');
-    const _images = await Promise.all((request.images as Blob[]).map(async (image, id) => {
-      const ext = image.name.split('.')[1];
-      const name = `${request.reference}_${request.referenceId}_${formatedDate}_${id}.${ext}`;
-      await Bun.write(`static/images/${name}`, image);
-      return {
-        createdAt,
-        path: `static/images/${name}`,
-        url: `http://localhost:3000/static/images/${name}`,
-        reference: request.reference,
-        referenceId: request.referenceId,
-      };
-    }))
+    if (request.images instanceof Array) {
+      const _images = await Promise.all((request.images as Blob[]).map(async (image, id) => {
+        const ext = image.name.split('.')[1];
+        const name = `${request.reference}_${request.referenceId}_${formatedDate}_${id}.${ext}`;
+        await Bun.write(`static/images/${name}`, image);
+        return {
+          createdAt,
+          path: `static/images/${name}`,
+          url: `http://localhost:3000/static/images/${name}`,
+          reference: request.reference,
+          referenceId: request.referenceId,
+        };
+      }))
 
-    await db.insert(images).values(_images);
+      await db.insert(images).values(_images);
+      return;
+    }
+
+    const ext = (request.images as Blob).name.split('.')[1];
+    const name = `${request.reference}_${request.referenceId}_${formatedDate}_0.${ext}`;
+    await Bun.write(`static/images/${name}`, (request.images as Blob));
+
+    await db.insert(images).values({
+      createdAt,
+      path: `static/images/${name}`,
+      url: `http://localhost:3000/static/images/${name}`,
+      reference: request.reference,
+      referenceId: request.referenceId,
+    });
   }
 
   static async delete(param: ParamId) {

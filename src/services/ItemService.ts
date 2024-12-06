@@ -1,6 +1,6 @@
 import { db } from 'db';
 import { ParamId } from '@/schemas/ParamIdSchema';
-import { and, eq, isNull, asc, desc, or, like, inArray, count } from 'drizzle-orm';
+import { and, eq, isNull, asc, desc, or, like, inArray, count, sql, sum } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { items } from 'db/schema/items';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
@@ -13,6 +13,15 @@ import { Item } from '@/schemas/items/ItemSchema';
 import { ImageService } from './ImageService';
 import { products } from 'db/schema/products';
 import { productItems } from 'db/schema/productItems';
+import { ItemProduct } from '@/schemas/items/ItemProductSchema';
+import { ItemOrderStat } from '@/schemas/items/ItemOrderStatSchema';
+import { orders } from 'db/schema/orders';
+import { orderedProducts } from 'db/schema/orderedProducts';
+import { ItemOrderStatQuery } from '@/schemas/items/ItemOrderStatQuerySchema';
+import { OrderService } from './OrderService';
+import { BadRequestException } from '@/exceptions/BadRequestException';
+import { ProductItemService } from './ProductItemService';
+import { ProductService } from './ProductService';
 
 export abstract class ItemService {
   static async getList(query: ItemFilter): Promise<Array<Item>> {
@@ -178,13 +187,30 @@ export abstract class ItemService {
         })
         .returning({
           id: items.id,
+          name: items.name,
         })
 
-      await ImageService.upload({
-        reference: 'items',
-        referenceId: item[0].id,
-        images: request.images,
-      })
+      if (!!request.images) {
+        await ImageService.upload({
+          reference: 'items',
+          referenceId: item[0].id,
+          images: request.images,
+        })
+      }
+
+      if (!!request.price) {
+        await ProductService.create({
+          name: item[0].name,
+          price: request.price,
+          overtimeRatio: request.overtimeRatio || 0,
+          productItems: [
+            {
+              itemId: item[0].id,
+              price: request.price,
+            }
+          ],
+        })
+      }
     })
   }
 
@@ -217,11 +243,14 @@ export abstract class ItemService {
           id: items.id,
         })
 
-      await ImageService.upload({
-        reference: 'items',
-        referenceId: item[0].id,
-        images: request.images,
-      })
+      if (!!request.images) {
+        await ImageService.upload({
+          reference: 'items',
+          referenceId: item[0].id,
+          images: request.images,
+        })
+      }
+
     })
   }
 
@@ -241,6 +270,10 @@ export abstract class ItemService {
 
   static async delete(param: ParamId) {
     const deletedAt = dayjs().unix();
+    const orderCount = await OrderService.countByItem(Number(param.id));
+    if (orderCount > 0) {
+      throw new BadRequestException(['Barang masih digunakan dalam pesanan aktif.'])
+    }
     await db.transaction(async (transaction) => {
       const existingItem = await this.get(param);
 
@@ -260,6 +293,59 @@ export abstract class ItemService {
         ))
 
       await Promise.all(images.map((image) => ImageService.delete({ id: image.id.toString() })))
+      await ProductItemService.deleteByItem(Number(param.id))
+    })
+  }
+
+  static async getProductByItem(param: ParamId): Promise<Array<ItemProduct>> {
+    const _products = await db
+      .select({
+        id: products.id,
+        name: products.name,
+        price: productItems.price,
+      })
+      .from(productItems)
+      .leftJoin(items, eq(items.id, productItems.itemId))
+      .leftJoin(products, eq(products.id, productItems.productId))
+      .where(eq(items.id, Number(param.id)))
+
+    return _products
+  }
+
+  static async getItemOrderStats(param: ParamId, query: ItemOrderStatQuery): Promise<Array<ItemOrderStat>> {
+    const year = query.year || dayjs().format('YYYY');
+
+    const stats = await db
+      .select({
+        order: count(),
+        quantity: sum(orderedProducts.baseQuantity),
+        month: sql<string>`strftime('%Y-%m', ${orders.startDate}, 'unixepoch')`,
+        monthId: sql<string>`strftime('%m', ${orders.startDate}, 'unixepoch')`,
+      })
+      .from(orders)
+      .leftJoin(orderedProducts, eq(orderedProducts.orderId, orders.id))
+      .leftJoin(products, eq(products.id, orderedProducts.productId))
+      .leftJoin(productItems, eq(productItems.productId, products.id))
+      .where(and(
+        eq(productItems.itemId, Number(param.id)),
+        eq(sql<string>`strftime('%Y', ${orders.startDate}, 'unixepoch')`, year)
+      ))
+      .groupBy(sql`strftime('%Y-%m', ${orders.startDate}, 'unixepoch')`)
+
+    return new Array(12).fill(0).map((_, id) => {
+      const existingData = stats.find((stat) => Number(stat.monthId) === id + 1);
+      const data: ItemOrderStat = {
+        month: `${query.year}-${(id + 1).toString().padStart(2, '0')}`,
+        order: 0,
+        quantity: 0,
+      }
+      if (existingData) {
+        data.month = existingData.month;
+        data.order = existingData.order;
+        data.quantity = Number(existingData.quantity || 0);
+      }
+
+      return data;
     })
   }
 

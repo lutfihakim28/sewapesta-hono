@@ -7,7 +7,7 @@ export async function seedItems() {
   console.log('Seeding items...')
   await db.insert(items).values([
     {
-      quantity: faker.number.int({ min: 60, max: 100 }),
+      quantity: faker.number.int({ min: 800, max: 1000 }),
       name: 'Sound System Event',
       ownerId: faker.helpers.arrayElement([1, 2, 3]),
       unitId: 1,
@@ -15,7 +15,7 @@ export async function seedItems() {
       createdAt: dayjs().unix(),
     },
     {
-      quantity: faker.number.int({ min: 60, max: 100 }),
+      quantity: faker.number.int({ min: 800, max: 1000 }),
       name: 'Sound System Hajatan',
       ownerId: faker.helpers.arrayElement([1, 2, 3]),
       unitId: 1,
@@ -23,7 +23,7 @@ export async function seedItems() {
       createdAt: dayjs().unix(),
     },
     {
-      quantity: faker.number.int({ min: 60, max: 100 }),
+      quantity: faker.number.int({ min: 800, max: 1000 }),
       name: 'Generator 10000Watt',
       ownerId: faker.helpers.arrayElement([1, 2, 3]),
       unitId: 1,
@@ -31,7 +31,7 @@ export async function seedItems() {
       createdAt: dayjs().unix(),
     },
     {
-      quantity: faker.number.int({ min: 60, max: 100 }),
+      quantity: faker.number.int({ min: 800, max: 1000 }),
       name: 'Generator 15000Watt',
       ownerId: faker.helpers.arrayElement([1, 2, 3]),
       unitId: 1,
@@ -39,7 +39,7 @@ export async function seedItems() {
       createdAt: dayjs().unix(),
     },
     {
-      quantity: faker.number.int({ min: 60, max: 100 }),
+      quantity: faker.number.int({ min: 800, max: 1000 }),
       name: 'Generator 20000Watt',
       ownerId: faker.helpers.arrayElement([1, 2, 3]),
       unitId: 1,

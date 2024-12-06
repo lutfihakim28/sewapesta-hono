@@ -20,9 +20,9 @@ export const ImageRequestSchema = z.object({
       type: 'array',
       items: { type: 'string', format: 'binary' },
       description: 'Hanya mendukung format .png, .jpeg, atau .jpg. Berukuran maksimal 10MB',
-    })
+    }).optional()
 });
 
 export type ImageRequest = {
-  images: Blob[]
+  images: Blob[] | Blob
 }

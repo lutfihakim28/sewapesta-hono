@@ -4,10 +4,23 @@ import { CreateOwnerRoute } from '@/routes/owners/CreateOwnerRoute';
 import { DeleteOwnerRoute } from '@/routes/owners/DeleteOwnerRoute';
 import { DetailOwnerRoute } from '@/routes/owners/DetailOwnerRoute';
 import { ListOwnerRoute } from '@/routes/owners/ListOwnerRoute';
+import { OptionOwnerRoute } from '@/routes/owners/OptionOwnerRoute';
 import { UpdateOwnerRoute } from '@/routes/owners/UpdateOwnerRoute';
 import { OwnerService } from '@/services/OwnerService';
 
 const OwnerController = honoApp()
+
+OwnerController.openapi(OptionOwnerRoute, async (context) => {
+  const query = context.req.valid('query');
+
+  const options = await OwnerService.getOptions(query);
+
+  return context.json({
+    code: 200,
+    messages: messages.successList('opsi pemilik'),
+    data: options,
+  }, 200)
+})
 
 OwnerController.openapi(ListOwnerRoute, async (context) => {
   const query = context.req.valid('query');
