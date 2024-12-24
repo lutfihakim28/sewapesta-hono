@@ -10,9 +10,9 @@ export const items = sqliteTable('items', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   quantity: integer('quantity', { mode: 'number' }).notNull().default(1),
-  unitId: integer('unit').notNull(),
-  categoryId: integer('category_id', { mode: 'number' }),
-  ownerId: integer('owner_id', { mode: 'number' }).notNull(),
+  unitId: integer('unit').references(() => units.id, { onDelete: 'cascade' }).notNull(),
+  categoryId: integer('category_id', { mode: 'number' }).references(() => categories.id, { onDelete: 'cascade' }),
+  ownerId: integer('owner_id', { mode: 'number' }).references(() => owners.id, { onDelete: 'cascade' }).notNull(),
   createdAt: integer('created_at', { mode: 'number' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'number' }),
   deletedAt: integer('deleted_at', { mode: 'number' }),
@@ -27,7 +27,7 @@ export const itemsRelations = relations(items, ({ one, many }) => ({
   owner: one(owners, {
     fields: [items.ownerId],
     references: [owners.id],
-    relationName: 'owner.item',
+    relationName: 'owner.items',
   }),
   unit: one(units, {
     fields: [items.unitId],

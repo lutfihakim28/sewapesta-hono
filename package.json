@@ -3,7 +3,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run db/migrate.ts",
     "db:seed": "bun run db/seed/index.ts",
-    "db:init": "bun db:generate && bun db:migrate",
+    "db:init": "bun db:generate && bun db:migrate && bun db:seed",
     "db:drop": "drizzle-kit drop",
     "db:reset": "bun db:drop && rm -r sewapesta.db && bun db:generate && bun db:migrate && bun db:seed",
     "route:list": "bun run src/routeLists.ts",

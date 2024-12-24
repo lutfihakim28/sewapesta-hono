@@ -20,6 +20,7 @@ export const db = drizzle(connection, {
   schema: {
     ...categories,
     ...employees,
+    ...products,
     ...images,
     ...items,
     ...orderedProducts,
@@ -27,7 +28,6 @@ export const db = drizzle(connection, {
     ...owners,
     ...productEmployeeAssignments,
     ...productItems,
-    ...products,
     ...stockMutations,
     ...units,
     ...users,

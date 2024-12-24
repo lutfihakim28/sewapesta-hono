@@ -1,6 +1,7 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 import { OwnerTypeEnum } from '@/enums/OwnerTypeEnum';
+import { items } from './items';
 
 export const owners = sqliteTable('owners', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -17,5 +18,8 @@ export const owners = sqliteTable('owners', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-export const ownersRelations = relations(owners, ({ one }) => ({
+export const ownersRelations = relations(owners, ({ many }) => ({
+  items: many(items, {
+    relationName: 'owner.items'
+  }),
 }))

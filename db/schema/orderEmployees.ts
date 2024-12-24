@@ -5,7 +5,7 @@ import { employees } from './employees';
 
 export const orderEmployees = sqliteTable('order_employees', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  orderId: integer('order_id').notNull(),
+  orderId: integer('order_id').references(() => orders.id, { onDelete: 'cascade' }).notNull(),
   employeeId: integer('employee_id').notNull(),
   createdAt: integer('created_at', { mode: 'number' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'number' }),

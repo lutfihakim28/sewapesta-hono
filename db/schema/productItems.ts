@@ -5,8 +5,8 @@ import { products } from './products';
 
 export const productItems = sqliteTable('product_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  itemId: integer('item_id').notNull(),
-  productId: integer('product_id').notNull(),
+  itemId: integer('item_id').references(() => items.id, { onDelete: 'cascade' }).notNull(),
+  productId: integer('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
   price: real('price').notNull(),
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
