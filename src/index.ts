@@ -20,6 +20,7 @@ import { serveStatic } from 'hono/bun'
 import ProductController from './controllers/ProductController'
 import SQLTestController from './controllers/SQLTestController'
 import OrderController from './controllers/OrderController'
+import { NotFoundException } from './exceptions/NotFoundException'
 
 const app = honoApp()
 
@@ -80,7 +81,6 @@ app.use('/api/auth/logout', async (context, next) => {
   await next()
 })
 
-// TODO: uncomment ketika test
 app.use('/api/private/*', async (context, next) => {
   const token = getCookie(context, 'token');
   const secretKey = Bun.env.JWT_SECRET;
