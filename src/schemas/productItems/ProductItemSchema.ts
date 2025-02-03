@@ -1,8 +1,8 @@
-import { productItems } from 'db/schema/productItems';
+import { productsItems } from 'db/schema/productsItems';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-const _ProductItemSchema = createSelectSchema(productItems).pick({
+const _ProductItemSchema = createSelectSchema(productsItems).pick({
   id: true,
   price: true,
 })

@@ -6,11 +6,11 @@ import { orders } from 'db/schema/orders';
 import { and, asc, between, count, desc, eq, inArray, isNull, like, not, or, sql } from 'drizzle-orm';
 import { ItemService } from './ItemService';
 import { StockMutationCreate } from '@/schemas/stockMutations/StockMutationCreateSchema';
-import { StockMutationTypeEnum } from '@/enums/StockMutationTypeEnum';
+import { ItemMutationTypeEnum } from '@/enums/ItemMutationType.Enum';
 import { StockMutationService } from './StockMutationService';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { OrderUpdate } from '@/schemas/orders/OrderUpdateSchema';
-import { stockMutations } from 'db/schema/stockMutations';
+import { itemMutations } from 'db/schema/itemMutations';
 import { productEmployeeAssignments } from 'db/schema/productEmployeeAssignments';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { messages } from '@/constatnts/messages';
@@ -22,7 +22,7 @@ import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
 import { OrderedProduct } from '@/schemas/orderedProducts/OrderedProductSchema';
 import { AssignedEmployee } from '@/schemas/productEmployeeAssignments/AssignedEmployeeSchema';
 import { OrderPatch } from '@/schemas/orders/OrderPatchSchema';
-import { productItems } from 'db/schema/productItems';
+import { productsItems } from 'db/schema/productsItems';
 import { products } from 'db/schema/products';
 
 export abstract class OrderService {
@@ -140,7 +140,7 @@ export abstract class OrderService {
         return {
           itemId: item.id,
           note: 'Dipesan',
-          type: StockMutationTypeEnum.Reduction,
+          type: ItemMutationTypeEnum.Reduction,
           orderId: order[0].id,
           quantity,
         }
@@ -159,8 +159,8 @@ export abstract class OrderService {
     await db.transaction(async (transaction) => {
       await this.get(param)
       await transaction
-        .delete(stockMutations)
-        .where(eq(stockMutations.orderId, Number(param.id)))
+        .delete(itemMutations)
+        .where(eq(itemMutations.orderId, Number(param.id)))
 
       await StockMutationService.checkStock(request.orderedProducts);
 
@@ -207,7 +207,7 @@ export abstract class OrderService {
         return {
           itemId: item.id,
           note: 'Dipesan',
-          type: StockMutationTypeEnum.Reduction,
+          type: ItemMutationTypeEnum.Reduction,
           orderId: Number(param.id),
           quantity,
         }
@@ -360,7 +360,7 @@ export abstract class OrderService {
           return {
             itemId: item.id,
             note: request.status === OrderStatusEnum.Cancel ? 'Dibatalkan' : 'Pesanan Selesai',
-            type: StockMutationTypeEnum.Addition,
+            type: ItemMutationTypeEnum.Addition,
             orderId: Number(param.id),
             quantity,
           }
@@ -400,8 +400,8 @@ export abstract class OrderService {
         .where(inArray(productEmployeeAssignments.orderedProductId, deletedOrderedProducts.map((data) => data.id)))
 
       await transaction
-        .delete(stockMutations)
-        .where(eq(stockMutations.orderId, Number(param.id)))
+        .delete(itemMutations)
+        .where(eq(itemMutations.orderId, Number(param.id)))
     })
   }
 
@@ -472,9 +472,9 @@ export abstract class OrderService {
       .from(orders)
       .leftJoin(orderedProducts, eq(orderedProducts.orderId, orders.id))
       .leftJoin(products, eq(products.id, orderedProducts.productId))
-      .leftJoin(productItems, eq(productItems.productId, products.id))
+      .leftJoin(productsItems, eq(productsItems.productId, products.id))
       .where(and(
-        eq(productItems.itemId, itemId),
+        eq(productsItems.itemId, itemId),
         not(inArray(orders.status, [OrderStatusEnum.Cancel, OrderStatusEnum.Done]))
       ))
       .groupBy(orders.id)

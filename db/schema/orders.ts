@@ -22,19 +22,15 @@ export const orders = sqliteTable('orders', {
     ],
   }).default(OrderStatusEnum.Created),
   middleman: integer('middleman', { mode: 'boolean' }).default(false),
-  overtime: integer('overtime', { mode: 'number' }).default(0),
-  startDate: integer('start_date', { mode: 'number' }).notNull(),
-  endDate: integer('end_date', { mode: 'number' }).notNull(),
-  createdAt: integer('created_at', { mode: 'number' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'number' }),
-  deletedAt: integer('deleted_at', { mode: 'number' }),
+  overtime: integer('overtime').default(0),
+  startDate: integer('start_date').notNull(),
+  endDate: integer('end_date').notNull(),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at'),
+  deletedAt: integer('deleted_at'),
 });
 
 export const ordersRelations = relations(orders, ({ many }) => ({
-  orderedProducts: many(orderedProducts, {
-    relationName: 'order.orderedProducts'
-  }),
-  orderEmployees: many(orderEmployees, {
-    relationName: 'order.orderEmployees'
-  })
+  orderedProducts: many(orderedProducts),
+  orderEmployees: many(orderEmployees)
 }))

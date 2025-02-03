@@ -23,7 +23,7 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
   const payload: JWTPayload = {
     id: user.id,
     username: user.username,
-    exp: dayjs().add(10, 'years'),
+    exp: dayjs().add(10, 'years').unix(),
   };
 
   const secretKey = Bun.env.JWT_SECRET;

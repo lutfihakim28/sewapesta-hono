@@ -20,7 +20,7 @@ import { serveStatic } from 'hono/bun'
 import ProductController from './controllers/ProductController'
 import SQLTestController from './controllers/SQLTestController'
 import OrderController from './controllers/OrderController'
-import { NotFoundException } from './exceptions/NotFoundException'
+// import { NotFoundException } from './exceptions/NotFoundException'
 
 const app = honoApp()
 
@@ -107,7 +107,7 @@ app.route('/api/auth', AuthController)
 app.route('/api/test', SQLTestController)
 
 // PRIVATE PATH
-app.route('/api/private/categories', CategoryController)
+app.route('/api/private/categoriesTable', CategoryController)
 app.route('/api/private/employees', EmployeeController)
 app.route('/api/private/items', ItemController)
 app.route('/api/private/orders', OrderController)

@@ -12,7 +12,7 @@ import { owners } from 'db/schema/owners';
 import { Item } from '@/schemas/items/ItemSchema';
 import { ImageService } from './ImageService';
 import { products } from 'db/schema/products';
-import { productItems } from 'db/schema/productItems';
+import { productsItems } from 'db/schema/productsItems';
 import { ItemProduct } from '@/schemas/items/ItemProductSchema';
 import { ItemOrderStat } from '@/schemas/items/ItemOrderStatSchema';
 import { orders } from 'db/schema/orders';
@@ -261,8 +261,8 @@ export abstract class ItemService {
         productId: products.id,
       })
       .from(items)
-      .leftJoin(productItems, eq(productItems.itemId, items.id))
-      .leftJoin(products, eq(productItems.productId, products.id))
+      .leftJoin(productsItems, eq(productsItems.itemId, items.id))
+      .leftJoin(products, eq(productsItems.productId, products.id))
       .where(inArray(products.id, productIds))
 
     return _items
@@ -302,11 +302,11 @@ export abstract class ItemService {
       .select({
         id: products.id,
         name: products.name,
-        price: productItems.price,
+        price: productsItems.price,
       })
-      .from(productItems)
-      .leftJoin(items, eq(items.id, productItems.itemId))
-      .leftJoin(products, eq(products.id, productItems.productId))
+      .from(productsItems)
+      .leftJoin(items, eq(items.id, productsItems.itemId))
+      .leftJoin(products, eq(products.id, productsItems.productId))
       .where(eq(items.id, Number(param.id)))
 
     return _products
@@ -325,9 +325,9 @@ export abstract class ItemService {
       .from(orders)
       .leftJoin(orderedProducts, eq(orderedProducts.orderId, orders.id))
       .leftJoin(products, eq(products.id, orderedProducts.productId))
-      .leftJoin(productItems, eq(productItems.productId, products.id))
+      .leftJoin(productsItems, eq(productsItems.productId, products.id))
       .where(and(
-        eq(productItems.itemId, Number(param.id)),
+        eq(productsItems.itemId, Number(param.id)),
         eq(sql<string>`strftime('%Y', ${orders.startDate}, 'unixepoch')`, year)
       ))
       .groupBy(sql`strftime('%Y-%m', ${orders.startDate}, 'unixepoch')`)

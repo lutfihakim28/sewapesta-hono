@@ -1,10 +1,11 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { timestamps } from 'db/schema/timestamps.helper';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 import { OwnerTypeEnum } from '@/enums/OwnerTypeEnum';
-import { items } from './items';
+import { items } from 'db/schema/items';
 
 export const owners = sqliteTable('owners', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   phone: text('phone').notNull(),
   type: text('type', {
@@ -13,13 +14,11 @@ export const owners = sqliteTable('owners', {
       OwnerTypeEnum.Individu,
     ]
   }).default(OwnerTypeEnum.Individu),
-  createdAt: integer('created_at', { mode: 'number' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'number' }),
-  deletedAt: integer('deleted_at', { mode: 'number' }),
-})
+  ...timestamps,
+}, (table) => ({
+  ownerTypeIndex: index('owners_type_index').on(table.type),
+}))
 
 export const ownersRelations = relations(owners, ({ many }) => ({
-  items: many(items, {
-    relationName: 'owner.items'
-  }),
+  items: many(items),
 }))

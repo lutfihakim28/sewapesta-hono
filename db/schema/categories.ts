@@ -1,9 +1,9 @@
+import dayjs from 'dayjs';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {timestamps} from "db/schema/timestamps.helper";
 
 export const categories = sqliteTable('categories', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
-  createdAt: integer('created_at', { mode: 'number' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'number' }),
-  deletedAt: integer('deleted_at', { mode: 'number' }),
+  ...timestamps,
 })

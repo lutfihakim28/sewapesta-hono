@@ -1,43 +1,40 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { owners } from './owners';
 import { relations } from 'drizzle-orm';
 import { units } from './units';
-import { categories } from './categories';
-import { stockMutations } from './stockMutations';
-import { productItems } from './productItems';
+import { categories } from 'db/schema/categories';
+import { itemMutations } from 'db/schema/itemMutations';
+import { productsItems } from 'db/schema/productsItems';
+import {timestamps} from "db/schema/timestamps.helper";
 
 export const items = sqliteTable('items', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
-  quantity: integer('quantity', { mode: 'number' }).notNull().default(1),
+  quantity: integer('quantity').notNull().default(1),
+  overtime: real('overtime').default(0),
+  price: real('price').notNull().default(0),
   unitId: integer('unit').references(() => units.id, { onDelete: 'cascade' }).notNull(),
-  categoryId: integer('category_id', { mode: 'number' }).references(() => categories.id, { onDelete: 'cascade' }),
-  ownerId: integer('owner_id', { mode: 'number' }).references(() => owners.id, { onDelete: 'cascade' }).notNull(),
-  createdAt: integer('created_at', { mode: 'number' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'number' }),
-  deletedAt: integer('deleted_at', { mode: 'number' }),
-})
+  categoryId: integer('category_id').references(() => categories.id, { onDelete: 'cascade' }),
+  ownerId: integer('owner_id').references(() => owners.id, { onDelete: 'cascade' }).notNull(),
+  ...timestamps,
+}, (table) => ({
+  itemCategoryIndex: index('item_category_index').on(table.categoryId),
+  itemOwnerIndex: index('item_owner_index').on(table.ownerId),
+}))
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
   category: one(categories, {
-    fields: [items.categoryId],
+    fields: [ items.categoryId],
     references: [categories.id],
-    relationName: 'category.item'
   }),
   owner: one(owners, {
-    fields: [items.ownerId],
+    fields: [ items.ownerId],
     references: [owners.id],
-    relationName: 'owner.items',
   }),
   unit: one(units, {
-    fields: [items.unitId],
+    fields: [ items.unitId],
     references: [units.id],
-    relationName: 'unit.item',
   }),
-  stockMutations: many(stockMutations, {
-    relationName: 'item.stockMutations'
-  }),
-  productItems: many(productItems, {
-    relationName: 'item.productItems'
-  }),
+  stockMutations: many(itemMutations),
+  productItems: many(productsItems),
 }))

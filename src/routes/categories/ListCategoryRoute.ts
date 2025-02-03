@@ -17,7 +17,7 @@ export const ListCategoryRoute = createRoute({
           schema: CategoryListSchema,
         },
       },
-      description: 'Retrieve list categories',
+      description: 'Retrieve list categoriesTable',
     },
     401: {
       content: {

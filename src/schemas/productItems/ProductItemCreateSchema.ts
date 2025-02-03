@@ -1,9 +1,9 @@
 import { validationMessages } from '@/constatnts/validationMessages';
-import { productItems } from 'db/schema/productItems';
+import { productsItems } from 'db/schema/productsItems';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const ProductItemCreateSchema = createInsertSchema(productItems, {
+export const ProductItemCreateSchema = createInsertSchema(productsItems, {
   itemId: z.number({ message: validationMessages.requiredNumber('ID barang') }),
   price: z.number({ message: validationMessages.requiredNumber('Harga barang') })
 }).pick({

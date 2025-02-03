@@ -13,26 +13,21 @@ export const orderedProducts = sqliteTable('ordered_products', {
   orderedQuantity: integer('ordered_quantity').notNull(),
   orderedUnitId: integer('ordered_unit').notNull(),
   price: real('price').notNull().default(0),
-  deletedAt: integer('deleted_at', { mode: 'number' }),
+  deletedAt: integer('deleted_at'),
 })
 
 export const orderedProductsRelations = relations(orderedProducts, ({ one, many }) => ({
   product: one(products, {
     fields: [orderedProducts.productId],
     references: [products.id],
-    relationName: 'product.orderedProducts',
   }),
   order: one(orders, {
     fields: [orderedProducts.orderId],
     references: [orders.id],
-    relationName: 'order.orderedProducts',
   }),
   orderedUnit: one(units, {
     fields: [orderedProducts.orderedUnitId],
     references: [units.id],
-    relationName: 'unit.orderedProducts',
   }),
-  assignedEmployees: many(productEmployeeAssignments, {
-    relationName: 'orderedProduct.productEmployeeAssignments'
-  })
+  assignedEmployees: many(productEmployeeAssignments)
 }));

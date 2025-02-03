@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { db } from 'db';
-import { productItems } from 'db/schema/productItems';
+import { productsItems } from 'db/schema/productsItems';
 import { products } from 'db/schema/products';
 import { eq, inArray } from 'drizzle-orm';
 
@@ -9,14 +9,14 @@ export abstract class ProductItemService {
     const deletedAt = dayjs().unix();
     await db.transaction(async (transaction) => {
       const deletedProductItem = await transaction
-        .update(productItems)
+        .update(productsItems)
         .set({
           deletedAt,
         })
-        .where(eq(productItems.itemId, itemId))
+        .where(eq(productsItems.itemId, itemId))
         .returning({
-          productId: productItems.productId,
-          price: productItems.price,
+          productId: productsItems.productId,
+          price: productsItems.price,
         })
 
       const _products = await transaction

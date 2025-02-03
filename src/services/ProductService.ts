@@ -10,7 +10,7 @@ import { countOffset } from '@/utils/countOffset';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { items } from 'db/schema/items';
-import { productItems } from 'db/schema/productItems';
+import { productsItems } from 'db/schema/productsItems';
 import { products } from 'db/schema/products';
 import { and, asc, count, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
 
@@ -45,11 +45,11 @@ export abstract class ProductService {
               inArray(
                 products.id,
                 db
-                  .select({ productId: productItems.productId })
-                  .from(productItems)
+                  .select({ productId: productsItems.productId })
+                  .from(productsItems)
                   .where(
                     inArray(
-                      productItems.itemId,
+                      productsItems.itemId,
                       db
                         .select({ id: items.id })
                         .from(items)
@@ -139,7 +139,7 @@ export abstract class ProductService {
       })
 
       await transaction
-        .insert(productItems)
+        .insert(productsItems)
         .values(productItemsValue)
     })
   }
@@ -162,8 +162,8 @@ export abstract class ProductService {
         ))
 
       await transaction
-        .delete(productItems)
-        .where(eq(productItems.productId, existingPackage.id))
+        .delete(productsItems)
+        .where(eq(productsItems.productId, existingPackage.id))
 
       const productItemsValue = request.productItems.map((items) => {
         return {
@@ -173,7 +173,7 @@ export abstract class ProductService {
       })
 
       await transaction
-        .insert(productItems)
+        .insert(productsItems)
         .values(productItemsValue)
     })
   }
@@ -194,13 +194,13 @@ export abstract class ProductService {
         ))
 
       await transaction
-        .update(productItems)
+        .update(productsItems)
         .set({
           deletedAt,
         })
         .where(and(
-          eq(productItems.productId, existingPackage.id),
-          isNull(productItems.deletedAt),
+          eq(productsItems.productId, existingPackage.id),
+          isNull(productsItems.deletedAt),
         ))
     })
   }
@@ -217,11 +217,11 @@ export abstract class ProductService {
             inArray(
               products.id,
               db
-                .select({ productId: productItems.productId })
-                .from(productItems)
+                .select({ productId: productsItems.productId })
+                .from(productsItems)
                 .where(
                   inArray(
-                    productItems.itemId,
+                    productsItems.itemId,
                     db
                       .select({ id: items.id })
                       .from(items)
@@ -241,14 +241,14 @@ export abstract class ProductService {
     const _products = await db
       .select()
       .from(products)
-      .leftJoin(productItems, eq(productItems.productId, products.id))
-      .leftJoin(items, eq(items.id, productItems.itemId))
+      .leftJoin(productsItems, eq(productsItems.productId, products.id))
+      .leftJoin(items, eq(items.id, productsItems.itemId))
       .where(and(
         inArray(items.id, itemIds),
         isNull(products.deletedAt),
       ))
       .groupBy(products.id)
-      .having(eq(count(productItems.itemId), itemIds.length));
+      .having(eq(count(productsItems.itemId), itemIds.length));
 
     if (_products.length > 0) {
       const existingPackageName = _products[0].products.name;

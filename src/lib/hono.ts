@@ -10,4 +10,4 @@ export function honoApp() {
       throw new BadRequestException(result.error.errors.map((e) => e.message))
     },
   })
-};
+}

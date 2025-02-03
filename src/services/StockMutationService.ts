@@ -1,4 +1,4 @@
-import { StockMutationTypeEnum } from '@/enums/StockMutationTypeEnum';
+import { ItemMutationTypeEnum } from '@/enums/ItemMutationType.Enum';
 import { BadRequestException } from '@/exceptions/BadRequestException';
 import { OrderedProductRequest } from '@/schemas/orderedProducts/OrderedProductRequestSchema';
 import { ParamId } from '@/schemas/ParamIdSchema';
@@ -7,20 +7,20 @@ import dayjs from 'dayjs';
 import { db } from 'db';
 import { items } from 'db/schema/items';
 import { products } from 'db/schema/products';
-import { productItems } from 'db/schema/productItems';
-import { stockMutations } from 'db/schema/stockMutations';
+import { productsItems } from 'db/schema/productsItems';
+import { itemMutations } from 'db/schema/itemMutations';
 import { eq, inArray } from 'drizzle-orm';
 
 export abstract class StockMutationService {
   static async getList(param: ParamId) {
     const _stockMutations = db
       .select()
-      .from(stockMutations)
-      .where(eq(stockMutations.itemId, Number(param.id)))
+      .from(itemMutations)
+      .where(eq(itemMutations.itemId, Number(param.id)))
       .all()
 
     const stock = _stockMutations.reduce((result, mutation) => {
-      if (mutation.type === StockMutationTypeEnum.Addition) {
+      if (mutation.type === ItemMutationTypeEnum.Addition) {
         return result + mutation.quantity
       }
       return result - mutation.quantity
@@ -36,14 +36,14 @@ export abstract class StockMutationService {
 
   static async create(requests: Array<StockMutationCreate>) {
     const createdAt = dayjs().unix()
-    await db.insert(stockMutations).values(requests.map((request) => ({
+    await db.insert(itemMutations).values(requests.map((request) => ({
       ...request,
       createdAt,
     })))
   }
 
   static async delete(itemId: number) {
-    await db.delete(stockMutations).where(eq(stockMutations.itemId, itemId))
+    await db.delete(itemMutations).where(eq(itemMutations.itemId, itemId))
   }
 
   static async checkStock(orderedProducts: Array<OrderedProductRequest>) {
@@ -51,15 +51,15 @@ export abstract class StockMutationService {
       .select({
         itemId: items.id,
         itemName: items.name,
-        type: stockMutations.type,
-        quantity: stockMutations.quantity,
+        type: itemMutations.type,
+        quantity: itemMutations.quantity,
         itemQuantity: items.quantity,
         productId: products.id,
       })
-      .from(stockMutations)
-      .leftJoin(items, eq(items.id, stockMutations.itemId))
-      .leftJoin(productItems, eq(items.id, productItems.itemId))
-      .leftJoin(products, eq(products.id, productItems.productId))
+      .from(itemMutations)
+      .leftJoin(items, eq(items.id, itemMutations.itemId))
+      .leftJoin(productsItems, eq(items.id, productsItems.itemId))
+      .leftJoin(products, eq(products.id, productsItems.productId))
       .where(inArray(products.id, orderedProducts.map((order) => order.productId)))
 
     const groupedMutation: typeof _stockMutations = [];
@@ -69,11 +69,11 @@ export abstract class StockMutationService {
       if (existingMutationIndex === -1) {
         groupedMutation.push({
           ...mutation,
-          quantity: mutation.quantity * (mutation.type === StockMutationTypeEnum.Reduction ? -1 : 1)
+          quantity: mutation.quantity * (mutation.type === ItemMutationTypeEnum.Reduction ? -1 : 1)
         })
         return
       }
-      groupedMutation[existingMutationIndex].quantity += mutation.quantity * (mutation.type === StockMutationTypeEnum.Reduction ? -1 : 1)
+      groupedMutation[existingMutationIndex].quantity += mutation.quantity * (mutation.type === ItemMutationTypeEnum.Reduction ? -1 : 1)
     })
 
     groupedMutation.forEach((mutation) => {

@@ -1,22 +1,17 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { timestamps } from 'db/schema/timestamps.helper';
+import { orderEmployees } from 'db/schema/orderEmployees';
+import { productEmployeeAssignments } from 'db/schema/productEmployeeAssignments';
 import { relations } from 'drizzle-orm';
-import { orderEmployees } from './orderEmployees';
-import { productEmployeeAssignments } from './productEmployeeAssignments';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const employees = sqliteTable('employees', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name', { length: 100 }).notNull(),
   phone: text('phone', { length: 14 }).notNull(),
-  createdAt: integer('created_at', { mode: 'number' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'number' }),
-  deletedAt: integer('deleted_at', { mode: 'number' }),
+  ...timestamps,
 })
 
 export const employeesRelations = relations(employees, ({ many }) => ({
-  orderEmployees: many(orderEmployees, {
-    relationName: 'employee.orderEmployees'
-  }),
-  productEmployeeAssignments: many(productEmployeeAssignments, {
-    relationName: 'employee.productEmployeeAssignments'
-  })
-}))
+  orderEmployees: many(orderEmployees),
+  productEmployeeAssignments: many(productEmployeeAssignments),
+}));
