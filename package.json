@@ -14,7 +14,6 @@
     "@hono/zod-openapi": "^0.12.1",
     "dayjs": "^1.11.11",
     "drizzle-orm": "^0.30.10",
-    "drizzle-seed": "^0.3.1",
     "drizzle-zod": "^0.5.1",
     "hono": "^4.6.18",
     "zod": "^3.23.8"

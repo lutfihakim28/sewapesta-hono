@@ -5,7 +5,7 @@ export const images = sqliteTable('images', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   path: text('path').notNull().unique(),
   url: text('url').notNull().unique(),
-  reference: text('reference', { enum: [ ImageReferenceEnum.EMPLOYEE, ImageReferenceEnum.ITEM] }).notNull(),
+  reference: text('reference', { enum: [ImageReferenceEnum.PROFILE, ImageReferenceEnum.ITEM] }).notNull(),
   referenceId: integer('reference_id').notNull(),
   createdAt: integer('created_at').notNull(),
 }, (table) => ({

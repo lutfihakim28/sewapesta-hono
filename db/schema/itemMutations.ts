@@ -14,7 +14,7 @@ export const itemMutations = sqliteTable('item_mutations', {
       ItemMutationTypeEnum.Adjustment,
     ],
   }).default(ItemMutationTypeEnum.Addition),
-  itemId: integer('item_id').references(() => items.id, { onDelete: 'cascade' }).notNull(),
+  itemId: integer('item_id').references(() => items.id).notNull(),
   quantity: integer('quantity').notNull(),
   description: text('description'),
   ...timestamps,
@@ -25,7 +25,7 @@ export const itemMutations = sqliteTable('item_mutations', {
 
 export const stockMutationsRelations = relations(itemMutations, ({ one }) => ({
   item: one(items, {
-    fields: [ itemMutations.itemId],
+    fields: [itemMutations.itemId],
     references: [items.id],
   }),
 }))

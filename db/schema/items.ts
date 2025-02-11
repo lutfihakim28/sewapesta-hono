@@ -1,11 +1,11 @@
 import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { owners } from './owners';
 import { relations } from 'drizzle-orm';
 import { units } from './units';
 import { categories } from 'db/schema/categories';
 import { itemMutations } from 'db/schema/itemMutations';
 import { productsItems } from 'db/schema/productsItems';
-import {timestamps} from "db/schema/timestamps.helper";
+import { timestamps } from "db/schema/timestamps.helper";
+import { users } from './users';
 
 export const items = sqliteTable('items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -13,9 +13,9 @@ export const items = sqliteTable('items', {
   quantity: integer('quantity').notNull().default(1),
   overtime: real('overtime').default(0),
   price: real('price').notNull().default(0),
-  unitId: integer('unit').references(() => units.id, { onDelete: 'cascade' }).notNull(),
-  categoryId: integer('category_id').references(() => categories.id, { onDelete: 'cascade' }),
-  ownerId: integer('owner_id').references(() => owners.id, { onDelete: 'cascade' }).notNull(),
+  unitId: integer('unit').references(() => units.id).notNull(),
+  categoryId: integer('category_id').references(() => categories.id),
+  ownerId: integer('owner_id').references(() => users.id).notNull(),
   ...timestamps,
 }, (table) => ({
   itemCategoryIndex: index('item_category_index').on(table.categoryId),
@@ -24,15 +24,15 @@ export const items = sqliteTable('items', {
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
   category: one(categories, {
-    fields: [ items.categoryId],
+    fields: [items.categoryId],
     references: [categories.id],
   }),
-  owner: one(owners, {
-    fields: [ items.ownerId],
-    references: [owners.id],
+  owner: one(users, {
+    fields: [items.ownerId],
+    references: [users.id],
   }),
   unit: one(units, {
-    fields: [ items.unitId],
+    fields: [items.unitId],
     references: [units.id],
   }),
   stockMutations: many(itemMutations),

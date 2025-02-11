@@ -4,8 +4,8 @@ import { relations } from 'drizzle-orm';
 import { integer, primaryKey, sqliteTable } from 'drizzle-orm/sqlite-core';
 
 export const rolesPermissions = sqliteTable('roles_permissions', {
-  roleId: integer('role_id').references(() => roles.id, { onDelete: 'cascade' }).notNull(),
-  permissionId: integer('permission_id').references(() => permissions.id, { onDelete: 'cascade' }).notNull(),
+  roleId: integer('role_id').references(() => roles.id).notNull(),
+  permissionId: integer('permission_id').references(() => permissions.id).notNull(),
 }, (table) => ({
   primaryKey: primaryKey({ columns: [table.roleId, table.permissionId] }),
 }))
