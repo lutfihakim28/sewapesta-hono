@@ -1,4 +1,4 @@
-import { validationMessages } from '@/constatnts/validationMessages';
+import { validationMessages } from '@/constants/ValidationMessage';
 import { z } from 'zod';
 
 export const BadRequestSchema = z.object({

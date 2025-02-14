@@ -1,4 +1,4 @@
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { honoApp } from '@/lib/hono';
 import { CreateCategoryRoute } from '@/routes/categories/CreateCategoryRoute';
 import { DeleteCategoryRoute } from '@/routes/categories/DeleteCategoryRoute';

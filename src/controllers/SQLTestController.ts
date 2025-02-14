@@ -1,4 +1,4 @@
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { honoApp } from '@/lib/hono';
 import { SuccessSchema } from '@/schemas/SuccessSchema';
 import { SQLTestService } from '@/services/SQLTestService';

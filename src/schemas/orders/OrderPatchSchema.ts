@@ -1,4 +1,4 @@
-import { validationMessages } from '@/constatnts/validationMessages';
+import { validationMessages } from '@/constants/ValidationMessage';
 import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
 import { orders } from 'db/schema/orders';
 import { createInsertSchema } from 'drizzle-zod';

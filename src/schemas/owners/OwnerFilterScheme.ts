@@ -4,7 +4,7 @@ import { PaginationSchema } from '../PaginationSchema';
 import { z } from 'zod';
 import { owners } from 'db/schema/owners';
 import { OwnerTypeEnum } from '@/enums/OwnerTypeEnum';
-import { validationMessages } from '@/constatnts/validationMessages';
+import { validationMessages } from '@/constants/ValidationMessage';
 
 export type OwnerColumn = keyof typeof owners.$inferSelect;
 

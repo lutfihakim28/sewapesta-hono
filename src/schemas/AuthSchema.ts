@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { UserSchema } from './UserSchema';
-import { validationMessages } from '@/constatnts/validationMessages';
-import { messages } from '@/constatnts/messages';
+import { validationMessages } from '@/constants/ValidationMessage';
+import { messages } from '@/constants/Message';
 
 export const LoginRequestSchema = z.object({
   username: z.string({

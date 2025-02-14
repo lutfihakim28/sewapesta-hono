@@ -1,4 +1,4 @@
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { honoApp } from '@/lib/hono';
 import { CreateOwnerRoute } from '@/routes/owners/CreateOwnerRoute';
 import { DeleteOwnerRoute } from '@/routes/owners/DeleteOwnerRoute';

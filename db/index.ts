@@ -4,9 +4,6 @@ import * as cities from 'db/schema/cities';
 import * as districts from 'db/schema/districts';
 import * as provinces from 'db/schema/provinces';
 import * as subdistricts from 'db/schema/subdistricts';
-import * as roles from 'db/schema/roles';
-import * as rolesPermissions from 'db/schema/rolesPermissions';
-import * as permissions from 'db/schema/permissions';
 import * as branches from 'db/schema/branches';
 import * as categories from 'db/schema/categories';
 import * as images from './schema/images';
@@ -29,9 +26,6 @@ export const db = drizzle(connection, {
     ...cities,
     ...districts,
     ...subdistricts,
-    ...roles,
-    ...rolesPermissions,
-    ...permissions,
     ...branches,
     ...categories,
     ...products,

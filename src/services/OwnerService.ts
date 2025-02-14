@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { owners } from 'db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { OwnerColumn, OwnerFilter } from '@/schemas/owners/OwnerFilterScheme';
 import { countOffset } from '@/utils/countOffset';
 import { Owner } from '@/schemas/owners/OwnerSchema';

@@ -13,7 +13,7 @@ import { OrderUpdate } from '@/schemas/orders/OrderUpdateSchema';
 import { itemMutations } from 'db/schema/itemMutations';
 import { productEmployeeAssignments } from 'db/schema/productEmployeeAssignments';
 import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { OrderColumn, OrderFilter } from '@/schemas/orders/OrderFilterSchema';
 import { Order } from '@/schemas/orders/OrderSchema';
 import { BadRequestException } from '@/exceptions/BadRequestException';

@@ -5,7 +5,7 @@ import { EmployeeRequest } from '@/schemas/employees/EmployeeRequestSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { EmployeeColumn, EmployeeFilter } from '@/schemas/employees/EmployeeFilterSchema';
 import { countOffset } from '@/utils/countOffset';
 import { Employee } from '@/schemas/employees/EmployeeSchema';

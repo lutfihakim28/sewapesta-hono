@@ -5,9 +5,7 @@ import { seedCities } from 'db/seed/cities.seed';
 import { seedDistricts } from 'db/seed/districts.seed';
 import { seedItems } from 'db/seed/item.seed';
 import { seedOrders } from 'db/seed/order.seed';
-import { seedPermissions } from 'db/seed/permission.seed';
 import { seedProvinces } from 'db/seed/provinces.seed';
-import { seedRoles } from 'db/seed/role.seed';
 import { seedSubdistricts } from 'db/seed/subdistricts.seed';
 import { seedUnits } from 'db/seed/unit.seed';
 import { seedUsers } from 'db/seed/user.seed';
@@ -35,9 +33,6 @@ const _subdistricts = await db
       '%33%'
     )
   )
-
-  await seedPermissions()
-  await seedRoles()
 
 await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
   const branchId = await seedBranches(_subdistricts.map((el) => el.code))

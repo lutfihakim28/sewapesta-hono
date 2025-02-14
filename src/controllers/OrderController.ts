@@ -1,4 +1,4 @@
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { honoApp } from '@/lib/hono';
 import { CreateOrderRoute } from '@/routes/orders/CreateOrderRoute';
 import { DeleteOrderRoute } from '@/routes/orders/DeleteOrderRoute';

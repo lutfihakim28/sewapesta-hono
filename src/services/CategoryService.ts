@@ -5,7 +5,7 @@ import { ParamId } from '@/schemas/ParamIdSchema';
 import { CategoryRequest } from '@/schemas/categories/CategoryRequestSchema';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { Category } from '@/schemas/categories/CategorySchema';
 import { items } from 'db/schema/items';
 

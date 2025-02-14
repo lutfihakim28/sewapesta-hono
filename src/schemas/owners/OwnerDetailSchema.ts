@@ -1,4 +1,4 @@
-import { messages } from '@/constatnts/messages';
+import { messages } from '@/constants/Message';
 import { z } from 'zod';
 import { OwnerSchema } from './OwnerSchema';
 
