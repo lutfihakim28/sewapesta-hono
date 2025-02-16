@@ -1,13 +1,16 @@
 # TODO
 
-1. Add branch relation on specific table
-2. Create seeder for
-    - items
-    - agents
-    - products
-    - productsItems
+1. ~~Add branch relation on specific table~~
+2. ~~Create seeder for~~
+    - ~~items~~
+    - ~~products~~
+    - ~~productsItems~~
 3. Create order table and all related table to it
 4. Create accounting table
+5. ~~Location Schema~~
+6. Location route
+7. Location controller
+8. Tes location (unit/e2e test?)
 
 ## WHO
 
@@ -17,7 +20,7 @@
    - Create new user
    - Confirm new user request (Owner, Employee, Customer, Agent)
    - Confirm new item request (Owner)
-2. Admin: Who controll app in a specific branch
+2. Admin: Who control app in a specific branch
    - Can access all features of the app in specific branch
    - Can see branch's app log? (if it any)
    - Create new user
@@ -38,7 +41,7 @@
    - See their task each day/week/month
    - See their income per order
    - See their income total
-   - See their income per periode
+   - See their income per period
 5. Customer: Who rent items
    - Request order
    - Make payment

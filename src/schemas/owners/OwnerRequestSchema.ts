@@ -1,4 +1,4 @@
-import { validationMessages } from '@/constants/ValidationMessage';
+import { validationMessages } from '@/constants/validationMessage';
 import { owners } from 'db/schema/owners';
 import { OwnerTypeEnum } from '@/enums/OwnerTypeEnum';
 import { createInsertSchema } from 'drizzle-zod';

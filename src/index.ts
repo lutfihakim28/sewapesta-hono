@@ -4,7 +4,7 @@ import { honoApp } from './lib/hono'
 import { HTTPException } from 'hono/http-exception'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
 import { logger } from 'hono/logger'
-import { messages } from './constants/Message'
+import { messages } from 'src/constants/message'
 import { swaggerUI } from '@hono/swagger-ui'
 import { UnauthorizedException } from './exceptions/UnauthorizedException'
 import { verify } from 'hono/jwt'
@@ -107,11 +107,8 @@ app.route('/api/auth', AuthController)
 app.route('/api/test', SQLTestController)
 
 // PRIVATE PATH
-app.route('/api/private/categoriesTable', CategoryController)
-app.route('/api/private/employees', EmployeeController)
+app.route('/api/private/categories', CategoryController)
 app.route('/api/private/items', ItemController)
-app.route('/api/private/orders', OrderController)
-app.route('/api/private/owners', OwnerController)
 app.route('/api/private/products', ProductController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/vehicles', VehicleController)

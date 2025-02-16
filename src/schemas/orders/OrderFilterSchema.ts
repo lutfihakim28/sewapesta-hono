@@ -4,7 +4,7 @@ import { PaginationSchema } from '../PaginationSchema';
 import { z } from 'zod';
 import { orders } from 'db/schema/orders';
 import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
-import { validationMessages } from '@/constants/ValidationMessage';
+import { validationMessages } from '@/constants/validationMessage';
 import { DateRangeSchema } from '../DateRangeSchema';
 
 export type OrderColumn = keyof typeof orders.$inferSelect;

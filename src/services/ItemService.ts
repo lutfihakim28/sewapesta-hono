@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { items } from 'db/schema/items';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
 import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constants/Message';
+import { messages } from '@/constants/message';
 import { ItemColumn, ItemFilter } from '@/schemas/items/ItemFilterSchema';
 import { countOffset } from '@/utils/countOffset';
 import { owners } from 'db/schema/owners';

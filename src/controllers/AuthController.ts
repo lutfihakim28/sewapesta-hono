@@ -3,7 +3,7 @@ import { honoApp } from '@/lib/hono';
 import { UserService } from '@/services/UserService';
 import { sign } from 'hono/jwt';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
-import { messages } from '@/constants/Message';
+import { messages } from '@/constants/message';
 import { JWTPayload } from 'hono/utils/jwt/types';
 import dayjs from 'dayjs';
 import { AuthLoginRoute } from '@/routes/auths/AuthLoginRoute';

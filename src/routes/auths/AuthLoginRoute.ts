@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { LoginRequestSchema, LoginResponseSchema } from '../../schemas/AuthSchema';
-import { messages } from '@/constants/Message';
+import { LoginRequestSchema, LoginResponseSchema } from '@/schemas/AuthSchema';
+import { messages } from '@/constants/message';
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema';
 import { BadRequestSchema } from '@/schemas/BadRequestSchema';
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema';

@@ -24,10 +24,17 @@ export const users = sqliteTable('users', {
   ...timestamps,
 }, (table) => ({
   userBranchIndex: index('user_branch_index').on(table.branchId),
-  userProfileIndex: index('user_profile_index').on(table.profileId)
+  userProfileIndex: index('user_profile_index').on(table.profileId),
+  userRoleIndex: index('user_role_index').on(table.role),
 }))
 
 export const usersRelations = relations(users, ({ one }) => ({
-  branch: one(branches),
-  profile: one(profiles)
+  branch: one(branches, {
+    fields: [users.branchId],
+    references: [branches.id],
+  }),
+  profile: one(profiles, {
+    fields: [users.profileId],
+    references: [profiles.id],
+  })
 }))

@@ -11,7 +11,6 @@ export const items = sqliteTable('items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   quantity: integer('quantity').notNull().default(1),
-  overtime: real('overtime').default(0),
   price: real('price').notNull().default(0),
   unitId: integer('unit').references(() => units.id).notNull(),
   categoryId: integer('category_id').references(() => categories.id),
@@ -35,6 +34,6 @@ export const itemsRelations = relations(items, ({ one, many }) => ({
     fields: [items.unitId],
     references: [units.id],
   }),
-  stockMutations: many(itemMutations),
-  productItems: many(productsItems),
+  mutations: many(itemMutations),
+  products: many(productsItems),
 }))

@@ -10,7 +10,7 @@ const _SortSchema = SortSchema<PackageColumn>([
   'id',
   'name',
   'price',
-] as const);
+]);
 
 export const ProductFilterSchema = _SortSchema
   .merge(SearchSchema)

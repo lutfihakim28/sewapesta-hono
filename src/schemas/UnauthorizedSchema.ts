@@ -1,4 +1,4 @@
-import { messages } from '@/constants/Message';
+import { messages } from '@/constants/message';
 import { z } from 'zod';
 
 export const UnauthorizedSchema = z.object({

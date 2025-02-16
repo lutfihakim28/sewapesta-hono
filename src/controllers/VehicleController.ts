@@ -1,4 +1,4 @@
-import { messages } from '@/constants/Message';
+import { messages } from '@/constants/message';
 import { honoApp } from '@/lib/hono';
 import { CreateVehicleRoute } from '@/routes/vehicles/CreateVehicleRoute';
 import { DeleteVehicleRoute } from '@/routes/vehicles/DeleteVehicleRoute';

@@ -1,4 +1,4 @@
-import { validationMessages } from '@/constants/ValidationMessage';
+import { validationMessages } from '@/constants/validationMessage';
 import { vehicles } from 'db/schema/vehicles';
 import { VehicleTypeEnum } from '@/enums/VehicleTypeEnum';
 import { createInsertSchema } from 'drizzle-zod';

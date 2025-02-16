@@ -1,4 +1,4 @@
-import { messages } from '@/constants/Message';
+import { messages } from '@/constants/message';
 import { db } from 'db';
 import { vehicles } from 'db/schema/vehicles';
 import { NotFoundException } from '@/exceptions/NotFoundException';

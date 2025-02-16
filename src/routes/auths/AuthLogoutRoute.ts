@@ -1,5 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { messages } from '@/constants/Message';
+import { messages } from '@/constants/message';
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema';
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema';
 

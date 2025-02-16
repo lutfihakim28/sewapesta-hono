@@ -10,7 +10,7 @@ const _SortSchema = SortSchema<ItemColumn>([
   'id',
   'name',
   'quantity',
-] as const);
+]);
 
 export const ItemFilterSchema = z.object({
   categories: z.string().openapi({ example: '1-2-10', description: 'category id, can be multiple id separated by dash (-)' })

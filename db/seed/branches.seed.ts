@@ -14,7 +14,7 @@ export async function seedBranches(subdistrictsCode: Array<string>) {
       subdistrictCode: faker.helpers.arrayElement(subdistrictsCode)
     })
     .returning({
-      id: branches.id
+      id: branches.id,
     })
 
   return branch.id
