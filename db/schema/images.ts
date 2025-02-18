@@ -1,4 +1,4 @@
-import { ImageReferenceEnum } from '@/enums/ImageReference.Enum';
+import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const images = sqliteTable('images', {

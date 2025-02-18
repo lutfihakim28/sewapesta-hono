@@ -1,5 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema';
 import { ServerErrorSchema } from '@/schemas/ServerErrorSchema';
 
@@ -18,7 +18,7 @@ export const AuthLogoutRoute = createRoute({
         'application/json': {
           schema: z.object({
             code: z.number().openapi({ example: 200 }),
-            messages: z.string().openapi({ example: messages.successLogout }),
+            messages: z.string().openapi({ example: MESSAGES.successLogout }),
           }),
         }
       },

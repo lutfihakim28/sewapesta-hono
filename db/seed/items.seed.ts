@@ -1,4 +1,4 @@
-import { OvertimeTypeEnum } from '@/enums/OvertimeTypeEnum';
+import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum';
 import dayjs from 'dayjs';
 import { productsItems } from 'db/schema/productsItems';
 import { db } from '..';

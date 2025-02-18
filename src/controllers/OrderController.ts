@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { honoApp } from '@/lib/hono';
 import { CreateOrderRoute } from '@/routes/orders/CreateOrderRoute';
 import { DeleteOrderRoute } from '@/routes/orders/DeleteOrderRoute';
@@ -23,7 +23,7 @@ OrderController.openapi(ListOrderRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('pesanan'),
+    messages: MESSAGES.successList('pesanan'),
     data: _orders,
     meta: {
       page: Number(query.page),
@@ -40,7 +40,7 @@ OrderController.openapi(DetailOrderRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDetail('pesanan'),
+    messages: MESSAGES.successDetail('pesanan'),
     data: order,
   }, 200)
 })
@@ -52,7 +52,7 @@ OrderController.openapi(CreateOrderRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successCreate('pesanan'),
+    messages: MESSAGES.successCreate('pesanan'),
   }, 200)
 })
 
@@ -64,7 +64,7 @@ OrderController.openapi(UpdateOrderRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successUpdate('pesanan'),
+    messages: MESSAGES.successUpdate('pesanan'),
   }, 200)
 })
 
@@ -86,7 +86,7 @@ OrderController.openapi(PatchOrderRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successPatch('pesanan', field.join(' dan ')),
+    messages: MESSAGES.successPatch('pesanan', field.join(' dan ')),
   }, 200)
 })
 
@@ -97,7 +97,7 @@ OrderController.openapi(ListOrderedProductRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDetail('produk yang dipesan'),
+    messages: MESSAGES.successDetail('produk yang dipesan'),
     data: orderedProducts,
   }, 200)
 })
@@ -109,7 +109,7 @@ OrderController.openapi(ListAssignedEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDetail('karyawan yang bertugas'),
+    messages: MESSAGES.successDetail('karyawan yang bertugas'),
     data: assignedEmployees,
   }, 200)
 })
@@ -121,7 +121,7 @@ OrderController.openapi(DeleteOrderRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDelete('pesanan'),
+    messages: MESSAGES.successDelete('pesanan'),
   }, 200)
 })
 

@@ -1,4 +1,4 @@
-import { validationMessages } from '@/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validationMessage';
 import { orderedProducts } from 'db/schema/orderedProducts';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';

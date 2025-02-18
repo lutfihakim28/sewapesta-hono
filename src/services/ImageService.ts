@@ -1,4 +1,4 @@
-import { NotFoundException } from '@/exceptions/NotFoundException';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { ImageFilter } from '@/schemas/images/ImageFilterSchema';
 import { Image } from '@/schemas/images/ImageSchema';

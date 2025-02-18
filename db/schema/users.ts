@@ -3,7 +3,7 @@ import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamps } from "db/schema/timestamps.helper";
 import { profiles } from './profiles';
 import { relations } from 'drizzle-orm';
-import { RoleEnum } from '@/enums/RoleEnum';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),

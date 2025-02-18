@@ -1,10 +1,10 @@
-import { validationMessages } from '@/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validationMessage';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { OrderedProductRequest, OrderedProductRequestSchema } from '../orderedProducts/OrderedProductRequestSchema';
 import { orders } from 'db/schema/orders';
 import dayjs from 'dayjs';
-import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
+import { OrderStatusEnum } from '@/lib/enums/OrderStatusEnum';
 
 const _OrderCreateSchema = createInsertSchema(orders, {
   customerAddress: z.string({ message: validationMessages.required('Alamat pelanggan') }).openapi({ example: 'Jl. Jalan' }),

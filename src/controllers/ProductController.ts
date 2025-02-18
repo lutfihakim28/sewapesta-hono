@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { honoApp } from '@/lib/hono';
 import { CreateProductRoute } from '@/routes/products/CreateProductRoute';
 import { DeleteProductRoute } from '@/routes/products/DeleteProductRoute';
@@ -19,7 +19,7 @@ ProductController.openapi(ListProductRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('produk'),
+    messages: MESSAGES.successList('produk'),
     data: products,
     meta: {
       page: Number(query.page),
@@ -36,7 +36,7 @@ ProductController.openapi(DetailProductRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDetail('barang'),
+    messages: MESSAGES.successDetail('barang'),
     data: item,
   }, 200)
 })
@@ -47,7 +47,7 @@ ProductController.openapi(CreateProductRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successCreate('produk'),
+    messages: MESSAGES.successCreate('produk'),
   }, 200)
 })
 
@@ -59,7 +59,7 @@ ProductController.openapi(UpdateProductRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successUpdate('produk'),
+    messages: MESSAGES.successUpdate('produk'),
   }, 200)
 })
 
@@ -70,7 +70,7 @@ ProductController.openapi(DeleteProductRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDelete('produk'),
+    messages: MESSAGES.successDelete('produk'),
   }, 200)
 })
 

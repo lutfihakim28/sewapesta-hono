@@ -4,9 +4,9 @@ import { ServerErrorSchema } from '@/schemas/ServerErrorSchema'
 import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema'
 import { createRoute } from '@hono/zod-openapi'
 
-export const OptionProvinceRoute = createRoute({
+export const ProvinceRoute = createRoute({
   method: 'get',
-  path: '/options',
+  path: '/',
   tags: ['Province'],
   security: [{
     cookieAuth: [],

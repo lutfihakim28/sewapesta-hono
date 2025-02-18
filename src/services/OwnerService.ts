@@ -4,10 +4,10 @@ import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { owners } from 'db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
-import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constants/message';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { OwnerColumn, OwnerFilter } from '@/schemas/owners/OwnerFilterScheme';
-import { countOffset } from '@/utils/countOffset';
+import { countOffset } from '@/lib/utils/countOffset';
 import { Owner } from '@/schemas/owners/OwnerSchema';
 import { Option, OptionQuery } from '@/schemas/OptionSchema';
 
@@ -68,7 +68,7 @@ export abstract class OwnerService {
     })
 
     if (!owner) {
-      throw new NotFoundException(messages.errorNotFound('Pemilik'))
+      throw new NotFoundException(MESSAGES.errorNotFound('Pemilik'))
     }
 
     return owner

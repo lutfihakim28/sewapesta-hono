@@ -1,12 +1,12 @@
-import { messages } from '@/constants/message';
-import { BadRequestException } from '@/exceptions/BadRequestException';
-import { NotFoundException } from '@/exceptions/NotFoundException';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { ProductCreate } from '@/schemas/products/ProductCreateSchema';
 import { PackageColumn, ProductFilter } from '@/schemas/products/ProductFilterSchema';
 import { Product } from '@/schemas/products/ProductSchema';
 import { ProductUpdate } from '@/schemas/products/ProductUpdateSchema';
 import { ParamId } from '@/schemas/ParamIdSchema';
-import { countOffset } from '@/utils/countOffset';
+import { countOffset } from '@/lib/utils/countOffset';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { items } from 'db/schema/items';
@@ -107,7 +107,7 @@ export abstract class ProductService {
       })
 
       if (!product) {
-        throw new NotFoundException(messages.errorNotFound('produk'))
+        throw new NotFoundException(MESSAGES.errorNotFound('produk'))
       }
 
       return product;

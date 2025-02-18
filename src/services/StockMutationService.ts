@@ -1,5 +1,5 @@
-import { ItemMutationTypeEnum } from '@/enums/ItemMutationType.Enum';
-import { BadRequestException } from '@/exceptions/BadRequestException';
+import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { OrderedProductRequest } from '@/schemas/orderedProducts/OrderedProductRequestSchema';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { StockMutationCreate } from '@/schemas/stockMutations/StockMutationCreateSchema';

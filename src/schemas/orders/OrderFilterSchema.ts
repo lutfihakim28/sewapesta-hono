@@ -3,8 +3,8 @@ import { SearchSchema } from '../SearchSchema';
 import { PaginationSchema } from '../PaginationSchema';
 import { z } from 'zod';
 import { orders } from 'db/schema/orders';
-import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
-import { validationMessages } from '@/constants/validationMessage';
+import { OrderStatusEnum } from '@/lib/enums/OrderStatusEnum';
+import { validationMessages } from '@/lib/constants/validationMessage';
 import { DateRangeSchema } from '../DateRangeSchema';
 
 export type OrderColumn = keyof typeof orders.$inferSelect;

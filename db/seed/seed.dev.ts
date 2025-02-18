@@ -11,7 +11,7 @@ import { seedUnits } from 'db/seed/units.seed';
 import { seedUsers } from 'db/seed/users.seed';
 import { subdistricts } from 'db/schema/subdistricts';
 import { like } from 'drizzle-orm';
-import { RoleEnum } from '@/enums/RoleEnum';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { faker } from '@faker-js/faker/locale/id_ID';
 
 await seedProvinces()

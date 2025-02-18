@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { z } from 'zod';
 import { ItemSchema } from './ItemSchema';
 
@@ -7,7 +7,7 @@ export const ItemDetailSchema = z.object({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: messages.successDetail('barang'),
+    example: MESSAGES.successDetail('barang'),
   }),
   data: ItemSchema,
 })

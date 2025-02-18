@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { honoApp } from '@/lib/hono';
 import { CreateOwnerRoute } from '@/routes/owners/CreateOwnerRoute';
 import { DeleteOwnerRoute } from '@/routes/owners/DeleteOwnerRoute';
@@ -17,7 +17,7 @@ OwnerController.openapi(OptionOwnerRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('opsi pemilik'),
+    messages: MESSAGES.successList('opsi pemilik'),
     data: options,
   }, 200)
 })
@@ -30,7 +30,7 @@ OwnerController.openapi(ListOwnerRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('pemilik'),
+    messages: MESSAGES.successList('pemilik'),
     data: owners,
     meta: {
       page: Number(query.page),
@@ -47,7 +47,7 @@ OwnerController.openapi(DetailOwnerRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDetail('pemilik'),
+    messages: MESSAGES.successDetail('pemilik'),
     data: owner,
   }, 200)
 })
@@ -59,7 +59,7 @@ OwnerController.openapi(CreateOwnerRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successCreate('pemilik'),
+    messages: MESSAGES.successCreate('pemilik'),
   }, 200)
 })
 
@@ -71,7 +71,7 @@ OwnerController.openapi(UpdateOwnerRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successUpdate('pemilik'),
+    messages: MESSAGES.successUpdate('pemilik'),
   }, 200)
 })
 
@@ -82,7 +82,7 @@ OwnerController.openapi(DeleteOwnerRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDelete('pemilik'),
+    messages: MESSAGES.successDelete('pemilik'),
   }, 200)
 })
 

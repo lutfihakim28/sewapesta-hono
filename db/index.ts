@@ -17,7 +17,6 @@ import * as itemMutations from 'db/schema/itemMutations';
 import * as units from './schema/units';
 import * as users from './schema/users';
 import * as profiles from './schema/profiles';
-import * as vehicles from './schema/vehicles';
 
 const connection = new Database('sewapesta.db')
 export const db = drizzle(connection, {

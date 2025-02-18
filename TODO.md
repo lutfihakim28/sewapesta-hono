@@ -11,6 +11,7 @@
 6. Location route
 7. Location controller
 8. Tes location (unit/e2e test?)
+9. Restructure folder
 
 ## WHO
 

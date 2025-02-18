@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ResponseSchema } from '../ResponseSchema';
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { OptionSchema } from '../OptionSchema';
 
-export const ProvinceOptionSchema = ResponseSchema(z.array(OptionSchema), messages.successList('opsi provinsi'))
+export const ProvinceOptionSchema = ResponseSchema(z.array(OptionSchema), MESSAGES.successList('opsi provinsi'))

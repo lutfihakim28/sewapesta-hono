@@ -1,4 +1,4 @@
-export const messages = {
+export const MESSAGES = {
   errorServer: 'Terjadi kesalahan server.',
   tokenNotFound: 'Token tidak ditemukan atau kadaluarsa.',
   unauthorized: 'Token tidak valid.',

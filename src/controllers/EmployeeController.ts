@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { honoApp } from '@/lib/hono';
 import { CreateEmployeeRoute } from '@/routes/employees/CreateEmployeeRoute';
 import { DeleteEmployeeRoute } from '@/routes/employees/DeleteEmployeeRoute';
@@ -17,7 +17,7 @@ EmployeeController.openapi(ListEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('karyawan'),
+    messages: MESSAGES.successList('karyawan'),
     data: employees,
     meta: {
       page: Number(query.page),
@@ -34,7 +34,7 @@ EmployeeController.openapi(DetailEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDetail('karyawan'),
+    messages: MESSAGES.successDetail('karyawan'),
     data: employee,
   }, 200)
 })
@@ -45,7 +45,7 @@ EmployeeController.openapi(CreateEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successCreate('karyawan'),
+    messages: MESSAGES.successCreate('karyawan'),
   }, 200)
 })
 
@@ -56,7 +56,7 @@ EmployeeController.openapi(UpdateEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successUpdate('karyawan'),
+    messages: MESSAGES.successUpdate('karyawan'),
   }, 200)
 })
 
@@ -67,7 +67,7 @@ EmployeeController.openapi(DeleteEmployeeRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDelete('karyawan'),
+    messages: MESSAGES.successDelete('karyawan'),
   }, 200)
 })
 

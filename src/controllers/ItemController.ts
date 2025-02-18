@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { honoApp } from '@/lib/hono';
 import { CreateItemRoute } from '@/routes/items/CreateItemRoute';
 import { DeleteItemRoute } from '@/routes/items/DeleteItemRoute';
@@ -21,7 +21,7 @@ ItemController.openapi(ListItemRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('barang'),
+    messages: MESSAGES.successList('barang'),
     data: items,
     meta: {
       page: Number(query.page),
@@ -38,7 +38,7 @@ ItemController.openapi(DetailItemRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDetail('barang'),
+    messages: MESSAGES.successDetail('barang'),
     data: item,
   }, 200)
 })
@@ -50,7 +50,7 @@ ItemController.openapi(CreateItemRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successCreate('barang'),
+    messages: MESSAGES.successCreate('barang'),
   }, 200)
 })
 
@@ -62,7 +62,7 @@ ItemController.openapi(UpdateItemRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successUpdate('barang'),
+    messages: MESSAGES.successUpdate('barang'),
   }, 200)
 })
 
@@ -73,7 +73,7 @@ ItemController.openapi(DeleteItemRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successDelete('barang'),
+    messages: MESSAGES.successDelete('barang'),
   }, 200)
 })
 
@@ -84,7 +84,7 @@ ItemController.openapi(ListStockMutationRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('mutasi stok'),
+    messages: MESSAGES.successList('mutasi stok'),
     data
   }, 200)
 })
@@ -96,7 +96,7 @@ ItemController.openapi(ListItemProductRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('produk'),
+    messages: MESSAGES.successList('produk'),
     data
   }, 200)
 })
@@ -109,7 +109,7 @@ ItemController.openapi(ListItemOrderStatRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successList('statistik pemesanan'),
+    messages: MESSAGES.successList('statistik pemesanan'),
     data
   }, 200)
 })

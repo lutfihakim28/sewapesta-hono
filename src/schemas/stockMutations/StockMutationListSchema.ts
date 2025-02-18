@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { z } from 'zod';
 import { StockMutationSchema } from './StockMutationSchema';
 
@@ -7,7 +7,7 @@ export const StockMutationListSchema = z.object({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: messages.successList('mutasi stok'),
+    example: MESSAGES.successList('mutasi stok'),
   }),
   data: z.array(StockMutationSchema),
 })

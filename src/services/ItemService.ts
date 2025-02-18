@@ -4,10 +4,10 @@ import { and, eq, isNull, asc, desc, or, like, inArray, count, sql, sum } from '
 import dayjs from 'dayjs';
 import { items } from 'db/schema/items';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
-import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constants/message';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { ItemColumn, ItemFilter } from '@/schemas/items/ItemFilterSchema';
-import { countOffset } from '@/utils/countOffset';
+import { countOffset } from '@/lib/utils/countOffset';
 import { owners } from 'db/schema/owners';
 import { Item } from '@/schemas/items/ItemSchema';
 import { ImageService } from './ImageService';
@@ -19,7 +19,7 @@ import { orders } from 'db/schema/orders';
 import { orderedProducts } from 'db/schema/orderedProducts';
 import { ItemOrderStatQuery } from '@/schemas/items/ItemOrderStatQuerySchema';
 import { OrderService } from './OrderService';
-import { BadRequestException } from '@/exceptions/BadRequestException';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { ProductItemService } from './ProductItemService';
 import { ProductService } from './ProductService';
 
@@ -154,7 +154,7 @@ export abstract class ItemService {
       })
 
       if (!_item) {
-        throw new NotFoundException(messages.errorNotFound('barang'))
+        throw new NotFoundException(MESSAGES.errorNotFound('barang'))
       }
 
       const images = await ImageService.getByReference({

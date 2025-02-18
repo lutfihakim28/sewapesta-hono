@@ -1,5 +1,5 @@
-import { validationMessages } from '@/constants/validationMessage';
-import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
+import { validationMessages } from '@/lib/constants/validationMessage';
+import { OrderStatusEnum } from '@/lib/enums/OrderStatusEnum';
 import { orders } from 'db/schema/orders';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';

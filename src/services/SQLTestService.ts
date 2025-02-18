@@ -1,4 +1,4 @@
-import { BadRequestException } from '@/exceptions/BadRequestException';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { db } from 'db';
 import { items } from 'db/schema/items';
 import { orderedProducts } from 'db/schema/orderedProducts';

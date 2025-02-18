@@ -1,4 +1,4 @@
-import { BadRequestException } from '@/exceptions/BadRequestException';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { OpenAPIHono } from '@hono/zod-openapi';
 
 export function honoApp() {

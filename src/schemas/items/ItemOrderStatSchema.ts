@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { z } from 'zod';
 
 export const ItemOrderStatSchema = z.object({
@@ -14,7 +14,7 @@ export const ListItemOrderStatSchema = z.object({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: messages.successList('statistik pesanan'),
+    example: MESSAGES.successList('statistik pesanan'),
   }),
   data: z.array(ItemOrderStatSchema),
 })

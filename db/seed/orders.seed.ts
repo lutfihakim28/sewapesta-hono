@@ -1,4 +1,4 @@
-import { OrderStatusEnum } from '@/enums/OrderStatusEnum'
+import { OrderStatusEnum } from '@/lib/enums/OrderStatusEnum'
 import { OrderCreate } from '@/schemas/orders/OrderCreateSchema'
 import { OrderService } from '@/services/OrderService'
 import { faker } from '@faker-js/faker/locale/id_ID'

@@ -1,7 +1,7 @@
 import { UserSchema } from '@/schemas/users/UserSchema';
 import { z } from 'zod';
-import { validationMessages } from '@/constants/validationMessage';
-import { messages } from '@/constants/message';
+import { validationMessages } from '@/lib/constants/validationMessage';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 
 export const LoginRequestSchema = z.object({
   username: z.string({
@@ -25,16 +25,19 @@ export const LoginResponseSchema = z.object({
     .openapi({
       example: 'eyJH*************',
     }),
-  user: UserSchema
+  user: UserSchema.pick({
+    username: true,
+    id: true,
+  })
 }).openapi('LoginResponse');
 
 export const LogoutResponseSchema = z.object({
   messages: z
     .string()
     .array()
-    .default([messages.successLogout])
+    .default([MESSAGES.successLogout])
     .openapi({
-      example: [messages.successLogout]
+      example: [MESSAGES.successLogout]
     }),
 }).openapi('LogoutResponse');
 

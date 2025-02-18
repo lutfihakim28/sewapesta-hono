@@ -4,8 +4,8 @@ import { categories } from 'db/schema/categories';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { CategoryRequest } from '@/schemas/categories/CategoryRequestSchema';
 import dayjs from 'dayjs';
-import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constants/message';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { Category } from '@/schemas/categories/CategorySchema';
 import { items } from 'db/schema/items';
 
@@ -39,7 +39,7 @@ export abstract class CategoryService {
     })
 
     if (!category) {
-      throw new NotFoundException(messages.errorNotFound('kategori'))
+      throw new NotFoundException(MESSAGES.errorNotFound('kategori'))
     }
 
     return category

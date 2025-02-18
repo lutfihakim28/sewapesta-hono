@@ -1,4 +1,4 @@
-import { ItemMutationTypeEnum } from '@/enums/ItemMutationType.Enum';
+import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 import { timestamps } from 'db/schema/timestamps.helper';
 import { relations } from 'drizzle-orm';
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';

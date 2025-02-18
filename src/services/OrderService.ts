@@ -6,19 +6,19 @@ import { orders } from 'db/schema/orders';
 import { and, asc, between, count, desc, eq, inArray, isNull, like, not, or, sql } from 'drizzle-orm';
 import { ItemService } from './ItemService';
 import { StockMutationCreate } from '@/schemas/stockMutations/StockMutationCreateSchema';
-import { ItemMutationTypeEnum } from '@/enums/ItemMutationType.Enum';
+import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 import { StockMutationService } from './StockMutationService';
 import { ParamId } from '@/schemas/ParamIdSchema';
 import { OrderUpdate } from '@/schemas/orders/OrderUpdateSchema';
 import { itemMutations } from 'db/schema/itemMutations';
 import { productEmployeeAssignments } from 'db/schema/productEmployeeAssignments';
-import { NotFoundException } from '@/exceptions/NotFoundException';
-import { messages } from '@/constants/message';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { OrderColumn, OrderFilter } from '@/schemas/orders/OrderFilterSchema';
 import { Order } from '@/schemas/orders/OrderSchema';
-import { BadRequestException } from '@/exceptions/BadRequestException';
-import { countOffset } from '@/utils/countOffset';
-import { OrderStatusEnum } from '@/enums/OrderStatusEnum';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { countOffset } from '@/lib/utils/countOffset';
+import { OrderStatusEnum } from '@/lib/enums/OrderStatusEnum';
 import { OrderedProduct } from '@/schemas/orderedProducts/OrderedProductSchema';
 import { AssignedEmployee } from '@/schemas/productEmployeeAssignments/AssignedEmployeeSchema';
 import { OrderPatch } from '@/schemas/orders/OrderPatchSchema';
@@ -87,7 +87,7 @@ export abstract class OrderService {
       .get();
 
     if (!order) {
-      throw new NotFoundException(messages.errorNotFound('pesanan'))
+      throw new NotFoundException(MESSAGES.errorNotFound('pesanan'))
     }
 
     return order;

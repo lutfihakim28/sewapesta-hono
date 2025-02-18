@@ -2,8 +2,8 @@ import { deleteCookie, setCookie } from 'hono/cookie';
 import { honoApp } from '@/lib/hono';
 import { UserService } from '@/services/UserService';
 import { sign } from 'hono/jwt';
-import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
-import { messages } from '@/constants/message';
+import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { JWTPayload } from 'hono/utils/jwt/types';
 import dayjs from 'dayjs';
 import { AuthLoginRoute } from '@/routes/auths/AuthLoginRoute';
@@ -17,7 +17,7 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
   const user = await UserService.checkCredentials(loginRequest);
 
   if (!user) {
-    throw new UnauthorizedException(messages.invalidCredential)
+    throw new UnauthorizedException(MESSAGES.invalidCredential)
   }
 
   const payload: JWTPayload = {
@@ -28,16 +28,18 @@ AuthController.openapi(AuthLoginRoute, async (context) => {
 
   const secretKey = Bun.env.JWT_SECRET;
 
+  console.log(payload, secretKey)
+
   const token = await sign(payload, secretKey);
 
-  setCookie(context, "token", token, {
-    secure: true,
-    httpOnly: true,
-  });
+  // setCookie(context, "token", token, {
+  //   secure: true,
+  //   httpOnly: true,
+  // });
 
   return context.json({
     code: 200,
-    messages: messages.successLogin,
+    messages: MESSAGES.successLogin,
     data: {
       token,
       user: {
@@ -53,7 +55,7 @@ AuthController.openapi(AuthLogoutRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: messages.successLogout
+    messages: MESSAGES.successLogout
   }, 200)
 })
 

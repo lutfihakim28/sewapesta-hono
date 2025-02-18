@@ -1,4 +1,4 @@
-import { messages } from '@/constants/message';
+import { MESSAGES } from '@/lib/constants/MESSAGES';
 import { z } from 'zod';
 import { OptionSchema } from '../OptionSchema';
 
@@ -7,7 +7,7 @@ export const OwnerOptionSchema = z.object({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: messages.successList('opsi pemilik'),
+    example: MESSAGES.successList('opsi pemilik'),
   }),
   data: z.array(OptionSchema),
 })

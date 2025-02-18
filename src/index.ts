@@ -4,10 +4,10 @@ import { honoApp } from './lib/hono'
 import { HTTPException } from 'hono/http-exception'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
 import { logger } from 'hono/logger'
-import { messages } from 'src/constants/message'
+import { MESSAGES } from '@/lib/constants/MESSAGES'
 import { swaggerUI } from '@hono/swagger-ui'
-import { UnauthorizedException } from './exceptions/UnauthorizedException'
-import { verify } from 'hono/jwt'
+import { UnauthorizedException } from './lib/exceptions/UnauthorizedException'
+import { jwt, verify } from 'hono/jwt'
 import AuthController from './controllers/AuthController'
 import CategoryController from './controllers/CategoryController'
 import EmployeeController from './controllers/EmployeeController'
@@ -20,6 +20,13 @@ import { serveStatic } from 'hono/bun'
 import ProductController from './controllers/ProductController'
 import SQLTestController from './controllers/SQLTestController'
 import OrderController from './controllers/OrderController'
+import { createSelectSchema } from 'drizzle-zod'
+import { provinces } from 'db/schema/provinces'
+import { bearerAuth } from 'hono/bearer-auth'
+import ProvinceController from './api/public/locations/provinces/Province.controller'
+import CityController from './api/public/locations/cities/City.controller'
+import DistrictController from './api/public/locations/districts/District.controller'
+import SubdistrictController from './api/public/locations/subdistricts/Subdistrict.controller'
 // import { NotFoundException } from './exceptions/NotFoundException'
 
 const app = honoApp()
@@ -52,10 +59,9 @@ app.onError((error, context) => {
       messages: ['Token kadaluarsa.']
     }, 401)
   }
-  console.log(error)
   return context.json({
     code: 500,
-    messages: [messages.errorServer]
+    messages: [MESSAGES.errorServer]
   }, 500)
 })
 
@@ -69,34 +75,19 @@ app.use('/api/auth/logout', async (context, next) => {
   const secretKey = Bun.env.JWT_SECRET;
 
   if (!token) {
-    throw new UnauthorizedException(messages.tokenNotFound)
+    throw new UnauthorizedException(MESSAGES.tokenNotFound)
   }
 
   const payload = await verify(token, secretKey);
 
   if (!payload) {
-    throw new UnauthorizedException(messages.tokenNotFound)
+    throw new UnauthorizedException(MESSAGES.tokenNotFound)
   }
 
   await next()
 })
 
-app.use('/api/private/*', async (context, next) => {
-  const token = getCookie(context, 'token');
-  const secretKey = Bun.env.JWT_SECRET;
-
-  if (!token) {
-    throw new UnauthorizedException(messages.tokenNotFound)
-  }
-
-  const payload = await verify(token, secretKey);
-
-  if (!payload) {
-    throw new UnauthorizedException(messages.tokenNotFound)
-  }
-
-  await next()
-})
+app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }))
 app.use(logger(), prettyJSON())
 
 // STATIC
@@ -104,14 +95,20 @@ app.use('/static/*', serveStatic({ root: './' }))
 
 // PUBLIC PATH
 app.route('/api/auth', AuthController)
-app.route('/api/test', SQLTestController)
+app.route('/api/public/locations/provinces', ProvinceController)
+app.route('/api/public/locations/cities', CityController)
+app.route('/api/public/locations/districts', DistrictController)
+app.route('/api/public/locations/subdistricts', SubdistrictController)
 
 // PRIVATE PATH
-app.route('/api/private/categories', CategoryController)
-app.route('/api/private/items', ItemController)
-app.route('/api/private/products', ProductController)
-app.route('/api/private/units', UnitController)
-app.route('/api/private/vehicles', VehicleController)
+// app.route('/api/private/categories', CategoryController)
+// app.route('/api/private/items', ItemController)
+// app.route('/api/private/products', ProductController)
+// app.route('/api/private/units', UnitController)
+// app.route('/api/private/vehicles', VehicleController)
+
+// TEST QUERY
+app.route('/api/test', SQLTestController)
 
 app.get(
   '/swagger',
@@ -121,10 +118,10 @@ app.get(
   })
 )
 
-app.openAPIRegistry.registerComponent('securitySchemes', 'cookieAuth', {
-  type: 'apiKey',
-  name: 'token',
-  in: 'cookie'
+app.openAPIRegistry.registerComponent('securitySchemes', 'bearerAuth', {
+  type: 'http',
+  scheme: 'bearer',
+  bearerFormat: 'JWT'
 });
 
 app.doc31('/docs', {
@@ -133,6 +130,9 @@ app.doc31('/docs', {
     version: '1.0.0',
     title: 'Sewapesta API',
   },
+  security: [{
+    bearerAuth: []
+  }]
 })
 
 // const worker = new Worker('src/worker.ts');
