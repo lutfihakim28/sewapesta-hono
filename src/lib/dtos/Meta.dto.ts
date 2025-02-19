@@ -1,4 +1,4 @@
-export class ResponseMeta {
+export class Meta {
   page!: number
   pageSize!: number
   pageCount!: number

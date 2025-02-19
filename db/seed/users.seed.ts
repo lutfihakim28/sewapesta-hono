@@ -6,7 +6,7 @@ import { users } from 'db/schema/users';
 
 let id = 0
 
-export async function seedUsers(branchId: number, subdistrictsCode: Array<string>, role: RoleEnum = RoleEnum.SuperAdmin) {
+export async function seedUsers(branchId: number, subdistrictsCode: string[], role: RoleEnum = RoleEnum.SuperAdmin) {
   const name = role === RoleEnum.SuperAdmin ? 'superadmin' : faker.person.fullName()
   const username = role === RoleEnum.SuperAdmin ? 'superadmin' : faker.internet.userName({
     firstName: name.split(' ')[0],

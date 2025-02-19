@@ -7,9 +7,9 @@ import { faker } from '@faker-js/faker/locale/id_ID';
 
 type ItemSeedProp = {
   owner: number;
-  categories: Array<number>;
-  units: Array<number>;
-  products: Array<number>;
+  categories: number[];
+  units: number[];
+  products: number[];
 }
 
 export async function seedItems({

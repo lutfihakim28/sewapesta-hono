@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
-import { UnauthorizedSchema } from '@/lib/schemas/UnauthorizedSchema'
-import { ServerErrorSchema } from '@/lib/schemas/ServerErrorSchema'
-import { CityFilterSchema, CityListSchema } from './City.schema'
+import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema'
+import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema'
+import { CityFilterSchema, CityResponseListSchema } from './City.schema'
 
 export const CityRoute = createRoute({
   method: 'get',
@@ -14,7 +14,7 @@ export const CityRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: CityListSchema,
+          schema: CityResponseListSchema,
         },
       },
       description: 'Retrieve list City\'s options',

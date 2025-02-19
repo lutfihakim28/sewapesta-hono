@@ -1,23 +1,23 @@
 import { createRoute } from '@hono/zod-openapi'
 import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema'
 import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema'
-import { DistrictFilterSchema, DistrictResponseListSchema } from './District.schema'
+import { BranchFilterSchema, BranchResponseListSchema } from './Branch.schema'
 
-export const DistrictRoute = createRoute({
+export const BranchRoute = createRoute({
   method: 'get',
   path: '/',
-  tags: ['Location'],
+  tags: ['Branch'],
   request: {
-    query: DistrictFilterSchema,
+    query: BranchFilterSchema,
   },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: DistrictResponseListSchema,
+          schema: BranchResponseListSchema,
         },
       },
-      description: 'Retrieve list District\'s options',
+      description: 'Retrieve list Branches',
     },
     401: {
       content: {

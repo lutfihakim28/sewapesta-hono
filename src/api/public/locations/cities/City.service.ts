@@ -3,21 +3,19 @@ import { and, count, eq, like } from 'drizzle-orm';
 import { countOffset } from '@/lib/utils/countOffset';
 import { CityFilter } from './City.schema';
 import { cities } from 'db/schema/cities';
-import { provinces } from 'db/schema/provinces';
+import { City } from './City.dto';
 
 export class CityService {
-  static async list(query: CityFilter) {
+  static async list(query: CityFilter): Promise<City[]> {
     const _cities = await db
-      .select()
+      .select({
+        code: cities.code,
+        name: cities.name,
+      })
       .from(cities)
-      .where(and(
-        eq(cities.provinceCode, query.provinceCode),
-        query.keyword
-          ? like(cities.name, `%${query.keyword}%`)
-          : undefined
-      ))
-      .limit( Number(query.pageSize || 5))
-      .offset( countOffset(query.page, query.pageSize))
+      .where(this.buildWhereClause(query))
+      .limit(Number(query.pageSize || 5))
+      .offset(countOffset(query.page, query.pageSize))
 
     return _cities
   }
@@ -26,14 +24,18 @@ export class CityService {
     const item = db
       .select({ count: count() })
       .from(cities)
-      .where(and(
-        eq(cities.provinceCode, query.provinceCode),
-        query.keyword
-          ? like(cities.name, `%${query.keyword}%`)
-          : undefined
-      ))
+      .where(this.buildWhereClause(query))
       .get();
 
-    return item ? item.count : 0;
+    return item?.count || 0;
+  }
+
+  private static buildWhereClause(query: CityFilter) {
+    const conditions: ReturnType<typeof and>[] = [eq(cities.provinceCode, query.provinceCode)];
+
+    if (query.keyword) {
+      conditions.push(like(cities.name, `%${query.keyword}%`))
+    }
+    return and(...conditions)
   }
 }

@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker/locale/id_ID';
 import { db } from 'db/index';
 import { branches } from 'db/schema/branches';
 
-export async function seedBranches(subdistrictsCode: Array<string>) {
+export async function seedBranches(subdistrictsCode: string[]) {
   console.log('Seeding branches...')
   const [branch] = await db
     .insert(branches)
@@ -10,7 +10,7 @@ export async function seedBranches(subdistrictsCode: Array<string>) {
       name: faker.company.name(),
       address: faker.location.streetAddress(),
       cpName: faker.person.fullName(),
-      cpPhone: faker.phone.number(),
+      cpPhone: faker.helpers.fromRegExp('+628[1-9][0-9]{8,9}'),
       subdistrictCode: faker.helpers.arrayElement(subdistrictsCode)
     })
     .returning({

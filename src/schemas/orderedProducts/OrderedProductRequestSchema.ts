@@ -18,7 +18,7 @@ const _OrderedProductRequestSchema = createInsertSchema(orderedProducts, {
 })
 
 export type OrderedProductRequest = z.infer<typeof _OrderedProductRequestSchema> & {
-  employees: Array<number>
+  employees: number[]
 }
 
 export const OrderedProductRequestSchema: z.ZodType<OrderedProductRequest> = _OrderedProductRequestSchema.extend({

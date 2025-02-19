@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
-import { ProvinceFilterSchema, ProvinceListSchema } from './Province.schema'
-import { UnauthorizedSchema } from '@/lib/schemas/UnauthorizedSchema'
-import { ServerErrorSchema } from '@/lib/schemas/ServerErrorSchema'
+import { ProvinceFilterSchema, ProvinceResponseListSchema } from './Province.schema'
+import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema'
+import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema'
 
 export const ProvinceRoute = createRoute({
   method: 'get',
@@ -14,7 +14,7 @@ export const ProvinceRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: ProvinceListSchema,
+          schema: ProvinceResponseListSchema,
         },
       },
       description: 'Retrieve list Provinces\'s options',

@@ -27,7 +27,7 @@ export abstract class ItemService {
   static async getList(query: ItemFilter): Promise<Array<Item>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: ItemColumn = 'id';
-    let categories: Array<number> | undefined = undefined;
+    let categories: number[] | undefined = undefined;
 
     if (query.sort) {
       sort = query.sort
@@ -254,7 +254,7 @@ export abstract class ItemService {
     })
   }
 
-  static async getItemsByProducts(productIds: Array<number>) {
+  static async getItemsByProducts(productIds: number[]) {
     const _items = await db
       .select({
         id: items.id,
@@ -370,6 +370,6 @@ export abstract class ItemService {
       ))
       .get();
 
-    return item ? item.count : 0;
+    return item?.count || 0;
   }
 }

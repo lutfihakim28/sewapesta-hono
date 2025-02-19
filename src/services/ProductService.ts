@@ -234,10 +234,10 @@ export abstract class ProductService {
       ))
       .get();
 
-    return item ? item.count : 0;
+    return item?.count || 0;
   }
 
-  static async checkPackageAvailability(itemIds: Array<number>) {
+  static async checkPackageAvailability(itemIds: number[]) {
     const _products = await db
       .select()
       .from(products)

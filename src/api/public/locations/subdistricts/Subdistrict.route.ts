@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
-import { UnauthorizedSchema } from '@/lib/schemas/UnauthorizedSchema'
-import { ServerErrorSchema } from '@/lib/schemas/ServerErrorSchema'
-import { SubdistrictFilterSchema, SubdistrictListSchema } from './Subdistrict.schema'
+import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema'
+import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema'
+import { SubdistrictFilterSchema, SubdistrictResponseListSchema } from './Subdistrict.schema'
 
 export const SubdistrictRoute = createRoute({
   method: 'get',
@@ -14,7 +14,7 @@ export const SubdistrictRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: SubdistrictListSchema,
+          schema: SubdistrictResponseListSchema,
         },
       },
       description: 'Retrieve list Subdistrict\'s options',

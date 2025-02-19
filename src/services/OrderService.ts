@@ -29,7 +29,7 @@ export abstract class OrderService {
   static async getList(query: OrderFilter): Promise<Array<Order>> {
     let sort: 'asc' | 'desc' = 'asc';
     let sortBy: OrderColumn = 'id';
-    let dateRange: Array<number> = [];
+    let dateRange: number[] = [];
 
     if (query.sort) {
       sort = query.sort
@@ -406,7 +406,7 @@ export abstract class OrderService {
   }
 
   static async count(query: OrderFilter): Promise<number> {
-    let dateRange: Array<number> = [];
+    let dateRange: number[] = [];
 
     if (query.startAt) {
       if (!query.endAt) {
@@ -438,7 +438,7 @@ export abstract class OrderService {
       ))
       .get();
 
-    return item ? item.count : 0;
+    return item?.count || 0;
   }
 
   static async generateNumber() {
