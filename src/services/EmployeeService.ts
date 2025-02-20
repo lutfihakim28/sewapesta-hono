@@ -5,7 +5,7 @@ import { EmployeeRequest } from '@/schemas/employees/EmployeeRequestSchema';
 import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { EmployeeColumn, EmployeeFilter } from '@/schemas/employees/EmployeeFilterSchema';
 import { countOffset } from '@/lib/utils/countOffset';
 import { Employee } from '@/schemas/employees/EmployeeSchema';
@@ -72,7 +72,7 @@ export abstract class EmployeeService {
     })
 
     if (!employee) {
-      throw new NotFoundException(MESSAGES.errorNotFound('karyawan'))
+      throw new NotFoundException(messages.errorNotFound('karyawan'))
     }
 
     return employee;

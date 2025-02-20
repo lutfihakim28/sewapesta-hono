@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { db } from 'db';
 import { vehicles } from 'db/schema/vehicles';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';

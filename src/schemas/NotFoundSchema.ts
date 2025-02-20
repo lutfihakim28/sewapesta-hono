@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { z } from 'zod';
 
 export const NotFoundSchema = z.object({
@@ -6,6 +6,6 @@ export const NotFoundSchema = z.object({
     example: 404,
   }),
   messages: z.string().openapi({
-    example: MESSAGES.errorNotFound('Pesanan')
+    example: messages.errorNotFound('Pesanan')
   })
 }).openapi('NotFound')

@@ -1,10 +1,9 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { honoApp } from '@/lib/hono';
 import { Meta } from '@/lib/dtos/Meta.dto';
 import { CityRoute } from './City.route';
 import { CityService } from './City.service';
 import { ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { City } from './City.dto';
 
 const CityController = honoApp()
 
@@ -17,13 +16,13 @@ CityController.openapi(CityRoute, async (context) => {
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: MESSAGES.successList('kabupaten/kota'),
+    messages: [messages.successList('kabupaten/kota')],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,
       total: totalData
     }),
-    data: cities.map((city) => new City(city))
+    data: cities
   }), 200)
 })
 

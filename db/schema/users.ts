@@ -19,7 +19,7 @@ export const users = sqliteTable('users', {
       RoleEnum.Owner,
       RoleEnum.SuperAdmin,
     ]
-  }),
+  }).notNull(),
   profileId: integer('profile_id').references(() => profiles.id).unique().notNull(),
   ...timestamps,
 }, (table) => ({

@@ -1,9 +1,8 @@
 import { db } from 'db';
 import { and, count, eq, like } from 'drizzle-orm';
 import { countOffset } from '@/lib/utils/countOffset';
-import { CityFilter } from './City.schema';
+import { City, CityFilter } from './City.schema';
 import { cities } from 'db/schema/cities';
-import { City } from './City.dto';
 
 export class CityService {
   static async list(query: CityFilter): Promise<City[]> {

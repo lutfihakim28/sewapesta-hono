@@ -1,9 +1,9 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { LoginRequestSchema, LoginResponseSchema } from '@/schemas/AuthSchema';
+import { LoginRequestSchema, LoginResponseSchema } from './Login.schema';
 import { messages } from '@/lib/constants/messages';
-import { UnauthorizedSchema } from '@/schemas/UnauthorizedSchema';
-import { BadRequestSchema } from '@/schemas/BadRequestSchema';
-import { ServerErrorSchema } from '@/schemas/ServerErrorSchema';
+import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema';
+import { BadRequestSchema } from '@/lib/schemas/BadRequest.schema';
+import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema';
 
 export const AuthLoginRoute = createRoute({
   method: 'post',
@@ -22,11 +22,7 @@ export const AuthLoginRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: z.object({
-            code: z.number().openapi({ example: 200 }),
-            messages: z.string().openapi({ example: messages.successLogin }),
-            data: LoginResponseSchema,
-          })
+          schema: LoginResponseSchema,
         }
       },
       description: 'Login success',

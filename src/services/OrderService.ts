@@ -13,7 +13,7 @@ import { OrderUpdate } from '@/schemas/orders/OrderUpdateSchema';
 import { itemMutations } from 'db/schema/itemMutations';
 import { productEmployeeAssignments } from 'db/schema/productEmployeeAssignments';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { OrderColumn, OrderFilter } from '@/schemas/orders/OrderFilterSchema';
 import { Order } from '@/schemas/orders/OrderSchema';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
@@ -87,7 +87,7 @@ export abstract class OrderService {
       .get();
 
     if (!order) {
-      throw new NotFoundException(MESSAGES.errorNotFound('pesanan'))
+      throw new NotFoundException(messages.errorNotFound('pesanan'))
     }
 
     return order;

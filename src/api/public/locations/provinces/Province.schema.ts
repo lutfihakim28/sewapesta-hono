@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
 import { ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { SearchSchema } from '@/lib/schemas/Search.schema';
@@ -10,7 +10,8 @@ export const ProvinceSchema = createSelectSchema(provinces).openapi('Province');
 export const ProvinceFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .openapi('ProvinceFilter')
-export const ProvinceListSchema = z.array(ProvinceSchema)
-export const ProvinceResponseListSchema = ApiResponseListSchema(ProvinceListSchema, MESSAGES.successList('provinsi'))
+const ProvinceListSchema = z.array(ProvinceSchema)
+export const ProvinceResponseListSchema = ApiResponseListSchema(ProvinceListSchema, messages.successList('provinsi'))
 
+export type Province = z.infer<typeof ProvinceSchema>
 export type ProvinceFilter = z.infer<typeof ProvinceFilterSchema>

@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { z } from 'zod';
 
 export const ServerErrorSchema = z.object({
@@ -6,6 +6,6 @@ export const ServerErrorSchema = z.object({
     example: 500,
   }),
   messages: z.string().openapi({
-    example: MESSAGES.errorServer,
+    example: messages.errorServer,
   })
 }).openapi('ServerError')

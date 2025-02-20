@@ -1,7 +1,8 @@
-import { UserSchema } from '@/schemas/users/UserSchema';
-import { z } from 'zod';
-import { validationMessages } from '@/lib/constants/validationMessage';
+import { UserSchema } from '@/api/private/users/User.schema';
 import { messages } from '@/lib/constants/messages';
+import { validationMessages } from '@/lib/constants/validationMessage';
+import { ApiResponseDataSchema } from '@/lib/schemas/ApiResponse.schema';
+import { z } from 'zod';
 
 export const LoginRequestSchema = z.object({
   username: z.string({
@@ -19,26 +20,13 @@ export const LoginRequestSchema = z.object({
     }),
 }).openapi('Login');
 
-export const LoginResponseSchema = z.object({
+export const LoginResponseSchema = ApiResponseDataSchema(z.object({
   token: z
     .string()
     .openapi({
       example: 'eyJH*************',
     }),
-  user: UserSchema.pick({
-    username: true,
-    id: true,
-  })
-}).openapi('LoginResponse');
-
-export const LogoutResponseSchema = z.object({
-  messages: z
-    .string()
-    .array()
-    .default([messages.successLogout])
-    .openapi({
-      example: [messages.successLogout]
-    }),
-}).openapi('LogoutResponse');
+  user: UserSchema
+}), messages.successLogin).openapi('LoginResponse');
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>

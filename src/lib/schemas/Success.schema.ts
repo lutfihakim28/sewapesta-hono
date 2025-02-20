@@ -1,11 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
-import { z } from 'zod';
+import { messages } from '@/lib/constants/messages';
+import { ApiResponseSchema } from './ApiResponse.schema';
 
-export const SuccessSchema = z.object({
-  code: z.number().openapi({
-    example: 200
-  }),
-  messages: z.string().openapi({
-    example: MESSAGES.successCreate('data'),
-  })
-}).openapi('Success')
+export const SuccessSchema = ApiResponseSchema(messages.successDetail('pengguna')).openapi('Success')

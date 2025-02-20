@@ -2,8 +2,7 @@ import { db } from 'db';
 import { and, count, eq, like } from 'drizzle-orm';
 import { countOffset } from '@/lib/utils/countOffset';
 import { subdistricts } from 'db/schema/subdistricts';
-import { SubdistrictFilter } from './Subdistrict.schema';
-import { Subdistrict } from './Subdistrict.dto';
+import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
 
 export class SubdistrictService {
   static async list(query: SubdistrictFilter): Promise<Subdistrict[]> {

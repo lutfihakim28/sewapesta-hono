@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { owners } from 'db/schema/owners';
 import { OwnerRequest } from '@/schemas/owners/OwnerRequestSchema';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { OwnerColumn, OwnerFilter } from '@/schemas/owners/OwnerFilterScheme';
 import { countOffset } from '@/lib/utils/countOffset';
 import { Owner } from '@/schemas/owners/OwnerSchema';
@@ -68,7 +68,7 @@ export abstract class OwnerService {
     })
 
     if (!owner) {
-      throw new NotFoundException(MESSAGES.errorNotFound('Pemilik'))
+      throw new NotFoundException(messages.errorNotFound('Pemilik'))
     }
 
     return owner

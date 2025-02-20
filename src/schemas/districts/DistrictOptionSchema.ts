@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ResponseSchema } from '../ResponseSchema';
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { OptionSchema } from '../OptionSchema';
 
-export const DistrictOptionSchema = ResponseSchema(z.array(OptionSchema), MESSAGES.successList('opsi kecamatan'))
+export const DistrictOptionSchema = ResponseSchema(z.array(OptionSchema), messages.successList('opsi kecamatan'))

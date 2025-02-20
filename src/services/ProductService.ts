@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { ProductCreate } from '@/schemas/products/ProductCreateSchema';
@@ -107,7 +107,7 @@ export abstract class ProductService {
       })
 
       if (!product) {
-        throw new NotFoundException(MESSAGES.errorNotFound('produk'))
+        throw new NotFoundException(messages.errorNotFound('produk'))
       }
 
       return product;

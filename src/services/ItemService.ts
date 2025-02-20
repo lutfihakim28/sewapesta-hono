@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { items } from 'db/schema/items';
 import { ItemCreate, ItemUpdate } from '@/schemas/items/ItemRequestSchema';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { ItemColumn, ItemFilter } from '@/schemas/items/ItemFilterSchema';
 import { countOffset } from '@/lib/utils/countOffset';
 import { owners } from 'db/schema/owners';
@@ -154,7 +154,7 @@ export abstract class ItemService {
       })
 
       if (!_item) {
-        throw new NotFoundException(MESSAGES.errorNotFound('barang'))
+        throw new NotFoundException(messages.errorNotFound('barang'))
       }
 
       const images = await ImageService.getByReference({

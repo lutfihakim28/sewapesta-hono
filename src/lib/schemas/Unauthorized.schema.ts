@@ -1,11 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
-import { z } from 'zod';
+import { messages } from '@/lib/constants/messages';
+import { ApiResponseSchema } from './ApiResponse.schema';
 
-export const UnauthorizedSchema = z.object({
-  code: z.number().openapi({
-    example: 401,
-  }),
-  messages: z.string().openapi({
-    example: MESSAGES.unauthorized,
-  })
-}).openapi('Unauthorized')
+export const UnauthorizedSchema = ApiResponseSchema(messages.unauthorized).openapi('Unauthorized')

@@ -1,11 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
-import { z } from 'zod';
+import { messages } from '@/lib/constants/messages';
+import { ApiResponseSchema } from './ApiResponse.schema';
 
-export const NotFoundSchema = z.object({
-  code: z.number().openapi({
-    example: 404,
-  }),
-  messages: z.string().openapi({
-    example: MESSAGES.errorNotFound('Pesanan')
-  })
-}).openapi('NotFound')
+export const NotFoundSchema = ApiResponseSchema(messages.errorNotFound('pengguna')).openapi('NotFound')

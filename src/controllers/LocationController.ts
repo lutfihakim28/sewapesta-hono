@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { honoApp } from '@/lib/hono';
 import { ProvinceRoute } from '@/routes/locations/ProvinceRoute';
 import { LocationService } from '@/services/LocationService';
@@ -11,7 +11,7 @@ LocationController.openapi(ProvinceRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: MESSAGES.successList('provinsi'),
+    messages: messages.successList('provinsi'),
     
   })
 })

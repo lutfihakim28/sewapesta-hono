@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { z } from 'zod';
 import { VehicleSchema } from './VehicleSchema';
 
@@ -7,7 +7,7 @@ export const VehicleListSchema = z.object({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: MESSAGES.successList('kendaraan'),
+    example: messages.successList('kendaraan'),
   }),
   data: z.array(VehicleSchema),
 })

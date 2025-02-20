@@ -11,7 +11,8 @@
 6. Location route
 7. Location controller
 8. Tes location (unit/e2e test?)
-9. Restructure folder
+9. Improve auth, save token to db
+10. Restructure folder
 
 ## WHO
 

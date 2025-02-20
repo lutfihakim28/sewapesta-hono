@@ -2,7 +2,7 @@ import { Meta } from './Meta.dto';
 
 export class ApiResponse {
   public code!: number
-  public messages!: string[] | string
+  public messages!: string[]
 
   constructor(response: ApiResponse) {
     this.code = response.code
@@ -17,6 +17,7 @@ export class ApiResponseData<T> extends ApiResponse {
     this.data = response.data
   }
 }
+// TODO: Hapus file dto
 
 export class ApiResponseList<T> extends ApiResponseData<T> {
   public meta!: Meta

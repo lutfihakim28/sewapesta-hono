@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { honoApp } from '@/lib/hono';
 import { CreateUnitRoute } from '@/routes/units/CreateUnitRoute';
 import { DeleteUnitRoute } from '@/routes/units/DeleteUnitRoute';
@@ -13,7 +13,7 @@ UnitController.openapi(ListUnitRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: MESSAGES.successList('satuan'),
+    messages: messages.successList('satuan'),
     data: categories,
   }, 200)
 })
@@ -25,7 +25,7 @@ UnitController.openapi(CreateUnitRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: MESSAGES.successCreate('satuan'),
+    messages: messages.successCreate('satuan'),
   }, 200)
 })
 
@@ -37,7 +37,7 @@ UnitController.openapi(UpdateUnitRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: MESSAGES.successUpdate('satuan'),
+    messages: messages.successUpdate('satuan'),
   }, 200)
 })
 
@@ -48,7 +48,7 @@ UnitController.openapi(DeleteUnitRoute, async (context) => {
 
   return context.json({
     code: 200,
-    messages: MESSAGES.successDelete('satuan'),
+    messages: messages.successDelete('satuan'),
   }, 200)
 })
 

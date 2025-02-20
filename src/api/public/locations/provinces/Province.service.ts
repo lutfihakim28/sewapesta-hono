@@ -1,9 +1,8 @@
 import { db } from 'db';
 import { provinces } from 'db/schema/provinces';
 import { count, like } from 'drizzle-orm';
-import { ProvinceFilter } from './Province.schema';
+import { Province, ProvinceFilter } from './Province.schema';
 import { countOffset } from '@/lib/utils/countOffset';
-import { Province } from './Province.dto';
 
 export class ProvinceService {
   static async list(query: ProvinceFilter): Promise<Province[]> {

@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { z } from 'zod';
 import { OwnerSchema } from './OwnerSchema';
 
@@ -7,7 +7,7 @@ export const OwnerListSchema = z.object({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: MESSAGES.successList('pemilik'),
+    example: messages.successList('pemilik'),
   }),
   data: z.array(OwnerSchema),
   meta: z.object({

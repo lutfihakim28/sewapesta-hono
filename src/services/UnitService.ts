@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { db } from 'db';
 import { units } from 'db/schema/units';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
@@ -66,7 +66,7 @@ export abstract class UnitService {
       .get();
 
     if (!unit) {
-      throw new NotFoundException(MESSAGES.errorNotFound('satuan'))
+      throw new NotFoundException(messages.errorNotFound('satuan'))
     }
 
     return unit

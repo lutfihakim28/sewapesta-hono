@@ -1,11 +1,4 @@
 import { validationMessages } from '@/lib/constants/validationMessage';
-import { z } from 'zod';
+import { ApiResponseSchema } from './ApiResponse.schema';
 
-export const BadRequestSchema = z.object({
-  code: z.number().openapi({
-    example: 422,
-  }),
-  messages: z.string().array().openapi({
-    example: [validationMessages.required('Nama')]
-  })
-}).openapi('BadRequest')
+export const BadRequestSchema = ApiResponseSchema(validationMessages.required('Nama')).openapi('BadRequest')

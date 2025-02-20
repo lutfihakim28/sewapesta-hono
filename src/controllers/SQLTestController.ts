@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { honoApp } from '@/lib/hono';
 import { SuccessSchema } from '@/schemas/SuccessSchema';
 import { SQLTestService } from '@/services/SQLTestService';
@@ -23,7 +23,7 @@ SQLTestController.openapi(createRoute({
   const data = await SQLTestService.test();
   return context.json({
     code: 200,
-    messages: MESSAGES.successList('kategori'),
+    messages: messages.successList('kategori'),
     data
   }, 200)
 })

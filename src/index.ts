@@ -5,7 +5,7 @@ import { HTTPException } from 'hono/http-exception'
 import { jwt, verify } from 'hono/jwt'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
 import { logger } from 'hono/logger'
-import { MESSAGES } from '@/lib/constants/MESSAGES'
+import { messages } from '@/lib/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/bun'
 import { swaggerUI } from '@hono/swagger-ui'
@@ -19,6 +19,7 @@ import SubdistrictController from './api/public/locations/subdistricts/Subdistri
 import { ApiResponse } from './lib/dtos/ApiResponse.dto'
 import { BadRequestException } from './lib/exceptions/BadRequestException'
 import { NotFoundException } from './lib/exceptions/NotFoundException'
+import BranchController from './api/private/branches/Branch.controller'
 
 const app = honoApp()
 
@@ -41,12 +42,12 @@ app.onError((error, context) => {
   if (error instanceof JwtTokenExpired) {
     return context.json(new ApiResponse({
       code: 401,
-      messages: 'Token kadaluarsa.'
+      messages: ['Token kadaluarsa.']
     }), 401)
   }
   return context.json(new ApiResponse({
     code: 500,
-    messages: [MESSAGES.errorServer]
+    messages: [messages.errorServer]
   }), 500)
 })
 
@@ -55,24 +56,10 @@ app.use('/api/*', cors({
   credentials: true,
 }))
 
-app.use('/api/auth/logout', async (context, next) => {
-  const token = getCookie(context, 'token');
-  const secretKey = Bun.env.JWT_SECRET;
-
-  if (!token) {
-    throw new UnauthorizedException(MESSAGES.tokenNotFound)
-  }
-
-  const payload = await verify(token, secretKey);
-
-  if (!payload) {
-    throw new UnauthorizedException(MESSAGES.tokenNotFound)
-  }
-
-  await next()
-})
 
 app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }))
+app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
+
 app.use(logger(), prettyJSON())
 
 // STATIC
@@ -86,7 +73,7 @@ app.route('/api/public/locations/districts', DistrictController)
 app.route('/api/public/locations/subdistricts', SubdistrictController)
 
 // PRIVATE PATH
-// app.route('/api/private/categories', CategoryController)
+app.route('/api/private/branches', BranchController)
 // app.route('/api/private/items', ItemController)
 // app.route('/api/private/products', ProductController)
 // app.route('/api/private/units', UnitController)

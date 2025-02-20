@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { z } from 'zod';
 
 export const UnauthorizedSchema = z.object({
@@ -6,6 +6,6 @@ export const UnauthorizedSchema = z.object({
     example: 401,
   }),
   messages: z.string().openapi({
-    example: MESSAGES.unauthorized,
+    example: messages.unauthorized,
   })
 }).openapi('Unauthorized')

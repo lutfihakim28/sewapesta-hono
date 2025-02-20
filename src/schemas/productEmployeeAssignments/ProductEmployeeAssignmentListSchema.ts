@@ -1,4 +1,4 @@
-import { MESSAGES } from '@/lib/constants/MESSAGES';
+import { messages } from '@/lib/constants/messages';
 import { z } from 'zod';
 import { AssignedEmployeeSchema } from './AssignedEmployeeSchema';
 
@@ -7,7 +7,7 @@ export const ProductEmployeeAssignmentListSchema = z.object({
     example: 200,
   }),
   messages: z.string().openapi({
-    example: MESSAGES.successList('karyawan yang bertugas'),
+    example: messages.successList('karyawan yang bertugas'),
   }),
   data: z.array(AssignedEmployeeSchema),
 })

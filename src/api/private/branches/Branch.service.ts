@@ -1,12 +1,11 @@
 import { and, count, eq, like, or } from 'drizzle-orm';
-import { Branch } from './dto/Branch.dto';
-import { BranchFilter } from './Branch.schema';
+import { BranchExtended, BranchFilter } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
 
 export class BranchService {
-  static async list(query: BranchFilter): Promise<Branch[]> {
+  static async list(query: BranchFilter): Promise<BranchExtended[]> {
     const _branches = await db.query.branches.findMany({
       columns: {
         address: true,
@@ -52,7 +51,7 @@ export class BranchService {
       offset: countOffset(query.page, query.pageSize)
     })
 
-    return _branches.map((branch) => new Branch(branch))
+    return _branches
   }
 
   static async count(query: BranchFilter) {
