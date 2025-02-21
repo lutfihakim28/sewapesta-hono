@@ -19,3 +19,4 @@ export const UserExtendedSchema = UserSchema
   .openapi('UserExtended')
 
 export type User = z.infer<typeof UserSchema>
+export type UserExtended = z.infer<typeof UserExtendedSchema>

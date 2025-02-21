@@ -17,7 +17,6 @@ export class ApiResponseData<T> extends ApiResponse {
     this.data = response.data
   }
 }
-// TODO: Hapus file dto
 
 export class ApiResponseList<T> extends ApiResponseData<T> {
   public meta!: Meta

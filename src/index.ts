@@ -1,38 +1,37 @@
 import { cors } from 'hono/cors'
-import { getCookie } from 'hono/cookie'
 import { honoApp } from './lib/hono'
 import { HTTPException } from 'hono/http-exception'
-import { jwt, verify } from 'hono/jwt'
+import { jwt, } from 'hono/jwt'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
 import { logger } from 'hono/logger'
 import { messages } from '@/lib/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/bun'
 import { swaggerUI } from '@hono/swagger-ui'
-import { UnauthorizedException } from './lib/exceptions/UnauthorizedException'
-import AuthController from './controllers/AuthController'
 import CityController from './api/public/locations/cities/City.controller'
 import DistrictController from './api/public/locations/districts/District.controller'
 import ProvinceController from './api/public/locations/provinces/Province.controller'
 import SQLTestController from './controllers/SQLTestController'
 import SubdistrictController from './api/public/locations/subdistricts/Subdistrict.controller'
 import { ApiResponse } from './lib/dtos/ApiResponse.dto'
-import { BadRequestException } from './lib/exceptions/BadRequestException'
-import { NotFoundException } from './lib/exceptions/NotFoundException'
 import BranchController from './api/private/branches/Branch.controller'
+import LoginController from './api/auth/login/Login.controller'
+import LogoutController from './api/auth/logout/Logout.controller'
+import RefreshController from './api/auth/refresh/Refresh.controller'
+import { authMiddleware } from './lib/middlewares/auth.middleware'
 
 const app = honoApp()
 
 app.onError((error, context) => {
   console.log(error)
   if (error instanceof HTTPException) {
-    if (error instanceof UnauthorizedException || error instanceof NotFoundException) {
+    if (error.status === 401 || error.status === 404) {
       return context.json(new ApiResponse({
         code: error.status,
         messages: [error.message]
       }), error.status)
     }
-    if (error instanceof BadRequestException) {
+    if (error.status === 422) {
       context.json(new ApiResponse({
         code: error.status,
         messages: error.cause as string[]
@@ -57,7 +56,7 @@ app.use('/api/*', cors({
 }))
 
 
-app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }))
+app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }), authMiddleware)
 app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
 
 app.use(logger(), prettyJSON())
@@ -66,7 +65,7 @@ app.use(logger(), prettyJSON())
 app.use('/static/*', serveStatic({ root: './' }))
 
 // PUBLIC PATH
-app.route('/api/auth', AuthController)
+app.route('/api/auth/login', LoginController)
 app.route('/api/public/locations/provinces', ProvinceController)
 app.route('/api/public/locations/cities', CityController)
 app.route('/api/public/locations/districts', DistrictController)
@@ -74,6 +73,8 @@ app.route('/api/public/locations/subdistricts', SubdistrictController)
 
 // PRIVATE PATH
 app.route('/api/private/branches', BranchController)
+app.route('/api/auth/logout', LogoutController)
+app.route('/api/auth/refresh', RefreshController)
 // app.route('/api/private/items', ItemController)
 // app.route('/api/private/products', ProductController)
 // app.route('/api/private/units', UnitController)

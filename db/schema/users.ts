@@ -21,6 +21,7 @@ export const users = sqliteTable('users', {
     ]
   }).notNull(),
   profileId: integer('profile_id').references(() => profiles.id).unique().notNull(),
+  refreshToken: text('refresh_token').unique(),
   ...timestamps,
 }, (table) => ({
   userBranchIndex: index('user_branch_index').on(table.branchId),

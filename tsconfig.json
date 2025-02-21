@@ -1,8 +1,13 @@
 {
   "compilerOptions": {
+    "types": [
+      "bun-types"
+    ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     "target": "ES2022",
     "module": "ESNext",

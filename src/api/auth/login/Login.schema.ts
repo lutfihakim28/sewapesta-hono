@@ -19,14 +19,15 @@ export const LoginRequestSchema = z.object({
       example: 'password',
     }),
 }).openapi('Login');
-
-export const LoginResponseSchema = ApiResponseDataSchema(z.object({
+export const LoginDataSchema = z.object({
   token: z
     .string()
     .openapi({
       example: 'eyJH*************',
     }),
   user: UserSchema
-}), messages.successLogin).openapi('LoginResponse');
+})
+export const LoginResponseSchema = ApiResponseDataSchema(LoginDataSchema, messages.successLogin).openapi('LoginResponse');
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>
+export type LoginData = z.infer<typeof LoginDataSchema>

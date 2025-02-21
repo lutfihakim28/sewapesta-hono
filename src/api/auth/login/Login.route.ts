@@ -1,13 +1,12 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import { LoginRequestSchema, LoginResponseSchema } from './Login.schema';
-import { messages } from '@/lib/constants/messages';
 import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema';
 import { BadRequestSchema } from '@/lib/schemas/BadRequest.schema';
 import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema';
 
-export const AuthLoginRoute = createRoute({
+export const LoginRoute = createRoute({
   method: 'post',
-  path: '/login',
+  path: '/',
   tags: ['Auth'],
   request: {
     body: {

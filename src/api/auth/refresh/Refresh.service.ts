@@ -1,14 +1,22 @@
-import { User } from '@/api/private/users/User.schema';
-import { sign } from 'hono/jwt';
-import { JWTPayload } from 'hono/utils/jwt/types';
-import { LoginData } from './Login.schema';
+import { messages } from '@/lib/constants/messages';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
+import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { db } from 'db';
 import { users } from 'db/schema/users';
 import { eq } from 'drizzle-orm';
+import { sign } from 'hono/jwt';
+import { JWTPayload } from 'hono/utils/jwt/types';
+import { LoginData } from '../login/Login.schema';
+import { RefreshRequest } from './Refresh.schema';
 
-export class LoginService {
-  static async login(user: User): Promise<LoginData> {
+export class RefreshService {
+  static async refresh(request: RefreshRequest): Promise<LoginData> {
+    const [user] = await db.select().from(users).where(eq(users.id, request.userId))
+
+    if (!user) {
+      throw new UnauthorizedException(messages.unauthorized)
+    }
+
     const payload: JWTPayload = new JwtPayload(user);
 
     const secretKey = Bun.env.JWT_SECRET;
