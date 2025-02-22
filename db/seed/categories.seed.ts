@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { db } from '..';
 import { categories } from 'db/schema/categories';
 

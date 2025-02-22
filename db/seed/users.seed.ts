@@ -3,6 +3,7 @@ import { db } from '..';
 import { faker } from '@faker-js/faker/locale/id_ID';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { users } from 'db/schema/users';
+import dayjs from 'dayjs';
 
 let id = 0
 
@@ -31,6 +32,7 @@ export async function seedUsers(branchId: number, subdistrictsCode: string[], ro
       .values({
         password: await Bun.password.hash('password'),
         profileId: profile.id,
+        confirmedAt: dayjs().unix(),
         username,
         role,
         branchId,

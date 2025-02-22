@@ -11,7 +11,7 @@ export const ProvinceFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .openapi('ProvinceFilter')
 const ProvinceListSchema = z.array(ProvinceSchema)
-export const ProvinceResponseListSchema = ApiResponseListSchema(ProvinceListSchema, messages.successList('provinsi'))
+export const ProvinceResponseListSchema = ApiResponseListSchema(ProvinceListSchema, messages.successList('provinces'))
 
 export type Province = z.infer<typeof ProvinceSchema>
 export type ProvinceFilter = z.infer<typeof ProvinceFilterSchema>

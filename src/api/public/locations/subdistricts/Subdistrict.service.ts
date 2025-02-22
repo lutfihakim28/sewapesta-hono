@@ -7,11 +7,14 @@ import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
 export class SubdistrictService {
   static async list(query: SubdistrictFilter): Promise<Subdistrict[]> {
     const _subdistricts = await db
-      .select()
+      .select({
+        code: subdistricts.code,
+        name: subdistricts.name,
+      })
       .from(subdistricts)
       .where(this.buildWhereClause(query))
-      .limit( Number(query.pageSize || 5))
-      .offset( countOffset(query.page, query.pageSize))
+      .limit(Number(query.pageSize || 5))
+      .offset(countOffset(query.page, query.pageSize))
 
     return _subdistricts
   }
@@ -30,7 +33,7 @@ export class SubdistrictService {
     const conditions: ReturnType<typeof and>[] = [
       eq(subdistricts.districtCode, query.districtCode)
     ];
-        
+
     if (query.keyword) {
       conditions.push(like(subdistricts.name, `%${query.keyword}%`))
     }

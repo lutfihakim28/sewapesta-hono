@@ -3,6 +3,7 @@ import { db } from 'db/index';
 import { branches } from 'db/schema/branches';
 
 export async function seedBranches(subdistrictsCode: string[]) {
+  faker
   console.log('Seeding branches...')
   const [branch] = await db
     .insert(branches)

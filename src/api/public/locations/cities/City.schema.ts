@@ -21,7 +21,7 @@ export const CityFilterSchema = z
   .merge(PaginationSchema)
   .openapi('CityFilter')
 const CityListSchema = z.array(CitySchema)
-export const CityResponseListSchema = ApiResponseListSchema(CityListSchema, messages.successList('kabupaten/kota'))
+export const CityResponseListSchema = ApiResponseListSchema(CityListSchema, messages.successList('cities'))
 
 export type City = z.infer<typeof CitySchema>
 export type CityFilter = z.infer<typeof CityFilterSchema>

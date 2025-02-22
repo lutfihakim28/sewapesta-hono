@@ -23,7 +23,7 @@ export const DistrictFilterSchema = z
   .merge(PaginationSchema)
   .openapi('DistrictFilter')
 const DistrictListSchema = z.array(DistrictSchema);
-export const DistrictResponseListSchema = ApiResponseListSchema(DistrictListSchema, messages.successList('kecamatan'))
+export const DistrictResponseListSchema = ApiResponseListSchema(DistrictListSchema, messages.successList('districts'))
 
 export type District = z.infer<typeof DistrictSchema>
 export type DistrictFilter = z.infer<typeof DistrictFilterSchema>

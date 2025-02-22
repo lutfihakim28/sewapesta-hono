@@ -23,7 +23,7 @@ export const SubdistrictFilterSchema = z
   .merge(PaginationSchema)
   .openapi('SubdistrictFilter')
 const SubdistrictListSchema = z.array(SubdistrictSchema)
-export const SubdistrictResponseListSchema = ApiResponseListSchema(SubdistrictListSchema, messages.successList('kelurahan'))
+export const SubdistrictResponseListSchema = ApiResponseListSchema(SubdistrictListSchema, messages.successList('subdistricts'))
 
 export type Subdistrict = z.infer<typeof SubdistrictSchema>
 export type SubdistrictFilter = z.infer<typeof SubdistrictFilterSchema>

@@ -32,7 +32,7 @@ export const BranchFilterSchema = z
   .merge(PaginationSchema)
   .openapi('BranchFilter')
 export const BranchListSchema = z.array(BranchExtendedSchema)
-export const BranchResponseListSchema = ApiResponseListSchema(BranchListSchema, messages.successList('cabang'))
+export const BranchResponseListSchema = ApiResponseListSchema(BranchListSchema, messages.successList('branches'))
 
 export type Branch = z.infer<typeof BranchSchema>
 export type BranchExtended = z.infer<typeof BranchExtendedSchema>
