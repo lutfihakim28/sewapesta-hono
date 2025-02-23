@@ -11,9 +11,9 @@ export const LoginRequestSchema = z.object({
   }),
   password: z
     .string({
-      message: validationMessages.required('Kata sandi')
+      message: validationMessages.required('Password')
     })
-    .min(8, validationMessages.minLength('Kata sandi', 8))
+    .min(8, validationMessages.minLength('Password', 8))
     .openapi({
       example: 'password',
     }),

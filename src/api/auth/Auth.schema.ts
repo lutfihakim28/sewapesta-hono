@@ -10,15 +10,15 @@ import { z } from 'zod';
 
 export const LoginRequestSchema = z.object({
   username: z.string({
-    message: validationMessages.required('Nama pengguna')
+    message: validationMessages.required('Username')
   }).openapi({
     example: 'superadmin',
   }),
   password: z
     .string({
-      message: validationMessages.required('Kata sandi')
+      message: validationMessages.required('Password')
     })
-    .min(8, validationMessages.minLength('Kata sandi', 8))
+    .min(8, validationMessages.minLength('Password', 8))
     .openapi({
       example: 'password',
     }),
@@ -53,3 +53,9 @@ export const RefreshRequestSchema = z.object({
 export type RefreshRequest = z.infer<typeof RefreshRequestSchema>
 
 /*==== END OF REFRESH ====*/
+
+export const CheckUsernameSchema = z.object({
+  username: z.string()
+})
+
+export type CheckUsername = z.infer<typeof CheckUsernameSchema>

@@ -8,7 +8,7 @@ import { User, UserCreate } from '../private/users/User.schema';
 import { profiles } from 'db/schema/profiles';
 import { messages } from '@/lib/constants/messages';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
-import { LoginData, RefreshRequest } from './Auth.schema';
+import { CheckUsername, LoginData, RefreshRequest } from './Auth.schema';
 
 export class AuthService {
   static async register(request: UserCreate) {
@@ -91,5 +91,15 @@ export class AuthService {
 
   static async logout(jwtPayload: JwtPayload) {
     await db.update(users).set({ refreshToken: null }).where(eq(users.id, jwtPayload.user.id))
+  }
+
+  static async checkUsername(request: CheckUsername) {
+    const user = db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, request.username))
+      .get()
+
+    return user
   }
 }

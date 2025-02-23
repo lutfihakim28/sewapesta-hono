@@ -1,9 +1,10 @@
 import { honoApp } from '@/lib/hono';
-import { LoginRoute, LogoutRoute, RefreshRoute, RegisterRoute } from './Auth.route';
+import { CheckUsernameRoute, LoginRoute, LogoutRoute, RefreshRoute, RegisterRoute } from './Auth.route';
 import { UserService } from '../private/users/User.service';
 import { AuthService } from './Auth.service';
 import { ApiResponse, ApiResponseData } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 
 const AuthController = honoApp()
 
@@ -32,7 +33,6 @@ AuthController.openapi(LoginRoute, async (context) => {
 })
 
 AuthController.openapi(RefreshRoute, async (context) => {
-  console.log('tes')
   const request = context.req.valid('json')
 
   const tokenData = await AuthService.refresh(request)
@@ -52,6 +52,21 @@ AuthController.openapi(LogoutRoute, async (context) => {
   return context.json(new ApiResponse({
     code: 200,
     messages: [messages.successLogout]
+  }))
+})
+
+AuthController.openapi(CheckUsernameRoute, async (context) => {
+  const request = context.req.valid('json')
+
+  const existingUser = await AuthService.checkUsername(request);
+
+  if (existingUser) {
+    throw new BadRequestException('Username is already taken.')
+  }
+
+  return context.json(new ApiResponse({
+    code: 200,
+    messages: ['Username available.']
   }))
 })
 
