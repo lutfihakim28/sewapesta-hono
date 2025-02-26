@@ -1,7 +1,7 @@
 import { users } from 'db/schema/users'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { BranchExtendedSchema } from '../branches/Branch.schema'
-import { ProfileCreateSchema, ProfileExtendedSchema } from '../profiles/Profile.schema'
+import { ProfileCreateSchema, ProfileExtendedSchema, ProfileUpdateSchema } from '../profiles/Profile.schema'
 import { z } from 'zod'
 
 export const UserSchema = createSelectSchema(users)
@@ -26,8 +26,12 @@ export const UserCreateSchema = createInsertSchema(users)
   })
   .extend({
     profile: ProfileCreateSchema
-  })
+  }).openapi('UserCreate')
+export const UserUpdateSchema = UserCreateSchema.extend({
+  profile: ProfileUpdateSchema
+}).optional().openapi('UserUpdate')
 
 export type User = z.infer<typeof UserSchema>
 export type UserExtended = z.infer<typeof UserExtendedSchema>
 export type UserCreate = z.infer<typeof UserCreateSchema>
+export type UserUpdate = z.infer<typeof UserUpdateSchema>

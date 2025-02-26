@@ -4,7 +4,6 @@ import { timestamps } from "db/schema/timestamps.helper";
 import { profiles } from './profiles';
 import { relations } from 'drizzle-orm';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
-import dayjs from 'dayjs';
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -23,8 +22,6 @@ export const users = sqliteTable('users', {
   }).notNull(),
   profileId: integer('profile_id').references(() => profiles.id).unique().notNull(),
   refreshToken: text('refresh_token').unique(),
-  requestedAt: integer('requested_at').$defaultFn(() => dayjs().unix()),
-  confirmedAt: integer('confirmed_at'),
   ...timestamps,
 }, (table) => ({
   userBranchIndex: index('user_branch_index').on(table.branchId),

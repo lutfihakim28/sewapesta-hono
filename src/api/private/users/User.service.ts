@@ -3,13 +3,11 @@ import { users } from 'db/schema/users';
 import { eq } from 'drizzle-orm';
 import { User, UserCreate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
-import dayjs from 'dayjs';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { messages } from '@/lib/constants/messages';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 
-export class UserService {
+export abstract class UserService {
   static async create(request: UserCreate): Promise<User> {
     const user = await db.transaction(async (tx) => {
       const [profile] = await tx
@@ -24,7 +22,6 @@ export class UserService {
         .values({
           ...request,
           profileId: profile.id,
-          confirmedAt: dayjs().unix()
         })
         .returning()
 
@@ -49,10 +46,6 @@ export class UserService {
 
     if (!isMatch) {
       throw new UnauthorizedException(messages.invalidCredential)
-    }
-
-    if (!user.confirmedAt) {
-      throw new BadRequestException('Your account is not active.')
     }
 
     return user

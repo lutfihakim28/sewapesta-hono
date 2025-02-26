@@ -4,56 +4,6 @@ import { BadRequestSchema } from '@/lib/schemas/BadRequest.schema';
 import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema';
 import { CheckUsernameSchema, LoginRequestSchema, LoginResponseSchema, RefreshRequestSchema } from './Auth.schema';
 import { SuccessSchema } from '@/lib/schemas/Success.schema';
-import { UserCreateSchema } from '../private/users/User.schema';
-
-export const RegisterRoute = createRoute({
-  method: 'post',
-  path: '/register',
-  tags: ['Auth'],
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: UserCreateSchema
-        }
-      }
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: SuccessSchema,
-        }
-      },
-      description: 'Login success',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    422: {
-      content: {
-        'application/json': {
-          schema: BadRequestSchema,
-        },
-      },
-      description: 'Validation error',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
-})
 
 export const LoginRoute = createRoute({
   method: 'post',
@@ -157,55 +107,6 @@ export const LogoutRoute = createRoute({
   method: 'delete',
   path: '/logout',
   tags: ['Auth'],
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: SuccessSchema,
-        }
-      },
-      description: 'Logout success',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    422: {
-      content: {
-        'application/json': {
-          schema: BadRequestSchema,
-        },
-      },
-      description: 'Validation error',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
-})
-
-export const CheckUsernameRoute = createRoute({
-  method: 'get',
-  path: '/check-usernames',
-  tags: ['Auth'],
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: CheckUsernameSchema
-        }
-      }
-    },
-  },
   responses: {
     200: {
       content: {

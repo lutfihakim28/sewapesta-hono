@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { MetaSchema } from './Meta.schema';
 
-export function ApiResponseSchema(message: string) {
+export function ApiResponseSchema(message: string, code: number = 200) {
   return z.object({
     code: z.number().openapi({
-      example: 200,
+      example: code,
     }),
     messages: z.array(z.string()).openapi({ example: [message] })
   })

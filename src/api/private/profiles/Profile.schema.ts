@@ -20,6 +20,8 @@ export const ProfileCreateSchema = createInsertSchema(profiles).pick({
   name: true,
   phone: true,
   subdistrictCode: true
-})
+}).openapi('ProfileCreate')
+export const ProfileUpdateSchema = ProfileCreateSchema.optional().openapi('ProfileUpdate')
 
 export type ProfilCreate = z.infer<typeof ProfileCreateSchema>
+export type ProfilUpdate = z.infer<typeof ProfileUpdateSchema>

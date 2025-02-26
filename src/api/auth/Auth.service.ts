@@ -4,37 +4,12 @@ import { users } from 'db/schema/users';
 import { eq } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 import { JWTPayload } from 'hono/utils/jwt/types';
-import { User, UserCreate } from '../private/users/User.schema';
-import { profiles } from 'db/schema/profiles';
+import { User } from '../private/users/User.schema';
 import { messages } from '@/lib/constants/messages';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
-import { CheckUsername, LoginData, RefreshRequest } from './Auth.schema';
+import { LoginData, RefreshRequest } from './Auth.schema';
 
-export class AuthService {
-  static async register(request: UserCreate) {
-    const user = await db.transaction(async (tx) => {
-      const [profile] = await tx
-        .insert(profiles)
-        .values(request.profile)
-        .returning({
-          id: profiles.id
-        })
-
-      const [user] = await tx
-        .insert(users)
-        .values({
-          ...request,
-          password: await Bun.password.hash(request.password),
-          profileId: profile.id,
-        })
-        .returning()
-
-      return user
-    })
-
-    return user
-  }
-
+export abstract class AuthService {
   static async login(user: User): Promise<LoginData> {
     const payload: JWTPayload = new JwtPayload(user);
 
@@ -91,15 +66,5 @@ export class AuthService {
 
   static async logout(jwtPayload: JwtPayload) {
     await db.update(users).set({ refreshToken: null }).where(eq(users.id, jwtPayload.user.id))
-  }
-
-  static async checkUsername(request: CheckUsername) {
-    const user = db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.username, request.username))
-      .get()
-
-    return user
   }
 }

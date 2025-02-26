@@ -7,7 +7,7 @@ import { logger } from 'hono/logger'
 import { messages } from '@/lib/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/bun'
-import { swaggerUI } from '@hono/swagger-ui'
+import { apiReference } from '@scalar/hono-api-reference'
 import CityController from './api/public/locations/cities/City.controller'
 import DistrictController from './api/public/locations/districts/District.controller'
 import ProvinceController from './api/public/locations/provinces/Province.controller'
@@ -19,6 +19,7 @@ import { authMiddleware } from './lib/middlewares/auth.middleware'
 import AuthController from './api/auth/Auth.controller'
 
 const app = honoApp()
+app.use(logger(), prettyJSON())
 
 app.onError((error, context) => {
   if (error instanceof HTTPException) {
@@ -31,7 +32,7 @@ app.onError((error, context) => {
     if (error.status === 422) {
       return context.json(new ApiResponse({
         code: error.status,
-        messages: error.cause ? error.cause as string[] : [error.message]
+        messages: error.cause ? error.cause as string[] : error.message.split(',')
       }), error.status)
     }
   }
@@ -55,9 +56,6 @@ app.use('/api/*', cors({
 
 app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }), authMiddleware)
 app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
-
-app.use(logger(), prettyJSON())
-
 // STATIC
 app.use('/static/*', serveStatic({ root: './' }))
 
@@ -80,11 +78,22 @@ app.route('/api/private/branches', BranchController)
 // TEST QUERY
 app.route('/api/test', SQLTestController)
 
+// app.get(
+//   '/swagger',
+//   swaggerUI({
+//     url: '/docs',
+//     persistAuthorization: true,
+//   })
+// )
+
 app.get(
-  '/swagger',
-  swaggerUI({
-    url: '/docs',
-    persistAuthorization: true,
+  '/scalar',
+  apiReference({
+    theme: 'deepSpace',
+    spec: { url: '/docs' },
+    pageTitle: 'Sewapesta API',
+    darkMode: true,
+    layout: 'classic'
   })
 )
 
