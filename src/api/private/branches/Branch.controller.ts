@@ -7,6 +7,7 @@ import { Meta } from '@/lib/dtos/Meta.dto';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { checkPermissions } from '@/lib/utils/checkPermissions';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 
 const BranchController = honoApp()
 
@@ -68,6 +69,10 @@ BranchController.openapi(BranchUpdateRoute, async (context) => {
 
   const branch = await BranchService.update(+param.id, payload);
 
+  if (!branch) {
+    throw new NotFoundException(messages.errorNotFound(`Branch with ID ${param.id}`))
+  }
+
   return context.json(new ApiResponseData({
     code: 200,
     messages: [messages.successUpdate('branch')],
@@ -80,7 +85,11 @@ BranchController.openapi(BranchDeleteRoute, async (context) => {
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
   checkPermissions(jwtPayload, [RoleEnum.SuperAdmin])
 
-  await BranchService.delete(+param.id)
+  const branch = await BranchService.delete(+param.id)
+
+  if (!branch) {
+    throw new NotFoundException(messages.errorNotFound(`Branch with ID ${param.id}`))
+  }
 
   return context.json(new ApiResponse({
     code: 200,

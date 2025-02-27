@@ -1,8 +1,8 @@
 import { createRoute } from '@hono/zod-openapi'
 import { BranchFilterSchema, BranchRequestSchema, BranchResponseDataSchema, BranchResponseExtendedDataSchema, BranchResponseListSchema } from './Branch.schema'
-import { ParamIdSchema } from '@/schemas/ParamIdSchema'
 import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
+import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
 
 export const BranchListRoute = createRoute({
   method: 'get',

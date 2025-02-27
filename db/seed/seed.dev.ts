@@ -31,11 +31,11 @@ const _subdistricts = await db
     )
   )
 
-const categoriesId = await seedCategories()
 const unitsId = await seedUnits()
 
 await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
   const branchId = await seedBranches(_subdistricts.map((el) => el.code))
+  const categoriesId = await seedCategories(branchId)
   if (index === 0) {
     await seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.SuperAdmin)
   }

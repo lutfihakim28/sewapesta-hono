@@ -11,12 +11,12 @@ import { apiReference } from '@scalar/hono-api-reference'
 import CityController from './api/public/locations/cities/City.controller'
 import DistrictController from './api/public/locations/districts/District.controller'
 import ProvinceController from './api/public/locations/provinces/Province.controller'
-import SQLTestController from './controllers/SQLTestController'
 import SubdistrictController from './api/public/locations/subdistricts/Subdistrict.controller'
 import { ApiResponse } from './lib/dtos/ApiResponse.dto'
 import BranchController from './api/private/branches/Branch.controller'
 import { authMiddleware } from './lib/middlewares/auth.middleware'
 import AuthController from './api/auth/Auth.controller'
+import CategoryController from './api/private/categories/Category.controller'
 
 const app = honoApp()
 app.use(logger(), prettyJSON())
@@ -68,21 +68,16 @@ app.use('/static/*', serveStatic({ root: './' }))
 // AUTH
 app.route('/api/auth', AuthController)
 
+// PRIVATE PATH
+app.route('/api/private/branches', BranchController)
+app.route('/api/private/categories', CategoryController)
+
 // PUBLIC PATH
 app.route('/api/public/locations/provinces', ProvinceController)
 app.route('/api/public/locations/cities', CityController)
 app.route('/api/public/locations/districts', DistrictController)
 app.route('/api/public/locations/subdistricts', SubdistrictController)
 
-// PRIVATE PATH
-app.route('/api/private/branches', BranchController)
-// app.route('/api/private/items', ItemController)
-// app.route('/api/private/products', ProductController)
-// app.route('/api/private/units', UnitController)
-// app.route('/api/private/vehicles', VehicleController)
-
-// TEST QUERY
-app.route('/api/test', SQLTestController)
 
 app.get(
   '/scalar',

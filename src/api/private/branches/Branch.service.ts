@@ -84,8 +84,8 @@ export abstract class BranchService {
     return _branch;
   }
 
-  static async delete(id: number): Promise<void> {
-    await db
+  static async delete(id: number): Promise<Branch> {
+    const [branch] = await db
       .update(branches)
       .set({
         deletedAt: dayjs().unix(),
@@ -94,6 +94,9 @@ export abstract class BranchService {
         eq(branches.id, id),
         isNull(branches.deletedAt)
       ))
+      .returning(columns)
+
+    return branch
   }
 
   static async count(query: BranchFilter) {
