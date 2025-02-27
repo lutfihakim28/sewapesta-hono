@@ -1,9 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema';
-import { BadRequestSchema } from '@/lib/schemas/BadRequest.schema';
-import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema';
-import { CheckUsernameSchema, LoginRequestSchema, LoginResponseSchema, RefreshRequestSchema } from './Auth.schema';
+import { LoginRequestSchema, LoginResponseSchema, RefreshRequestSchema } from './Auth.schema';
 import { SuccessSchema } from '@/lib/schemas/Success.schema';
+import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto';
 
 export const LoginRoute = createRoute({
   method: 'post',
@@ -18,40 +16,10 @@ export const LoginRoute = createRoute({
       }
     },
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: LoginResponseSchema,
-        }
-      },
-      description: 'Login success',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    422: {
-      content: {
-        'application/json': {
-          schema: BadRequestSchema,
-        },
-      },
-      description: 'Validation error',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: LoginResponseSchema, description: 'Login success' },
+    codes: [422],
+  }),
 })
 
 export const RefreshRoute = createRoute({
@@ -67,78 +35,18 @@ export const RefreshRoute = createRoute({
       }
     },
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: LoginResponseSchema,
-        }
-      },
-      description: 'Refresh success',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    422: {
-      content: {
-        'application/json': {
-          schema: BadRequestSchema,
-        },
-      },
-      description: 'Validation error',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: LoginResponseSchema, description: 'Refresh success' },
+    codes: [422],
+  }),
 })
 
 export const LogoutRoute = createRoute({
   method: 'delete',
   path: '/logout',
   tags: ['Auth'],
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: SuccessSchema,
-        }
-      },
-      description: 'Logout success',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    422: {
-      content: {
-        'application/json': {
-          schema: BadRequestSchema,
-        },
-      },
-      description: 'Validation error',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: SuccessSchema, description: 'Logout success' },
+    codes: [422],
+  }),
 })

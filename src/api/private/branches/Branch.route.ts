@@ -1,10 +1,8 @@
 import { createRoute } from '@hono/zod-openapi'
-import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema'
-import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema'
 import { BranchFilterSchema, BranchRequestSchema, BranchResponseDataSchema, BranchResponseExtendedDataSchema, BranchResponseListSchema } from './Branch.schema'
 import { ParamIdSchema } from '@/schemas/ParamIdSchema'
-import { NotFoundSchema } from '@/lib/schemas/NotFound.schema'
 import { SuccessSchema } from '@/lib/schemas/Success.schema'
+import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 
 export const BranchListRoute = createRoute({
   method: 'get',
@@ -13,32 +11,10 @@ export const BranchListRoute = createRoute({
   request: {
     query: BranchFilterSchema,
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: BranchResponseListSchema,
-        },
-      },
-      description: 'Retrieve list Branches',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: BranchResponseListSchema, description: 'Retrieve list branches' },
+    codes: [401, 403],
+  }),
 })
 
 export const BranchDetailRoute = createRoute({
@@ -48,40 +24,10 @@ export const BranchDetailRoute = createRoute({
   request: {
     params: ParamIdSchema,
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: BranchResponseExtendedDataSchema,
-        },
-      },
-      description: 'Retrieve detail branch',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: NotFoundSchema,
-        },
-      },
-      description: 'Not Found',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: BranchResponseExtendedDataSchema, description: 'Retrieve detail branch' },
+    codes: [401, 403, 404],
+  }),
 })
 
 export const BranchCreateRoute = createRoute({
@@ -97,40 +43,10 @@ export const BranchCreateRoute = createRoute({
       },
     }
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: BranchResponseDataSchema,
-        },
-      },
-      description: 'Branch created',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: NotFoundSchema,
-        },
-      },
-      description: 'Not Found',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: BranchResponseDataSchema, description: 'Branch created' },
+    codes: [401, 403, 422],
+  }),
 })
 
 export const BranchUpdateRoute = createRoute({
@@ -147,40 +63,10 @@ export const BranchUpdateRoute = createRoute({
       },
     }
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: BranchResponseDataSchema,
-        },
-      },
-      description: 'Branch updated',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: NotFoundSchema,
-        },
-      },
-      description: 'Not Found',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: BranchResponseDataSchema, description: 'Branch updated' },
+    codes: [401, 403, 404, 422],
+  }),
 })
 
 export const BranchDeleteRoute = createRoute({
@@ -190,38 +76,8 @@ export const BranchDeleteRoute = createRoute({
   request: {
     params: ParamIdSchema,
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: SuccessSchema,
-        },
-      },
-      description: 'Retrieve detail branch',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    404: {
-      content: {
-        'application/json': {
-          schema: NotFoundSchema,
-        },
-      },
-      description: 'Not Found',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: SuccessSchema, description: 'Branch deleted' },
+    codes: [401, 403, 404]
+  }),
 })

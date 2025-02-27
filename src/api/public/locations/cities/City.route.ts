@@ -1,7 +1,6 @@
 import { createRoute } from '@hono/zod-openapi'
-import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema'
-import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema'
 import { CityFilterSchema, CityResponseListSchema } from './City.schema'
+import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 
 export const CityRoute = createRoute({
   method: 'get',
@@ -10,30 +9,7 @@ export const CityRoute = createRoute({
   request: {
     query: CityFilterSchema,
   },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: CityResponseListSchema,
-        },
-      },
-      description: 'Retrieve list City\'s options',
-    },
-    401: {
-      content: {
-        'application/json': {
-          schema: UnauthorizedSchema,
-        },
-      },
-      description: 'Unauthorized',
-    },
-    500: {
-      content: {
-        'application/json': {
-          schema: ServerErrorSchema,
-        },
-      },
-      description: 'Internal error',
-    },
-  }
+  responses: new OpenApiResponse({
+    successResponse: { schema: CityResponseListSchema, description: 'Retrieve list cities' },
+  })
 })

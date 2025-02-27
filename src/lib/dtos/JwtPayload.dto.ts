@@ -7,9 +7,11 @@ export class JwtPayload {
   iat!: number
   [key: string]: unknown
 
-  constructor(user: User) {
-    this.user = user;
-    this.exp = dayjs().add(1, 'day').unix()
-    this.iat = dayjs().unix()
+  constructor(data: Partial<JwtPayload>) {
+    if (data.user) {
+      this.user = data.user;
+    }
+    this.exp = data.exp || dayjs().add(1, 'day').unix()
+    this.iat = data.iat || dayjs().unix()
   }
 }

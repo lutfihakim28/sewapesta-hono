@@ -5,6 +5,7 @@ import { AuthService } from './Auth.service';
 import { ApiResponse, ApiResponseData } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 
 const AuthController = honoApp()
 
@@ -34,7 +35,7 @@ AuthController.openapi(RefreshRoute, async (context) => {
 })
 
 AuthController.openapi(LogoutRoute, async (context) => {
-  const payload = context.get('jwtPayload')
+  const payload = new JwtPayload(context.get('jwtPayload'))
 
   await AuthService.logout(payload)
 

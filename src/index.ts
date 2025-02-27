@@ -35,6 +35,12 @@ app.onError((error, context) => {
         messages: error.cause ? error.cause as string[] : error.message.split(',')
       }), error.status)
     }
+    if (error.status === 403) {
+      return context.json(new ApiResponse({
+        code: error.status,
+        messages: [error.message]
+      }), error.status)
+    }
   }
   if (error instanceof JwtTokenExpired) {
     return context.json(new ApiResponse({
@@ -78,14 +84,6 @@ app.route('/api/private/branches', BranchController)
 // TEST QUERY
 app.route('/api/test', SQLTestController)
 
-// app.get(
-//   '/swagger',
-//   swaggerUI({
-//     url: '/docs',
-//     persistAuthorization: true,
-//   })
-// )
-
 app.get(
   '/scalar',
   apiReference({
@@ -93,7 +91,6 @@ app.get(
     spec: { url: '/docs' },
     pageTitle: 'Sewapesta API',
     darkMode: true,
-    layout: 'classic'
   })
 )
 

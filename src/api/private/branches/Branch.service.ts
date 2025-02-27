@@ -7,6 +7,7 @@ import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
 
+
 const branch = {
   address: branches.address,
   cpName: branches.cpName,
@@ -109,7 +110,7 @@ export abstract class BranchService {
       },
       where: and(
         isNull(branches.deletedAt),
-        eq(branches.id, id)
+        eq(branches.id, id),
       )
     })
 

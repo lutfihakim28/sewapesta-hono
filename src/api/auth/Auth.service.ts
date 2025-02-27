@@ -11,7 +11,7 @@ import { LoginData, RefreshRequest } from './Auth.schema';
 
 export abstract class AuthService {
   static async login(user: User): Promise<LoginData> {
-    const payload: JWTPayload = new JwtPayload(user);
+    const payload: JWTPayload = new JwtPayload({ user });
 
     const secretKey = Bun.env.JWT_SECRET;
 
@@ -41,7 +41,7 @@ export abstract class AuthService {
       throw new UnauthorizedException(messages.unauthorized)
     }
 
-    const payload: JWTPayload = new JwtPayload(user);
+    const payload: JWTPayload = new JwtPayload({ user });
 
     const secretKey = Bun.env.JWT_SECRET;
 

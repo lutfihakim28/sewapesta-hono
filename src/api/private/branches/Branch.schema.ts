@@ -39,7 +39,7 @@ export const BranchFilterSchema = z
   .merge(PaginationSchema)
   .openapi('BranchFilter')
 
-export const BranchListSchema = z.array(BranchExtendedSchema)
+const BranchListSchema = z.array(BranchExtendedSchema)
 
 export const BranchResponseListSchema = ApiResponseListSchema(BranchListSchema, messages.successList('branches'))
 
