@@ -1,4 +1,4 @@
-import { and, count, eq, isNull, like, or } from 'drizzle-orm';
+import { and, asc, count, eq, getTableColumns, isNull, like, or, sql } from 'drizzle-orm';
 import { Branch, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
@@ -6,113 +6,54 @@ import { countOffset } from '@/lib/utils/countOffset';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
+import { locationQuery } from '@/api/public/locations/Location.query';
 
-
-const branch = {
-  address: branches.address,
-  cpName: branches.cpName,
-  cpPhone: branches.cpPhone,
-  id: branches.id,
-  name: branches.name,
-  subdistrictCode: branches.subdistrictCode,
-}
+const { createdAt, updatedAt, deletedAt, ...columns } = getTableColumns(branches);
 
 export abstract class BranchService {
   static async list(query: BranchFilter): Promise<BranchExtended[]> {
-    const _branches = await db.query.branches.findMany({
-      columns: {
-        address: true,
-        cpName: true,
-        cpPhone: true,
-        id: true,
-        name: true,
-      },
-      with: {
-        subdistrict: {
-          columns: {
-            code: true,
-            name: true,
-          },
-          with: {
-            district: {
-              columns: {
-                code: true,
-                name: true,
-              },
-              with: {
-                city: {
-                  columns: {
-                    code: true,
-                    name: true,
-                  },
-                  with: {
-                    province: {
-                      columns: {
-                        code: true,
-                        name: true,
-                      },
-                    }
-                  },
-                }
-              },
-            }
-          },
+    const { subdistrictCode, ...selectedColumns } = columns
+    const _branches = await db
+      .with(locationQuery)
+      .select({
+        ...selectedColumns,
+        location: {
+          subdistrict: locationQuery.subdistrict,
+          district: locationQuery.district,
+          city: locationQuery.city,
+          province: locationQuery.province,
         }
-      },
-      where: this.buildWhereClause(query),
-      limit: Number(query.pageSize || 5),
-      offset: countOffset(query.page, query.pageSize)
-    })
+      })
+      .from(branches)
+      .innerJoin(locationQuery, eq(locationQuery.code, branches.subdistrictCode))
+      .where(this.buildWhereClause(query))
+      .limit(Number(query.pageSize || 5))
+      .offset(countOffset(query.page, query.pageSize))
 
     return _branches
   }
 
   static async get(id: number): Promise<BranchExtended> {
-    const branch = await db.query.branches.findFirst({
-      columns: {
-        address: true,
-        cpName: true,
-        cpPhone: true,
-        id: true,
-        name: true,
-      },
-      with: {
-        subdistrict: {
-          columns: {
-            code: true,
-            name: true,
-          },
-          with: {
-            district: {
-              columns: {
-                code: true,
-                name: true,
-              },
-              with: {
-                city: {
-                  columns: {
-                    code: true,
-                    name: true,
-                  },
-                  with: {
-                    province: {
-                      columns: {
-                        code: true,
-                        name: true,
-                      },
-                    }
-                  },
-                }
-              },
-            }
-          },
+    const { subdistrictCode, ...selectedColumns } = columns
+    const branch = db
+      .with(locationQuery)
+      .select({
+        ...selectedColumns,
+        location: {
+          subdistrict: locationQuery.subdistrict,
+          district: locationQuery.district,
+          city: locationQuery.city,
+          province: locationQuery.province,
         }
-      },
-      where: and(
+      })
+      .from(branches)
+      .innerJoin(locationQuery, eq(locationQuery.code, branches.subdistrictCode))
+      .where(and(
         isNull(branches.deletedAt),
         eq(branches.id, id),
-      )
-    })
+      ))
+      .orderBy(asc(branches.id))
+      .get()
 
     if (!branch) {
       throw new NotFoundException(messages.errorNotFound('branch'));
@@ -125,7 +66,7 @@ export abstract class BranchService {
     const [_branch] = await db
       .insert(branches)
       .values(payload)
-      .returning(branch)
+      .returning(columns)
 
     return _branch
   }
@@ -138,7 +79,7 @@ export abstract class BranchService {
         eq(branches.id, id),
         isNull(branches.deletedAt)
       ))
-      .returning(branch)
+      .returning(columns)
 
     return _branch;
   }

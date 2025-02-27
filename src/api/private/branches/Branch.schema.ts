@@ -1,4 +1,4 @@
-import { SubdistrictExtendedSchema } from '@/api/public/locations/subdistricts/Subdistrict.schema';
+import { LocationSchema } from '@/api/public/locations/Location.schema';
 import { messages } from '@/lib/constants/messages';
 import { validationMessages } from '@/lib/constants/validationMessage';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
@@ -24,7 +24,7 @@ export const BranchExtendedSchema = BranchSchema
     subdistrictCode: true,
   })
   .extend({
-    subdistrict: SubdistrictExtendedSchema,
+    location: LocationSchema,
   })
   .openapi('BranchExtended')
 

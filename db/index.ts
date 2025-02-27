@@ -40,5 +40,6 @@ export const db = drizzle(connection, {
     ...profiles,
     // ...vehicles,
   },
+  logger: true,
 })
 

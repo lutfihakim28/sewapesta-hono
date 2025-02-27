@@ -1,6 +1,4 @@
 import { createRoute } from '@hono/zod-openapi'
-import { UnauthorizedSchema } from '@/lib/schemas/Unauthorized.schema'
-import { ServerErrorSchema } from '@/lib/schemas/ServerError.schema'
 import { SubdistrictFilterSchema, SubdistrictResponseListSchema } from './Subdistrict.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 
