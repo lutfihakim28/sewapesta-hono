@@ -33,7 +33,7 @@ export abstract class ImageService {
         return {
           createdAt,
           path: `static/images/${name}`,
-          url: `http://localhost:3000/static/images/${name}`,
+          url: `${Bun.env.APP_URL}/static/images/${name}`,
           reference: request.reference,
           referenceId: request.referenceId,
         };
@@ -50,7 +50,7 @@ export abstract class ImageService {
     await db.insert(images).values({
       createdAt,
       path: `static/images/${name}`,
-      url: `http://localhost:3000/static/images/${name}`,
+      url: `${Bun.env.APP_URL}/static/images/${name}`,
       reference: request.reference,
       referenceId: request.referenceId,
     });

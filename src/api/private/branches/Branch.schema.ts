@@ -4,9 +4,12 @@ import { validationMessages } from '@/lib/constants/validationMessage';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
 import { SearchSchema } from '@/lib/schemas/Search.schema';
+import { SortSchema } from '@/lib/schemas/Sort.schema';
 import { z } from '@hono/zod-openapi';
 import { branches } from 'db/schema/branches';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+
+export type BranchColumn = keyof typeof branches.$inferSelect;
 
 export const BranchSchema = createSelectSchema(branches)
   .pick({
@@ -37,6 +40,11 @@ export const BranchFilterSchema = z
   })
   .merge(SearchSchema)
   .merge(PaginationSchema)
+  .merge(SortSchema<BranchColumn>([
+    'id',
+    'cpName',
+    'name',
+  ]))
   .openapi('BranchFilter')
 
 const BranchListSchema = z.array(BranchExtendedSchema)

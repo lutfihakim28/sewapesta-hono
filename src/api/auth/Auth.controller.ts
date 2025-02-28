@@ -4,7 +4,6 @@ import { UserService } from '../private/users/User.service';
 import { AuthService } from './Auth.service';
 import { ApiResponse, ApiResponseData } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 
 const AuthController = honoApp()

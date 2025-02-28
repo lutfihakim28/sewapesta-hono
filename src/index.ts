@@ -17,6 +17,7 @@ import BranchController from './api/private/branches/Branch.controller'
 import { authMiddleware } from './lib/middlewares/auth.middleware'
 import AuthController from './api/auth/Auth.controller'
 import CategoryController from './api/private/categories/Category.controller'
+import ProductController from './api/private/products/Product.controller'
 
 const app = honoApp()
 app.use(logger(), prettyJSON())
@@ -71,6 +72,7 @@ app.route('/api/auth', AuthController)
 // PRIVATE PATH
 app.route('/api/private/branches', BranchController)
 app.route('/api/private/categories', CategoryController)
+app.route('/api/private/products', ProductController)
 
 // PUBLIC PATH
 app.route('/api/public/locations/provinces', ProvinceController)

@@ -1,5 +1,5 @@
-import { and, asc, count, eq, getTableColumns, isNull, like, or, sql } from 'drizzle-orm';
-import { Branch, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
+import { and, asc, count, desc, eq, getTableColumns, isNull, like, or, sql } from 'drizzle-orm';
+import { Branch, BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
@@ -7,12 +7,29 @@ import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
 import { locationQuery } from '@/api/public/locations/Location.query';
+import { SortEnum } from '@/lib/enums/SortEnum';
 
 const { createdAt, updatedAt, deletedAt, ...columns } = getTableColumns(branches);
 
 export abstract class BranchService {
   static async list(query: BranchFilter): Promise<BranchExtended[]> {
     const { subdistrictCode, ...selectedColumns } = columns
+
+    let sort: SortEnum = SortEnum.Ascending;
+    let sortBy: BranchColumn = 'id';
+
+    if (query.sort) {
+      sort = query.sort
+    }
+
+    if (query.sortBy) {
+      sortBy = query.sortBy
+    }
+
+    const orderBy = sort === SortEnum.Ascending
+      ? asc(branches[sortBy])
+      : desc(branches[sortBy])
+
     const _branches = await db
       .with(locationQuery)
       .select({
@@ -27,6 +44,7 @@ export abstract class BranchService {
       .from(branches)
       .innerJoin(locationQuery, eq(locationQuery.code, branches.subdistrictCode))
       .where(this.buildWhereClause(query))
+      .orderBy(orderBy)
       .limit(Number(query.pageSize || 5))
       .offset(countOffset(query.page, query.pageSize))
 
@@ -52,7 +70,6 @@ export abstract class BranchService {
         isNull(branches.deletedAt),
         eq(branches.id, id),
       ))
-      .orderBy(asc(branches.id))
       .get()
 
     if (!branch) {
@@ -62,24 +79,26 @@ export abstract class BranchService {
     return branch
   }
 
-  static async create(payload: BranchRequest): Promise<Branch> {
+  static async create(payload: BranchRequest): Promise<Pick<Branch, 'id'>> {
+    const { id, ..._ } = columns;
     const [_branch] = await db
       .insert(branches)
       .values(payload)
-      .returning(columns)
+      .returning({ id })
 
     return _branch
   }
 
-  static async update(id: number, payload: BranchRequest): Promise<Branch> {
+  static async update(_id: number, payload: BranchRequest): Promise<Pick<Branch, 'id'>> {
+    const { id, ..._ } = columns;
     const [_branch] = await db
       .update(branches)
       .set(payload)
       .where(and(
-        eq(branches.id, id),
+        eq(branches.id, _id),
         isNull(branches.deletedAt)
       ))
-      .returning(columns)
+      .returning({ id })
 
     return _branch;
   }
