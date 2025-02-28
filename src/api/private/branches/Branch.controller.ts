@@ -1,4 +1,4 @@
-import { honoApp } from '@/lib/hono';
+import { honoApp } from '@/lib/utils/hono';
 import { BranchCreateRoute, BranchDeleteRoute, BranchDetailRoute, BranchListRoute, BranchUpdateRoute } from './Branch.route';
 import { BranchService } from './Branch.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
@@ -13,9 +13,6 @@ const BranchController = honoApp()
 
 BranchController.openapi(BranchListRoute, async (context) => {
   const query = context.req.valid('query')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const [branches, totalData] = await Promise.all([
     BranchService.list(query),
     BranchService.count(query),
@@ -35,9 +32,6 @@ BranchController.openapi(BranchListRoute, async (context) => {
 
 BranchController.openapi(BranchDetailRoute, async (context) => {
   const param = context.req.valid('param');
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const branch = await BranchService.get(+param.id);
 
   return context.json(new ApiResponseData({
@@ -49,9 +43,6 @@ BranchController.openapi(BranchDetailRoute, async (context) => {
 
 BranchController.openapi(BranchCreateRoute, async (context) => {
   const payload = context.req.valid('json');
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.SuperAdmin])
-
   const branch = await BranchService.create(payload)
 
   return context.json(new ApiResponseData({
@@ -64,9 +55,6 @@ BranchController.openapi(BranchCreateRoute, async (context) => {
 BranchController.openapi(BranchUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const branch = await BranchService.update(+param.id, payload);
 
   if (!branch) {
@@ -82,9 +70,6 @@ BranchController.openapi(BranchUpdateRoute, async (context) => {
 
 BranchController.openapi(BranchDeleteRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.SuperAdmin])
-
   const branch = await BranchService.delete(+param.id)
 
   if (!branch) {

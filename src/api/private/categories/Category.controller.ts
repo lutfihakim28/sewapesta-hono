@@ -1,4 +1,4 @@
-import { honoApp } from '@/lib/hono';
+import { honoApp } from '@/lib/utils/hono';
 import { CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryUpdateRoute } from './Category.route';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { RoleEnum } from '@/lib/enums/RoleEnum';

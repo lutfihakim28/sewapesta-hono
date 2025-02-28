@@ -1,4 +1,4 @@
-import { honoApp } from '@/lib/hono';
+import { honoApp } from '@/lib/utils/hono';
 import { LoginRoute, LogoutRoute, RefreshRoute } from './Auth.route';
 import { UserService } from '../private/users/User.service';
 import { AuthService } from './Auth.service';

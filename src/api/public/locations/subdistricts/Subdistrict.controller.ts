@@ -1,5 +1,5 @@
 import { messages } from '@/lib/constants/messages';
-import { honoApp } from '@/lib/hono';
+import { honoApp } from '@/lib/utils/hono';
 import { Meta } from '@/lib/dtos/Meta.dto';
 import { SubdistrictRoute } from './Subdistrict.route';
 import { SubdistrictService } from './Subdistrict.service';

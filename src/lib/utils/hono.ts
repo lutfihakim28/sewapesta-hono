@@ -7,7 +7,7 @@ export function honoApp() {
       if (result.success) {
         return;
       }
-      throw new BadRequestException(result.error.errors.map((e) => e.message))
+      throw new BadRequestException(result.error.errors.join(','))
     },
   })
 }

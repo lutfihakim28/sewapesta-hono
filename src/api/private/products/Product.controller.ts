@@ -1,4 +1,4 @@
-import { honoApp } from '@/lib/hono';
+import { honoApp } from '@/lib/utils/hono';
 import { ProductCreateRoute, ProductDeleteRoute, ProductDetailRoute, ProductListRoute, ProductUpdateRoute } from './Product.route';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { checkPermissions } from '@/lib/utils/checkPermissions';
@@ -13,9 +13,6 @@ const ProductController = honoApp()
 
 ProductController.openapi(ProductListRoute, async (context) => {
   const query = context.req.valid('query')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const [products, totalData] = await Promise.all([
     ProductService.list(query),
     ProductService.count(query),
@@ -35,9 +32,6 @@ ProductController.openapi(ProductListRoute, async (context) => {
 
 ProductController.openapi(ProductDetailRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const product = await ProductService.get(+param.id)
 
   return context.json(new ApiResponseData({
@@ -49,9 +43,6 @@ ProductController.openapi(ProductDetailRoute, async (context) => {
 
 ProductController.openapi(ProductCreateRoute, async (context) => {
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const product = await ProductService.create(payload)
 
   return context.json(new ApiResponseData({
@@ -64,9 +55,6 @@ ProductController.openapi(ProductCreateRoute, async (context) => {
 ProductController.openapi(ProductUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const product = await ProductService.update(+param.id, payload)
 
   if (!product) {
@@ -82,9 +70,6 @@ ProductController.openapi(ProductUpdateRoute, async (context) => {
 
 ProductController.openapi(ProductDeleteRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
-
   const product = await ProductService.delete(+param.id)
 
   if (!product) {

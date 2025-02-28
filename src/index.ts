@@ -1,5 +1,5 @@
 import { cors } from 'hono/cors'
-import { honoApp } from './lib/hono'
+import { honoApp } from './lib/utils/hono'
 import { HTTPException } from 'hono/http-exception'
 import { jwt, } from 'hono/jwt'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
@@ -18,10 +18,12 @@ import { authMiddleware } from './lib/middlewares/auth.middleware'
 import AuthController from './api/auth/Auth.controller'
 import CategoryController from './api/private/categories/Category.controller'
 import ProductController from './api/private/products/Product.controller'
+import { adminMiddleware } from './lib/middlewares/admin.middleware'
+import { superadminMiddleware } from './lib/middlewares/superadmin.middleware'
 
 const app = honoApp()
-app.use(logger(), prettyJSON())
 
+app.use(logger(), prettyJSON())
 app.onError((error, context) => {
   if (error instanceof HTTPException) {
     if (error.status === 401 || error.status === 404) {
@@ -54,17 +56,19 @@ app.onError((error, context) => {
     messages: [messages.errorServer]
   }), 500)
 })
-
 app.use('/api/*', cors({
   origin: 'http://localhost:5173',
   credentials: true,
 }))
-
-
 app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }), authMiddleware)
 app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
-// STATIC
 app.use('/static/*', serveStatic({ root: './' }))
+
+// MIDDLEWARES
+app.use('/api/private/branches/*', adminMiddleware)
+app.use('/api/private/branches/create', superadminMiddleware)
+app.use('/api/private/branches/delete', superadminMiddleware)
+app.use('/api/private/products/*', adminMiddleware)
 
 // AUTH
 app.route('/api/auth', AuthController)
