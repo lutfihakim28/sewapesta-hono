@@ -4,6 +4,7 @@ import { HTTPException } from 'hono/http-exception'
 import { jwt, } from 'hono/jwt'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
 import { logger } from 'hono/logger'
+import { logger as pinoLogger } from '@/lib/utils/logger'
 import { messages } from '@/lib/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/bun'
@@ -33,6 +34,7 @@ app.onError((error, context) => {
       }), error.status)
     }
     if (error.status === 422) {
+      console.log(error.message)
       return context.json(new ApiResponse({
         code: error.status,
         messages: error.cause ? error.cause as string[] : error.message.split(',')
@@ -51,6 +53,7 @@ app.onError((error, context) => {
       messages: ['Token expired.']
     }), 401)
   }
+  pinoLogger.error({ error: error.message, stack: error.stack }, 'Unhandled Error')
   return context.json(new ApiResponse({
     code: 500,
     messages: [messages.errorServer]
@@ -65,9 +68,9 @@ app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
 app.use('/static/*', serveStatic({ root: './' }))
 
 // MIDDLEWARES
+app.post('/api/private/branches', superadminMiddleware)
+app.delete('/api/private/branches', superadminMiddleware)
 app.use('/api/private/branches/*', adminMiddleware)
-app.use('/api/private/branches/create', superadminMiddleware)
-app.use('/api/private/branches/delete', superadminMiddleware)
 app.use('/api/private/products/*', adminMiddleware)
 
 // AUTH
