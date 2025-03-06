@@ -10,13 +10,15 @@ import { z } from 'zod';
 
 export const LoginRequestSchema = z.object({
   username: z.string({
-    message: validationMessages.required('Username')
+    required_error: validationMessages.required('Username'),
+    invalid_type_error: validationMessages.string('Username')
   }).openapi({
     example: 'superadmin',
   }),
   password: z
     .string({
-      message: validationMessages.required('Password')
+      required_error: validationMessages.required('Password'),
+      invalid_type_error: validationMessages.string('Password')
     })
     .openapi({
       example: 'password',
@@ -43,7 +45,8 @@ export type LoginData = z.infer<typeof LoginDataSchema>
 
 export const RefreshRequestSchema = z.object({
   userId: z.number({
-    message: validationMessages.requiredNumber('User ID')
+    invalid_type_error: validationMessages.number('User ID'),
+    required_error: validationMessages.required('User ID'),
   }).openapi({
     example: 1,
   }),

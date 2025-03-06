@@ -5,4 +5,4 @@ sewapesta.db
 static
 .devdbrc
 .idea
-logs
+logs/app.log

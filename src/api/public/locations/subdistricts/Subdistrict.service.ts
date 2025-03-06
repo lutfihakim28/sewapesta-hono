@@ -3,6 +3,8 @@ import { and, count, eq, like } from 'drizzle-orm';
 import { countOffset } from '@/lib/utils/countOffset';
 import { subdistricts } from 'db/schema/subdistricts';
 import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { messages } from '@/lib/constants/messages';
 
 export class SubdistrictService {
   static async list(query: SubdistrictFilter): Promise<Subdistrict[]> {
@@ -27,6 +29,23 @@ export class SubdistrictService {
       .get();
 
     return item?.count || 0;
+  }
+
+  static async checkCode(code: string): Promise<Subdistrict> {
+    const subdistrict = db
+      .select({
+        code: subdistricts.code,
+        name: subdistricts.name,
+      })
+      .from(subdistricts)
+      .where(eq(subdistricts.code, code))
+      .get()
+
+    if (!subdistrict) {
+      throw new BadRequestException(messages.errorConstraint('subdistrict'))
+    }
+
+    return subdistrict
   }
 
   private static buildWhereClause(query: SubdistrictFilter) {

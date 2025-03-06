@@ -34,7 +34,6 @@ app.onError((error, context) => {
       }), error.status)
     }
     if (error.status === 422) {
-      console.log(error.message)
       return context.json(new ApiResponse({
         code: error.status,
         messages: error.cause ? error.cause as string[] : error.message.split(',')
@@ -71,6 +70,9 @@ app.use('/static/*', serveStatic({ root: './' }))
 app.post('/api/private/branches', superadminMiddleware)
 app.delete('/api/private/branches', superadminMiddleware)
 app.use('/api/private/branches/*', adminMiddleware)
+app.post('/api/private/categories', superadminMiddleware)
+app.put('/api/private/categories/*', superadminMiddleware)
+app.delete('/api/private/categories/*', superadminMiddleware)
 app.use('/api/private/products/*', adminMiddleware)
 
 // AUTH

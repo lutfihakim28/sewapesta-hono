@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, getTableColumns, isNull, like } from 'drizzle-orm';
+import { and, asc, count, desc, eq, getTableColumns, isNull, like, SQL } from 'drizzle-orm';
 import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
 import { products } from 'db/schema/products';
 import { SortEnum } from '@/lib/enums/SortEnum';
@@ -7,11 +7,13 @@ import { countOffset } from '@/lib/utils/countOffset';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
+import { User } from '../users/User.schema';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
 
 const { createdAt, deletedAt, updatedAt, ...columns } = getTableColumns(products)
 
 export abstract class ProductService {
-  static async list(query: ProductFilter): Promise<Product[]> {
+  static async list(user: User, query: ProductFilter): Promise<[Product[], number]> {
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: ProductColumn = 'id';
 
@@ -27,25 +29,34 @@ export abstract class ProductService {
       ? asc(products[sortBy])
       : desc(products[sortBy])
 
-    const _products = await db
-      .select(columns)
-      .from(products)
-      .where(this.buildWhereClause(query))
-      .orderBy(orderBy)
-      .limit(Number(query.pageSize || 5))
-      .offset(countOffset(query.page, query.pageSize))
+    const where = this.buildWhereClause(user, query);
 
-    return _products
+    const result = await Promise.all([
+      db.select(columns)
+        .from(products)
+        .where(where)
+        .orderBy(orderBy)
+        .limit(Number(query.pageSize || 5))
+        .offset(countOffset(query.page, query.pageSize)),
+      this.count(where)
+    ])
+
+    return result
   }
 
-  static async get(id: number): Promise<Product> {
+  static async get(user: User, id: number): Promise<Product> {
+    const conditions = [
+      eq(products.id, id),
+      isNull(products.deletedAt),
+    ]
+
+    if (user.role === RoleEnum.Admin) {
+      conditions.push(eq(products.branchId, user.branchId))
+    }
     const product = db
       .select(columns)
       .from(products)
-      .where(and(
-        eq(products.id, id),
-        isNull(products.deletedAt)
-      ))
+      .where(and(...conditions))
       .get()
 
     if (!product) {
@@ -65,15 +76,24 @@ export abstract class ProductService {
     return product
   }
 
-  static async update(_id: number, payload: ProductRequest): Promise<Pick<Product, 'id'>> {
+  static async update(_id: number, payload: ProductRequest, user: User): Promise<Pick<Product, 'id'>> {
     const { id, ..._ } = columns;
+
+    const conditions = [
+      isNull(products.deletedAt),
+      eq(products.id, _id)
+    ]
+
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(
+        eq(products.branchId, user.branchId)
+      )
+    }
+
     const [product] = await db
       .update(products)
       .set(payload)
-      .where(and(
-        isNull(products.deletedAt),
-        eq(products.id, _id)
-      ))
+      .where(and(...conditions))
       .returning({ id })
 
     return product
@@ -93,21 +113,30 @@ export abstract class ProductService {
     return product
   }
 
-  static async count(query: ProductFilter): Promise<number> {
+  private static async count(query?: SQL<unknown>): Promise<number> {
     const item = db
       .select({ count: count() })
       .from(products)
-      .where(this.buildWhereClause(query))
+      .where(query)
       .get()
 
     return item?.count || 0
   }
 
-  private static buildWhereClause(query: ProductFilter) {
+  private static buildWhereClause(user: User, query: ProductFilter) {
     const conditions: ReturnType<typeof and>[] = [
       isNull(products.deletedAt),
-      eq(products.branchId, query.branchId)
     ]
+
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(
+        eq(products.branchId, user.branchId)
+      )
+    } else if (query.branchId) {
+      conditions.push(
+        eq(products.branchId, +query.branchId)
+      )
+    }
 
     if (query.keyword) {
       conditions.push(

@@ -6,6 +6,7 @@ import { z } from '@hono/zod-openapi';
 import { cities } from 'db/schema/cities';
 import { createSelectSchema } from 'drizzle-zod';
 import { ProvinceSchema } from '../provinces/Province.schema';
+import { validationMessages } from '@/lib/constants/validationMessage';
 
 export const CitySchema = createSelectSchema(cities)
   .omit({ provinceCode: true })
@@ -15,7 +16,7 @@ export const CityExtendedSchema = CitySchema
   .openapi('CityExtended')
 export const CityFilterSchema = z
   .object({
-    provinceCode: z.string().openapi({ example: '33' })
+    provinceCode: z.string({ message: validationMessages.required('Province code') }).openapi({ example: '33' })
   })
   .merge(SearchSchema)
   .merge(PaginationSchema)

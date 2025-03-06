@@ -11,8 +11,8 @@ const AuthController = honoApp()
 AuthController.openapi(LoginRoute, async (context) => {
   const loginRequest = context.req.valid('json');
 
-  const user = await UserService.checkCredentials(loginRequest);
-  const tokenData = await AuthService.login(user)
+  const userId = await UserService.checkCredentials(loginRequest);
+  const tokenData = await AuthService.login(userId)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -29,7 +29,7 @@ AuthController.openapi(RefreshRoute, async (context) => {
   return context.json(new ApiResponseData({
     code: 200,
     data: tokenData,
-    messages: [messages.successLogin]
+    messages: [messages.successRefresh]
   }), 200)
 })
 

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, getTableColumns, isNull, like, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, getTableColumns, isNull, like, or, SQL } from 'drizzle-orm';
 import { Branch, BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
@@ -8,11 +8,13 @@ import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
 import { locationQuery } from '@/api/public/locations/Location.query';
 import { SortEnum } from '@/lib/enums/SortEnum';
+import { SubdistrictService } from '@/api/public/locations/subdistricts/Subdistrict.service';
+import { logger } from '@/lib/utils/logger';
 
 const { createdAt, updatedAt, deletedAt, ...columns } = getTableColumns(branches);
 
 export abstract class BranchService {
-  static async list(query: BranchFilter): Promise<BranchExtended[]> {
+  static async list(query: BranchFilter): Promise<[BranchExtended[], number]> {
     const { subdistrictCode, ...selectedColumns } = columns
 
     let sort: SortEnum = SortEnum.Ascending;
@@ -30,25 +32,29 @@ export abstract class BranchService {
       ? asc(branches[sortBy])
       : desc(branches[sortBy])
 
-    const _branches = await db
-      .with(locationQuery)
-      .select({
-        ...selectedColumns,
-        location: {
-          subdistrict: locationQuery.subdistrict,
-          district: locationQuery.district,
-          city: locationQuery.city,
-          province: locationQuery.province,
-        }
-      })
-      .from(branches)
-      .innerJoin(locationQuery, eq(locationQuery.code, branches.subdistrictCode))
-      .where(this.buildWhereClause(query))
-      .orderBy(orderBy)
-      .limit(Number(query.pageSize || 5))
-      .offset(countOffset(query.page, query.pageSize))
+    const where = this.buildWhereClause(query);
 
-    return _branches
+    const result = await Promise.all([
+      db.with(locationQuery)
+        .select({
+          ...selectedColumns,
+          location: {
+            subdistrict: locationQuery.subdistrict,
+            district: locationQuery.district,
+            city: locationQuery.city,
+            province: locationQuery.province,
+          }
+        })
+        .from(branches)
+        .leftJoin(locationQuery, eq(locationQuery.code, branches.subdistrictCode))
+        .where(where)
+        .orderBy(orderBy)
+        .limit(Number(query.pageSize || 5))
+        .offset(countOffset(query.page, query.pageSize)),
+      this.count(where)
+    ])
+
+    return result
   }
 
   static async get(id: number): Promise<BranchExtended> {
@@ -65,7 +71,7 @@ export abstract class BranchService {
         }
       })
       .from(branches)
-      .innerJoin(locationQuery, eq(locationQuery.code, branches.subdistrictCode))
+      .leftJoin(locationQuery, eq(locationQuery.code, branches.subdistrictCode))
       .where(and(
         isNull(branches.deletedAt),
         eq(branches.id, id),
@@ -81,16 +87,27 @@ export abstract class BranchService {
 
   static async create(payload: BranchRequest): Promise<Pick<Branch, 'id'>> {
     const { id, ..._ } = columns;
+
+    await SubdistrictService.checkCode(payload.subdistrictCode)
+
     const [_branch] = await db
       .insert(branches)
       .values(payload)
       .returning({ id })
+
+    logger.debug({
+      payload,
+      result: _branch,
+    }, 'BranchService.create ')
 
     return _branch
   }
 
   static async update(_id: number, payload: BranchRequest): Promise<Pick<Branch, 'id'>> {
     const { id, ..._ } = columns;
+
+    await SubdistrictService.checkCode(payload.subdistrictCode)
+
     const [_branch] = await db
       .update(branches)
       .set(payload)
@@ -99,6 +116,12 @@ export abstract class BranchService {
         isNull(branches.deletedAt)
       ))
       .returning({ id })
+
+    logger.debug({
+      id: _id,
+      payload,
+      result: _branch,
+    }, 'BranchService.update ')
 
     return _branch;
   }
@@ -115,14 +138,19 @@ export abstract class BranchService {
       ))
       .returning(columns)
 
+    logger.debug({
+      id,
+      result: branch,
+    }, 'BranchService.delete ')
+
     return branch
   }
 
-  static async count(query: BranchFilter) {
+  private static async count(query?: SQL<unknown>) {
     const item = db
       .select({ count: count() })
       .from(branches)
-      .where(this.buildWhereClause(query))
+      .where(query)
       .get()
 
     return item?.count || 0
@@ -135,6 +163,12 @@ export abstract class BranchService {
 
     if (query.subdistrictCode) {
       conditions.push(eq(branches.subdistrictCode, query.subdistrictCode))
+    } else if (query.districtCode) {
+      conditions.push(like(branches.subdistrictCode, `${query.districtCode}%`))
+    } else if (query.cityCode) {
+      conditions.push(like(branches.subdistrictCode, `${query.cityCode}%`))
+    } else if (query.provinceCode) {
+      conditions.push(like(branches.subdistrictCode, `${query.provinceCode}%`))
     }
 
     if (query.keyword) {

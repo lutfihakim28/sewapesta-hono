@@ -1,9 +1,6 @@
-import { relations } from 'drizzle-orm';
 import { integer, real, sqliteTable } from 'drizzle-orm/sqlite-core';
 import { orders } from './orders';
-import { units } from './units';
 import { products } from './products';
-import { productEmployeeAssignments } from './productEmployeeAssignments';
 
 export const orderedProducts = sqliteTable('ordered_products', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -15,19 +12,3 @@ export const orderedProducts = sqliteTable('ordered_products', {
   price: real('price').notNull().default(0),
   deletedAt: integer('deleted_at'),
 })
-
-export const orderedProductsRelations = relations(orderedProducts, ({ one, many }) => ({
-  product: one(products, {
-    fields: [orderedProducts.productId],
-    references: [products.id],
-  }),
-  order: one(orders, {
-    fields: [orderedProducts.orderId],
-    references: [orders.id],
-  }),
-  orderedUnit: one(units, {
-    fields: [orderedProducts.orderedUnitId],
-    references: [units.id],
-  }),
-  assignedEmployees: many(productEmployeeAssignments)
-}));

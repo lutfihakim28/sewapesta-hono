@@ -4,19 +4,17 @@ import { BranchService } from './Branch.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
 import { Meta } from '@/lib/dtos/Meta.dto';
-import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { checkPermissions } from '@/lib/utils/checkPermissions';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
+import { UserService } from '../users/User.service';
+import { ForbiddenException } from '@/lib/exceptions/ForbiddenException';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
 
 const BranchController = honoApp()
 
 BranchController.openapi(BranchListRoute, async (context) => {
   const query = context.req.valid('query')
-  const [branches, totalData] = await Promise.all([
-    BranchService.list(query),
-    BranchService.count(query),
-  ])
+  const [branches, totalData] = await BranchService.list(query)
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -53,7 +51,15 @@ BranchController.openapi(BranchCreateRoute, async (context) => {
 })
 
 BranchController.openapi(BranchUpdateRoute, async (context) => {
+  const current = new JwtPayload(context.get('jwtPayload'))
   const param = context.req.valid('param')
+
+  const user = await UserService.isInBranch(+param.id, current.user.id)
+
+  if (!user && current.user.role !== RoleEnum.SuperAdmin) {
+    throw new ForbiddenException(messages.forbidden)
+  }
+
   const payload = context.req.valid('json')
   const branch = await BranchService.update(+param.id, payload);
 
@@ -69,7 +75,14 @@ BranchController.openapi(BranchUpdateRoute, async (context) => {
 })
 
 BranchController.openapi(BranchDeleteRoute, async (context) => {
+  const current = new JwtPayload(context.get('jwtPayload'))
   const param = context.req.valid('param')
+
+  const user = await UserService.isInBranch(+param.id, current.user.id)
+
+  if (!user && current.user.role !== RoleEnum.SuperAdmin) {
+    throw new ForbiddenException(messages.forbidden)
+  }
   const branch = await BranchService.delete(+param.id)
 
   if (!branch) {

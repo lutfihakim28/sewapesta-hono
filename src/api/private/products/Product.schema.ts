@@ -29,10 +29,9 @@ export const ProductExtendedSchema = ProductSchema
   })
   .openapi('ProductExtended')
 
-export const ProductFilterSchema = z
-  .object({
-    branchId: z.number(),
-  })
+export const ProductFilterSchema = z.object({
+  branchId: z.string().optional()
+})
   .merge(SearchSchema)
   .merge(PaginationSchema)
   .merge(SortSchema<ProductColumn>([
@@ -47,9 +46,18 @@ const ProductListSchema = z.array(ProductSchema)
 export const ProductResponseListSchema = ApiResponseListSchema(ProductListSchema, messages.successList('products'))
 
 export const ProductRequestSchema = createInsertSchema(products, {
-  name: z.string({ message: validationMessages.required('Name') }),
-  branchId: z.number({ message: validationMessages.requiredNumber('Branch ID') }),
-  rentalTimeIncrement: z.number({ message: validationMessages.requiredNumber('Rental increment') }),
+  name: z.string({
+    required_error: validationMessages.required('Name'),
+    invalid_type_error: validationMessages.string('Name'),
+  }),
+  branchId: z.number({
+    invalid_type_error: validationMessages.number('Branch ID'),
+    required_error: validationMessages.required('Branch ID'),
+  }),
+  rentalTimeIncrement: z.number({
+    invalid_type_error: validationMessages.number('Rental increment'),
+    required_error: validationMessages.required('Rental increment'),
+  }),
 }).pick({
   branchId: true,
   rentalTimeIncrement: true,

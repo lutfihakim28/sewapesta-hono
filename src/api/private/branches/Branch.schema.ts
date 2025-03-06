@@ -52,10 +52,22 @@ const BranchListSchema = z.array(BranchExtendedSchema)
 export const BranchResponseListSchema = ApiResponseListSchema(BranchListSchema, messages.successList('branches'))
 
 export const BranchRequestSchema = createInsertSchema(branches, {
-  address: z.string({ message: validationMessages.required('Address') }),
-  cpName: z.string({ message: validationMessages.required('Contact person name') }),
-  cpPhone: z.string({ message: validationMessages.required('Contact phone') }),
-  name: z.string({ message: validationMessages.required('Name') }),
+  address: z.string({
+    required_error: validationMessages.required('Address'),
+    invalid_type_error: validationMessages.string('Address')
+  }),
+  cpName: z.string({
+    required_error: validationMessages.required('Contact person name'),
+    invalid_type_error: validationMessages.string('Contact person name')
+  }),
+  cpPhone: z.string({
+    required_error: validationMessages.required('Contact phone'),
+    invalid_type_error: validationMessages.string('Contact phone')
+  }),
+  name: z.string({
+    required_error: validationMessages.required('Name'),
+    invalid_type_error: validationMessages.string('Name')
+  }),
   subdistrictCode: z.string({ message: validationMessages.required('Subdistrict') }),
 }).pick({
   address: true,

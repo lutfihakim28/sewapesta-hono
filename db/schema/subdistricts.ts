@@ -10,11 +10,3 @@ export const subdistricts = sqliteTable('subdistricts', {
 }, (table) => ({
   subdistrictDistrictIndex: index('subdistrict_district_index').on(table.districtCode),
 }))
-
-export const subdistrictsRelations = relations(subdistricts, ({ one, many }) => ({
-  district: one(districts, {
-    fields: [subdistricts.districtCode],
-    references: [districts.code],
-  }),
-  branches: many(branches),
-}))

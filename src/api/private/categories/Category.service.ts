@@ -1,22 +1,25 @@
-import { and, count, eq, getTableColumns, isNull, like } from 'drizzle-orm';
+import { and, count, eq, getTableColumns, isNull, like, SQL } from 'drizzle-orm';
 import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
 import dayjs from 'dayjs';
 
-const { branchId, createdAt, deletedAt, updatedAt, ...columns } = getTableColumns(categories)
+const { createdAt, deletedAt, updatedAt, ...columns } = getTableColumns(categories)
 
 export abstract class CategoryService {
-  static async list(query: CategoryFilter): Promise<Category[]> {
-    const _categories = await db
-      .select(columns)
-      .from(categories)
-      .where(this.buildWhereClause(query))
-      .limit(Number(query.pageSize || 5))
-      .offset(countOffset(query.page, query.pageSize))
+  static async list(query: CategoryFilter): Promise<[Category[], number]> {
+    const where = this.buildWhereClause(query);
+    const result = await Promise.all([
+      db.select(columns)
+        .from(categories)
+        .where(where)
+        .limit(Number(query.pageSize || 5))
+        .offset(countOffset(query.page, query.pageSize)),
+      this.count(where)
+    ])
 
-    return _categories
+    return result
   }
 
   static async create(payload: CategoryRequest): Promise<Category> {
@@ -56,11 +59,11 @@ export abstract class CategoryService {
     return category
   }
 
-  static async count(query: CategoryFilter) {
+  private static async count(query?: SQL<unknown>) {
     const item = db
       .select({ count: count() })
       .from(categories)
-      .where(this.buildWhereClause(query))
+      .where(query)
       .get()
 
     return item?.count || 0
@@ -69,7 +72,6 @@ export abstract class CategoryService {
   private static buildWhereClause(query: CategoryFilter) {
     const conditions: ReturnType<typeof and>[] = [
       isNull(categories.deletedAt),
-      eq(categories.branchId, query.branchId)
     ]
 
     if (query.keyword) {

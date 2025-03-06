@@ -32,10 +32,10 @@ const _subdistricts = await db
   )
 
 const unitsId = await seedUnits()
+const categoriesId = await seedCategories()
 
 await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
   const branchId = await seedBranches(_subdistricts.map((el) => el.code))
-  const categoriesId = await seedCategories(branchId)
   if (index === 0) {
     await seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.SuperAdmin)
   }
@@ -49,7 +49,7 @@ await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
     ...Array.from({ length: faker.number.int({ min: 5, max: 10 }) }).map(() => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Employee)),
   ])
 
-  const _owners = await Promise.all(Array.from({ length: faker.number.int({ min: 1, max: 4 }) }).map(() => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Owner)))
+  const _owners = await Promise.all(Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Owner)))
 
   await Promise.all(_owners.map(async (owner) => {
     return Promise.all(Array
@@ -63,8 +63,3 @@ await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
     )
   }))
 }))
-
-// await seedUsers()
-
-// await seedItems()
-// await seedOrders()

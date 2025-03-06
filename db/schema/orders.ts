@@ -1,8 +1,5 @@
 import { OrderStatusEnum } from '@/lib/enums/OrderStatusEnum';
-import { relations } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { orderedProducts } from './orderedProducts';
-import { orderEmployees } from './orderEmployees';
 
 export const orders = sqliteTable('orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -29,8 +26,3 @@ export const orders = sqliteTable('orders', {
   updatedAt: integer('updated_at'),
   deletedAt: integer('deleted_at'),
 });
-
-export const ordersRelations = relations(orders, ({ many }) => ({
-  orderedProducts: many(orderedProducts),
-  orderEmployees: many(orderEmployees)
-}))

@@ -14,10 +14,7 @@ const CategoryController = honoApp()
 CategoryController.openapi(CategoryListRoute, async (context) => {
   const query = context.req.valid('query')
 
-  const [categories, totalData] = await Promise.all([
-    CategoryService.list(query),
-    CategoryService.count(query),
-  ])
+  const [categories, totalData] = await CategoryService.list(query)
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -33,8 +30,6 @@ CategoryController.openapi(CategoryListRoute, async (context) => {
 
 CategoryController.openapi(CategoryCreateRoute, async (context) => {
   const payload = context.req.valid('json');
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
 
   await CategoryService.create(payload)
 
@@ -47,8 +42,6 @@ CategoryController.openapi(CategoryCreateRoute, async (context) => {
 CategoryController.openapi(CategoryUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
 
   const category = await CategoryService.update(+param.id, payload);
 
@@ -64,8 +57,6 @@ CategoryController.openapi(CategoryUpdateRoute, async (context) => {
 
 CategoryController.openapi(CategoryDeleteRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  checkPermissions(jwtPayload, [RoleEnum.Admin, RoleEnum.SuperAdmin])
 
   const category = await CategoryService.delete(+param.id)
 

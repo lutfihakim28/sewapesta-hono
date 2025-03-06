@@ -15,18 +15,17 @@ export const CategorySchema = createSelectSchema(categories)
   .openapi('Category')
 
 export const CategoryRequestSchema = createInsertSchema(categories, {
-  name: z.string({ message: validationMessages.required('Name') }),
-  branchId: z.number({ message: validationMessages.requiredNumber('Branch ID') })
+  name: z.string({
+    required_error: validationMessages.required('Name'),
+    invalid_type_error: validationMessages.string('Name')
+  }),
 })
   .pick({
     name: true,
-    branchId: true,
   })
   .openapi('CategoryRequest')
 
-export const CategoryFilterSchema = z.object({
-  branchId: z.number(),
-}).merge(SearchSchema)
+export const CategoryFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .openapi('CategoryFilter')
 
