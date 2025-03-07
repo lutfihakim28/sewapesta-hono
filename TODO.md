@@ -13,6 +13,9 @@
 8. ~~Tes location (unit/e2e test?)~~
 9. ~~Improve auth, save token to db~~
 10. ~~Restructure folder~~
+11. Finish product.test
+12. create item crud
+13. create item test
 
 ## WHO
 
