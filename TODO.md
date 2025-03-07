@@ -16,6 +16,7 @@
 11. Finish product.test
 12. create item crud
 13. create item test
+14. debug with all test
 
 ## WHO
 
