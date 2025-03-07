@@ -13,9 +13,7 @@ export async function seedUnits() {
         name: 'Meter',
       },
     ])
-    .returning({
-      id: units.id,
-    });
+    .$returningId();
 
   return _units.map((unit) => unit.id);
 }

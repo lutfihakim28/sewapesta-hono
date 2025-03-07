@@ -1,10 +1,10 @@
 import { provinces } from 'db/schema/provinces';
-import { index, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 
-export const cities = sqliteTable('cities', {
-  code: text('code').primaryKey(),
-  name: text('name').notNull(),
-  provinceCode: text('province_code').references(() => provinces.code).notNull()
-}, (table) => ({
-  cityProvinceCodeIndex: index('city_province_code_index').on(table.provinceCode),
-}))
+export const cities = mysqlTable('cities', {
+  code: varchar('code', { length: 6 }).primaryKey(),
+  name: varchar('name', { length: 150 }).notNull(),
+  provinceCode: varchar('province_code', { length: 2 }).references(() => provinces.code).notNull()
+}, (table) => [
+  index('city_province_code_index').on(table.provinceCode),
+])

@@ -17,9 +17,7 @@ export async function seedProducts(branchId: number) {
         branchId,
       },
     ])
-    .returning({
-      id: products.id,
-    })
+    .$returningId()
 
   return _products.map((product) => product.id)
 }
