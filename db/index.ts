@@ -2,7 +2,7 @@ import { logger } from '@/lib/utils/logger';
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 
-export const connection = await mysql.createConnection({
+const connection = await mysql.createConnection({
   host: Bun.env.DB_HOST,
   user: Bun.env.DB_USER,
   password: Bun.env.DB_PASSWORD,

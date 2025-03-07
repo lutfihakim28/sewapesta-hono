@@ -20,11 +20,10 @@ export class CityService {
   }
 
   static async count(query: CityFilter): Promise<number> {
-    const item = db
+    const [item] = await db
       .select({ count: count() })
       .from(cities)
       .where(this.buildWhereClause(query))
-      .get();
 
     return item?.count || 0;
   }

@@ -4,6 +4,8 @@ import { categories } from 'db/schema/categories';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
 import dayjs from 'dayjs';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { messages } from '@/lib/constants/messages';
 
 const { createdAt, deletedAt, updatedAt, ...columns } = getTableColumns(categories)
 
@@ -22,30 +24,26 @@ export abstract class CategoryService {
     return result
   }
 
-  static async create(payload: CategoryRequest): Promise<Category> {
-    const [category] = await db
+  static async create(payload: CategoryRequest): Promise<void> {
+    await db
       .insert(categories)
       .values(payload)
-      .returning(columns)
-
-    return category
   }
 
-  static async update(id: number, payload: CategoryRequest): Promise<Category> {
-    const [category] = await db
+  static async update(id: number, payload: CategoryRequest): Promise<void> {
+    await this.check(id)
+    await db
       .update(categories)
       .set(payload)
       .where(and(
         isNull(categories.deletedAt),
         eq(categories.id, id)
       ))
-      .returning(columns)
-
-    return category
   }
 
-  static async delete(id: number): Promise<Category> {
-    const [category] = await db
+  static async delete(id: number): Promise<void> {
+    await this.check(id)
+    await db
       .update(categories)
       .set({
         deletedAt: dayjs().unix()
@@ -54,17 +52,27 @@ export abstract class CategoryService {
         isNull(categories.deletedAt),
         eq(categories.id, id)
       ))
-      .returning(columns)
+  }
 
-    return category
+  private static async check(id: number) {
+    const [category] = await db
+      .select(columns)
+      .from(categories)
+      .where(and(
+        eq(categories.id, id),
+        isNull(categories.deletedAt)
+      ))
+
+    if (!category) {
+      throw new NotFoundException(messages.errorNotFound(`Category with ID ${id}`))
+    }
   }
 
   private static async count(query?: SQL<unknown>) {
-    const item = db
-      .select({ count: count() })
+    const [item] = await db
+      .select({ count: count().mapWith(Number) })
       .from(categories)
       .where(query)
-      .get()
 
     return item?.count || 0
   }

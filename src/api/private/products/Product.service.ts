@@ -44,81 +44,66 @@ export abstract class ProductService {
     return result
   }
 
-  static async get(user: User, id: number): Promise<Product> {
+  static async get(id: number, user?: User): Promise<Product> {
     const conditions = [
       eq(products.id, id),
       isNull(products.deletedAt),
     ]
 
-    if (user.role === RoleEnum.Admin) {
+    if (user?.role === RoleEnum.Admin) {
       conditions.push(eq(products.branchId, user.branchId))
     }
-    const product = db
+    const [product] = await db
       .select(columns)
       .from(products)
       .where(and(...conditions))
-      .get()
+      .limit(1)
 
     if (!product) {
-      throw new NotFoundException(messages.errorNotFound('product'));
+      throw new NotFoundException(messages.errorNotFound(`Product with ID ${id}`));
     }
 
     return product
   }
 
-  static async create(payload: ProductRequest): Promise<Pick<Product, 'id'>> {
-    const { id, ..._ } = columns;
-    const [product] = await db
+  static async create(payload: ProductRequest): Promise<Product> {
+    const [newProduct] = await db
       .insert(products)
       .values(payload)
-      .returning({ id })
+      .$returningId()
+
+    const product = await this.get(newProduct.id)
 
     return product
   }
 
-  static async update(_id: number, payload: ProductRequest, user: User): Promise<Pick<Product, 'id'>> {
+  static async update(_id: number, payload: ProductRequest, user: User): Promise<Product> {
+    const product = await this.get(_id, user)
     const { id, ..._ } = columns;
 
-    const conditions = [
-      isNull(products.deletedAt),
-      eq(products.id, _id)
-    ]
-
-    if (user.role !== RoleEnum.SuperAdmin) {
-      conditions.push(
-        eq(products.branchId, user.branchId)
-      )
-    }
-
-    const [product] = await db
+    await db
       .update(products)
       .set(payload)
-      .where(and(...conditions))
-      .returning({ id })
+      .where(eq(products.id, product.id))
 
     return product
   }
 
-  static async delete(_id: number): Promise<Pick<Product, 'id'>> {
-    const { id, ..._ } = columns;
-    const [product] = await db
+  static async delete(_id: number, user: User): Promise<void> {
+    const product = await this.get(_id)
+    await db
       .update(products)
       .set({ deletedAt: dayjs().unix() })
       .where(and(
-        isNull(products.deletedAt),
-        eq(products.id, _id)
+        eq(products.id, product.id)
       ))
-      .returning({ id })
-
-    return product
   }
 
   private static async count(query?: SQL<unknown>): Promise<number> {
-    const item = db
-      .select({ count: count() })
+    const [item] = await db
+      .select({ count: count().mapWith(Number) })
       .from(products)
       .where(query)
-      .get()
 
     return item?.count || 0
   }

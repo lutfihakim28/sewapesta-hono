@@ -6,6 +6,7 @@ import { db } from 'db'
 import { users } from 'db/schema/users'
 import { eq } from 'drizzle-orm'
 import { generateTestHeader } from '@/lib/utils/testingUtils'
+import { branches } from 'db/schema/branches'
 
 const username = 'superadmin'
 let jwt: string | undefined;
@@ -13,12 +14,13 @@ let userId: number;
 
 beforeEach(async () => {
   jwt = undefined;
-  const user = db
+  const [user] = await db
     .select({ id: users.id })
     .from(users)
     .where(eq(users.username, username))
-    .get()
-  userId = user?.id || 0
+    .limit(1)
+
+  userId = user.id || 0
   await db.update(users).set({ refreshToken: null }).where(eq(users.id, userId))
 })
 
@@ -126,13 +128,13 @@ describe('Auth', () => {
 
       const response: ApiResponse = await _response.json()
 
-      const user = db
+      const [user] = await db
         .select({ refreshToken: users.refreshToken })
         .from(users)
         .where(eq(users.id, userId))
-        .get()
+        .limit(1)
 
-      expect(user?.refreshToken).toBeNull()
+      expect(user.refreshToken).toBeNull()
       expect(response.code).toBe(200)
     })
   })

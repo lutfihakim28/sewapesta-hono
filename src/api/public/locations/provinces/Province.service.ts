@@ -17,18 +17,17 @@ export class ProvinceService {
   }
 
   static async count(query: ProvinceFilter): Promise<number> {
-    const item = db
+    const [item] = await db
       .select({ count: count() })
       .from(provinces)
       .where(this.buildWhereClause(query))
-      .get();
 
     return item?.count || 0;
   }
 
   private static buildWhereClause(query: ProvinceFilter) {
     return query.keyword
-    ? like(provinces.name, `%${query.keyword}%`)
-    : undefined
+      ? like(provinces.name, `%${query.keyword}%`)
+      : undefined
   }
 }

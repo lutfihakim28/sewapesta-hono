@@ -11,7 +11,10 @@ export const locationQuery = db.$with('locationQuery').as(db
     district: sql<string>`${districts.name}`.as('district'),
     city: sql<string>`${cities.name}`.as('city'),
     province: sql<string>`${provinces.name}`.as('province'),
-    code: subdistricts.code
+    subdistrictCode: sql<string>`${subdistricts.code}`.as('subdistrictCode'),
+    districtCode: sql<string>`${districts.code}`.as('districtCode'),
+    cityCode: sql<string>`${cities.code}`.as('cityCode'),
+    provinceCode: sql<string>`${provinces.code}`.as('provinceCode'),
   })
   .from(subdistricts)
   .leftJoin(districts, eq(districts.code, subdistricts.districtCode))

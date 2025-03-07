@@ -20,11 +20,11 @@ export async function getTestUsers(): Promise<Record<RoleEnum, LoginData>> {
 }
 
 async function getUserLogin(role: RoleEnum) {
-  const user = db
+  const [user] = await db
     .select({ username: users.username })
     .from(users)
     .where(eq(users.role, role))
-    .get()
+    .limit(1)
 
   const response = await login(user?.username)
 

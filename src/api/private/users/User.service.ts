@@ -1,11 +1,12 @@
 import { db } from 'db';
 import { users } from 'db/schema/users';
-import { and, eq, getTableColumns } from 'drizzle-orm';
+import { and, eq, getTableColumns, isNull } from 'drizzle-orm';
 import { User, UserCreate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { messages } from '@/lib/constants/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 
 const { createdAt, deletedAt, password, profileId, refreshToken, updatedAt, ...columns } = getTableColumns(users)
 
@@ -15,9 +16,7 @@ export abstract class UserService {
       const [profile] = await tx
         .insert(profiles)
         .values(request.profile)
-        .returning({
-          id: profiles.id
-        })
+        .$returningId()
 
       const [user] = await tx
         .insert(users)
@@ -25,20 +24,25 @@ export abstract class UserService {
           ...request,
           profileId: profile.id,
         })
-        .returning()
+        .$returningId()
 
       return user
     })
 
-    return user
+    return {
+      branchId: request.branchId,
+      id: user.id,
+      role: request.role,
+      username: request.username,
+    }
   }
 
   static async checkCredentials(loginRequest: LoginRequest): Promise<number> {
-    const user = db
+    const [user] = await db
       .select()
       .from(users)
       .where(eq(users.username, loginRequest.username))
-      .get()
+      .limit(1)
 
     if (!user) {
       throw new UnauthorizedException(messages.invalidCredential)
@@ -54,13 +58,30 @@ export abstract class UserService {
   }
 
   static async isInBranch(branchId: number, userId: number) {
-    return db
+    const [user] = await db
       .select({ id: users.id })
       .from(users)
       .where(and(
         eq(users.id, userId),
         eq(users.branchId, branchId)
       ))
-      .get()
+      .limit(1)
+
+    return user
+  }
+
+  static async check(id: number) {
+    const [user] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(
+        eq(users.id, id),
+        isNull(users.deletedAt)
+      ))
+      .limit(1)
+
+    if (!user) {
+      throw new NotFoundException(messages.errorNotFound(`User with ID ${id}`))
+    }
   }
 }

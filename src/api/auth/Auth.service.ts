@@ -15,10 +15,15 @@ export abstract class AuthService {
     const secretKey = Bun.env.JWT_SECRET;
 
     const [_user] = await db
+      .select(columns)
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1)
+
+    await db
       .update(users)
       .set({ refreshToken: crypto.randomUUID() })
       .where(eq(users.id, userId))
-      .returning(columns)
 
     const payload: JWTPayload = new JwtPayload({ user: _user })
     const token = await sign(payload, secretKey)
@@ -46,14 +51,19 @@ export abstract class AuthService {
 
     const secretKey = Bun.env.JWT_SECRET;
 
-    const [token, [_user]] = await Promise.all([
+    const [token, _] = await Promise.all([
       sign(payload, secretKey),
       db
         .update(users)
         .set({ refreshToken: crypto.randomUUID() })
         .where(eq(users.id, user.id))
-        .returning(columns)
     ])
+
+    const [_user] = await db
+      .select(columns)
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1)
 
     return {
       token,

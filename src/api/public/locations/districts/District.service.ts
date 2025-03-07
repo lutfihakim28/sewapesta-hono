@@ -13,25 +13,24 @@ export class DistrictService {
       })
       .from(districts)
       .where(this.buildWhereClause(query))
-      .limit( Number(query.pageSize || 5))
-      .offset( countOffset(query.page, query.pageSize))
+      .limit(Number(query.pageSize || 5))
+      .offset(countOffset(query.page, query.pageSize))
 
     return _districts
   }
 
   static async count(query: DistrictFilter): Promise<number> {
-    const item = db
+    const [item] = await db
       .select({ count: count() })
       .from(districts)
       .where(this.buildWhereClause(query))
-      .get();
 
     return item?.count || 0;
   }
 
   private static buildWhereClause(query: DistrictFilter) {
     const conditions: ReturnType<typeof and>[] = [eq(districts.cityCode, query.cityCode)];
-    
+
     if (query.keyword) {
       conditions.push(like(districts.name, `%${query.keyword}%`))
     }

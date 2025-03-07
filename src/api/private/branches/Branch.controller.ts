@@ -45,7 +45,7 @@ BranchController.openapi(BranchCreateRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successCreate('branch')],
+    messages: [messages.successCreate(`Branch with name ${branch.name}`)],
     data: branch
   }), 200)
 })
@@ -63,13 +63,9 @@ BranchController.openapi(BranchUpdateRoute, async (context) => {
   const payload = context.req.valid('json')
   const branch = await BranchService.update(+param.id, payload);
 
-  if (!branch) {
-    throw new NotFoundException(messages.errorNotFound(`Branch with ID ${param.id}`))
-  }
-
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successUpdate('branch')],
+    messages: [messages.successUpdate(`Branch with ID ${branch.id}`)],
     data: branch
   }), 200)
 })
@@ -83,15 +79,11 @@ BranchController.openapi(BranchDeleteRoute, async (context) => {
   if (!user && current.user.role !== RoleEnum.SuperAdmin) {
     throw new ForbiddenException(messages.forbidden)
   }
-  const branch = await BranchService.delete(+param.id)
-
-  if (!branch) {
-    throw new NotFoundException(messages.errorNotFound(`Branch with ID ${param.id}`))
-  }
+  await BranchService.delete(+param.id)
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete('branch')]
+    messages: [messages.successDelete(`Branch with ID ${param.id}`)]
   }), 200)
 })
 

@@ -78,7 +78,7 @@ export const BranchRequestSchema = createInsertSchema(branches, {
 }).openapi('BranchRequest')
 
 export const BranchResponseExtendedDataSchema = ApiResponseDataSchema(BranchExtendedSchema, messages.successDetail('branch'))
-export const BranchResponseDataSchema = ApiResponseDataSchema(BranchSchema, messages.successDetail('branch'))
+export const BranchResponseDataSchema = ApiResponseDataSchema(BranchExtendedSchema, messages.successDetail('branch'))
 
 export type Branch = z.infer<typeof BranchSchema>
 export type BranchExtended = z.infer<typeof BranchExtendedSchema>

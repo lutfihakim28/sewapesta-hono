@@ -1,4 +1,4 @@
-import { connection, db } from 'db';
+import { db } from 'db';
 import { seedBranches } from 'db/seed/branches.seed';
 import { seedCategories } from 'db/seed/categories.seed';
 import { seedCities } from 'db/seed/cities.seed';
@@ -64,4 +64,4 @@ await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
   }))
 }))
 
-connection.end()
+db.$client.end()

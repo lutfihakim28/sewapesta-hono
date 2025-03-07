@@ -1,11 +1,11 @@
-import { connection, db } from 'db';
+import { db } from 'db';
 import { sql } from 'drizzle-orm';
 
 async function resetDB() {
   await db.execute(sql`DROP DATABASE sewapesta`);
   await db.execute(sql`CREATE DATABASE sewapesta`);
 
-  await connection.end()
+  await db.$client.end()
 }
 
 resetDB()

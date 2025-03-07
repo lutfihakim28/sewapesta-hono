@@ -2,7 +2,7 @@ import { honoApp } from '@/lib/utils/hono';
 import { ProductCreateRoute, ProductDeleteRoute, ProductDetailRoute, ProductListRoute, ProductUpdateRoute } from './Product.route';
 import { ProductService } from './Product.service';
 import { messages } from '@/lib/constants/messages';
-import { ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
+import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { Meta } from '@/lib/dtos/Meta.dto';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
@@ -31,7 +31,7 @@ ProductController.openapi(ProductListRoute, async (context) => {
 ProductController.openapi(ProductDetailRoute, async (context) => {
   const param = context.req.valid('param')
   const jwt = new JwtPayload(context.get('jwtPayload'))
-  const product = await ProductService.get(jwt.user, +param.id)
+  const product = await ProductService.get(+param.id, jwt.user)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -52,7 +52,7 @@ ProductController.openapi(ProductCreateRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successCreate('product')],
+    messages: [messages.successCreate(`Product with name ${product.name}`)],
     data: product
   }), 200)
 })
@@ -75,23 +75,20 @@ ProductController.openapi(ProductUpdateRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successUpdate('product')],
+    messages: [messages.successUpdate(`Product with ID ${product.id}`)],
     data: product
   }), 200)
 })
 
 ProductController.openapi(ProductDeleteRoute, async (context) => {
   const param = context.req.valid('param')
-  const product = await ProductService.delete(+param.id)
+  const jwt = new JwtPayload(context.get('jwtPayload'))
 
-  if (!product) {
-    throw new NotFoundException(messages.errorNotFound(`Product with ID ${param.id}`))
-  }
+  await ProductService.delete(+param.id, jwt.user)
 
-  return context.json(new ApiResponseData({
+  return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete('product')],
-    data: product
+    messages: [messages.successDelete(`Product with ID ${param.id}`)],
   }), 200)
 })
 

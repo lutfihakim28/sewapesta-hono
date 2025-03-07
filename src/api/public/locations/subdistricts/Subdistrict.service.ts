@@ -22,24 +22,23 @@ export class SubdistrictService {
   }
 
   static async count(query: SubdistrictFilter): Promise<number> {
-    const item = db
+    const [item] = await db
       .select({ count: count() })
       .from(subdistricts)
       .where(this.buildWhereClause(query))
-      .get();
 
     return item?.count || 0;
   }
 
   static async checkCode(code: string): Promise<Subdistrict> {
-    const subdistrict = db
+    const [subdistrict] = await db
       .select({
         code: subdistricts.code,
         name: subdistricts.name,
       })
       .from(subdistricts)
       .where(eq(subdistricts.code, code))
-      .get()
+      .limit(1)
 
     if (!subdistrict) {
       throw new BadRequestException(messages.errorConstraint('subdistrict'))

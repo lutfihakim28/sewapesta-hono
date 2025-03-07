@@ -1,13 +1,9 @@
 import { honoApp } from '@/lib/utils/hono';
 import { CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryUpdateRoute } from './Category.route';
-import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { checkPermissions } from '@/lib/utils/checkPermissions';
 import { CategoryService } from './Category.service';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
 import { Meta } from '@/lib/dtos/Meta.dto';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 
 const CategoryController = honoApp()
 
@@ -35,7 +31,7 @@ CategoryController.openapi(CategoryCreateRoute, async (context) => {
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successCreate('category')],
+    messages: [messages.successCreate(`Category with name ${payload.name}`)],
   }), 200)
 })
 
@@ -43,30 +39,22 @@ CategoryController.openapi(CategoryUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
 
-  const category = await CategoryService.update(+param.id, payload);
-
-  if (!category) {
-    throw new NotFoundException(messages.errorNotFound(`Category with ID ${param.id}`))
-  }
+  await CategoryService.update(+param.id, payload);
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successUpdate('category')],
+    messages: [messages.successUpdate(`Category with ID ${param.id}`)],
   }), 200)
 })
 
 CategoryController.openapi(CategoryDeleteRoute, async (context) => {
   const param = context.req.valid('param')
 
-  const category = await CategoryService.delete(+param.id)
-
-  if (!category) {
-    throw new NotFoundException(messages.errorNotFound(`Category with ID ${param.id}`))
-  }
+  await CategoryService.delete(+param.id)
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete('category')]
+    messages: [messages.successDelete(`Category with ID ${param.id}`)]
   }), 200)
 })
 
