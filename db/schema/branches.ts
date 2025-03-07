@@ -1,15 +1,15 @@
 import { subdistricts } from 'db/schema/subdistricts';
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamps } from "db/schema/timestamps.helper";
+import { index, int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 
-export const branches = sqliteTable('branches', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
-  cpName: text('cp_name').notNull(),
-  cpPhone: text('cp_phone').notNull(),
-  address: text('address').notNull(),
-  subdistrictCode: text('subdistrict_code').references(() => subdistricts.code).notNull(),
+export const branches = mysqlTable('branches', {
+  id: int('id').primaryKey().autoincrement(),
+  name: varchar('name', { length: 150 }).notNull(),
+  cpName: varchar('cp_name', { length: 100 }).notNull(),
+  cpPhone: varchar('cp_phone', { length: 15 }).notNull(),
+  address: varchar('address', { length: 255 }).notNull(),
+  subdistrictCode: varchar('subdistrict_code', { length: 13 }).references(() => subdistricts.code).notNull(),
   ...timestamps,
-}, (table) => ({
-  branchSubdistrictCodeIndex: index('branch_subdistrict_code_index').on(table.subdistrictCode),
-}))
+}, (table) => [
+  index('branch_subdistrict_code_index').on(table.subdistrictCode)
+])

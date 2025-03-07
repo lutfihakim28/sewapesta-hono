@@ -1,6 +1,6 @@
-import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 
-export const provinces = sqliteTable('provinces', {
-  code: text('code').primaryKey(),
-  name: text('name').notNull(),
+export const provinces = mysqlTable('provinces', {
+  code: varchar('code', { length: 2 }).primaryKey(),
+  name: varchar('name', { length: 150 }).notNull(),
 })

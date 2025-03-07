@@ -25,9 +25,7 @@ export async function seedUsers(branchId: number, subdistrictsCode: string[], ro
         address: faker.location.streetAddress(),
         subdistrictCode: faker.helpers.arrayElement(subdistrictsCode),
       })
-      .returning({
-        id: profiles.id
-      })
+      .$returningId()
 
     const [user] = await tx
       .insert(users)
@@ -38,9 +36,7 @@ export async function seedUsers(branchId: number, subdistrictsCode: string[], ro
         role,
         branchId,
       })
-      .returning({
-        id: users.id
-      })
+      .$returningId()
 
     id++
 

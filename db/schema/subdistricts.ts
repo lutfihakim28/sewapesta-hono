@@ -1,12 +1,10 @@
-import { branches } from 'db/schema/branches';
 import { districts } from 'db/schema/districts';
-import { relations } from 'drizzle-orm';
-import { index, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 
-export const subdistricts = sqliteTable('subdistricts', {
-  code: text('code').primaryKey(),
-  name: text('name').notNull(),
-  districtCode: text('district_code').references(() => districts.code).notNull()
-}, (table) => ({
-  subdistrictDistrictIndex: index('subdistrict_district_index').on(table.districtCode),
-}))
+export const subdistricts = mysqlTable('subdistricts', {
+  code: varchar('code', { length: 13 }).primaryKey(),
+  name: varchar('name', { length: 150 }).notNull(),
+  districtCode: varchar('district_code', { length: 10 }).references(() => districts.code).notNull()
+}, (table) => ([
+  index('subdistrict_district_index').on(table.districtCode),
+]))

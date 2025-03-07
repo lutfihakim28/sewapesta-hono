@@ -14,9 +14,7 @@ export async function seedBranches(subdistrictsCode: string[]) {
       cpPhone: faker.helpers.fromRegExp('+628[1-9][0-9]{8,9}'),
       subdistrictCode: faker.helpers.arrayElement(subdistrictsCode)
     })
-    .returning({
-      id: branches.id,
-    })
+    .$returningId()
 
   return branch.id
 }
