@@ -22,7 +22,7 @@ beforeAll(async () => {
 describe('Category', () => {
   test('List', async () => {
     const query: CategoryFilter = {
-      keyword: 'Alat'
+      keyword: 'equip'
     };
     const searchParam = new URLSearchParams(query)
 
@@ -104,11 +104,11 @@ describe('Category', () => {
     })
 
     test('Success', async () => {
-      const oldCategory = db
+      const [oldCategory] = await db
         .select({ name: categories.name })
         .from(categories)
         .where(eq(categories.id, 1))
-        .get()
+        .limit(1)
 
       const _response = await app.request(`${path}/1`, {
         method: 'PUT',
@@ -120,11 +120,11 @@ describe('Category', () => {
 
       expect(response.code).toBe(200)
 
-      const newCategory = db
+      const [newCategory] = await db
         .select({ name: categories.name })
         .from(categories)
         .where(eq(categories.id, 1))
-        .get()
+        .limit(1)
 
       expect(newCategory?.name).toBe(payload.name)
 
@@ -168,14 +168,14 @@ describe('Category', () => {
 
       expect(response.code).toBe(200)
 
-      const newCategory = db
+      const [newCategory] = await db
         .select({ name: categories.name })
         .from(categories)
         .where(and(
           eq(categories.id, 1),
           isNull(categories.deletedAt)
         ))
-        .get()
+        .limit(1)
 
       expect(newCategory).toBeFalsy()
 

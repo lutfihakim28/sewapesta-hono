@@ -14,7 +14,7 @@ export const authMiddleware = createMiddleware(async (context, next) => {
     throw new UnauthorizedException(messages.unauthorized)
   }
 
-  if (!user.deletedAt) {
+  if (user.deletedAt) {
     throw new UnauthorizedException('Your account has been deleted by admin.')
   }
 

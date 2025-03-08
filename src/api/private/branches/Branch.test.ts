@@ -47,7 +47,7 @@ describe('Branch', () => {
 
     describe('Filter', async () => {
       test('By Location', async () => {
-        const location = db
+        const [location] = await db
           .select({
             subdistrictCode: subdistricts.code,
             subdistrict: subdistricts.name,
@@ -63,7 +63,7 @@ describe('Branch', () => {
           .innerJoin(districts, eq(subdistricts.districtCode, districts.code))
           .innerJoin(cities, eq(districts.cityCode, cities.code))
           .innerJoin(provinces, eq(cities.provinceCode, provinces.code))
-          .get()
+          .limit(1)
 
         // PROVINCES
 
@@ -344,11 +344,11 @@ describe('Branch', () => {
     })
 
     test('Admin This Branch', async () => {
-      const branch = db
+      const [branch] = await db
         .select()
         .from(branches)
         .where(eq(branches.id, user.Admin.user.branchId))
-        .get()
+        .limit(1)
 
       const _response = await app.request(`${path}/${user.Admin.user.branchId}`, {
         method: 'PUT',
@@ -360,11 +360,11 @@ describe('Branch', () => {
 
       expect(response.code).toBe(200)
 
-      const lastestBranch = db
+      const [lastestBranch] = await db
         .select({ name: branches.name })
         .from(branches)
-        .where(eq(branches.id, 1))
-        .get()
+        .where(eq(branches.id, user.Admin.user.branchId))
+        .limit(1)
 
       expect(lastestBranch?.name).toBe(payload.name)
 
@@ -422,14 +422,14 @@ describe('Branch', () => {
 
       expect(response.code).toBe(200)
 
-      const lastestBranch = db
+      const [lastestBranch] = await db
         .select({ name: branches.name })
         .from(branches)
         .where(and(
-          eq(branches.id, 1),
+          eq(branches.id, adminBranchId),
           isNull(branches.deletedAt)
         ))
-        .get()
+        .limit(1)
 
       expect(lastestBranch?.name).toBeFalsy()
 

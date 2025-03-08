@@ -58,11 +58,11 @@ export abstract class ImageService {
 
   static async delete(param: ParamId) {
     await db.transaction(async (transaction) => {
-      const image = db
+      const [image] = await db
         .select({ id: images.id, path: images.path })
         .from(images)
         .where(eq(images.id, Number(param.id)))
-        .get();
+        .limit(1);
 
 
       if (!image) {

@@ -45,7 +45,7 @@ ProductController.openapi(ProductCreateRoute, async (context) => {
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
   if (jwtPayload.user.role !== RoleEnum.SuperAdmin && jwtPayload.user.branchId !== payload.branchId) {
-    throw new BadRequestException('Requested Branch ID is not match with your Branch ID.')
+    throw new BadRequestException('Requested Branch ID is not match with yours.')
   }
 
   const product = await ProductService.create(payload)
@@ -63,15 +63,10 @@ ProductController.openapi(ProductUpdateRoute, async (context) => {
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
   if (jwtPayload.user.role !== RoleEnum.SuperAdmin && jwtPayload.user.branchId !== payload.branchId) {
-    throw new BadRequestException('Requested Branch ID is not match with your Branch ID.')
+    throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
   }
-
 
   const product = await ProductService.update(+param.id, payload, jwtPayload.user)
-
-  if (!product) {
-    throw new NotFoundException(messages.errorNotFound(`Product with ID ${param.id}`))
-  }
 
   return context.json(new ApiResponseData({
     code: 200,

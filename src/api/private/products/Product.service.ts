@@ -78,19 +78,24 @@ export abstract class ProductService {
   }
 
   static async update(_id: number, payload: ProductRequest, user: User): Promise<Product> {
-    const product = await this.get(_id, user)
+    await this.get(_id, user)
     const { id, ..._ } = columns;
 
     await db
       .update(products)
       .set(payload)
-      .where(eq(products.id, product.id))
+      .where(eq(products.id, _id))
+
+    const product = await this.get(_id, user)
 
     return product
   }
 
   static async delete(_id: number, user: User): Promise<void> {
     const product = await this.get(_id)
+    if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
+      throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
+    }
     await db
       .update(products)
       .set({ deletedAt: dayjs().unix() })

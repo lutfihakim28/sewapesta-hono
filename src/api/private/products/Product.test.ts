@@ -7,19 +7,43 @@ import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiRes
 import { SortEnum } from '@/lib/enums/SortEnum'
 import { db } from 'db'
 import { products } from 'db/schema/products'
-import { eq } from 'drizzle-orm'
+import { and, eq, isNull, not } from 'drizzle-orm'
 import { LoginData } from '@/api/auth/Auth.schema'
+import dayjs from 'dayjs'
 
 const path = '/api/private/products'
 let user: Record<RoleEnum, LoginData>
 const payload: ProductRequest = {
-  name: 'Kategori',
+  name: 'Produk',
   branchId: 1,
   rentalTimeIncrement: 8,
 }
+let testedProduct: Product
+let testedOtherProduct: Product
 
 beforeAll(async () => {
   user = await getTestUsers()
+  const [[product], [otherProduct]] = await Promise.all([
+    db
+      .select()
+      .from(products)
+      .where(and(
+        eq(products.branchId, user.Admin.user.branchId),
+        isNull(products.deletedAt)
+      ))
+      .limit(1),
+    db
+      .select()
+      .from(products)
+      .where(and(
+        not(eq(products.branchId, user.Admin.user.branchId)),
+        isNull(products.deletedAt)
+      ))
+      .limit(1)
+  ])
+
+  testedProduct = product
+  testedOtherProduct = otherProduct
 })
 
 describe('Product', () => {
@@ -143,11 +167,11 @@ describe('Product', () => {
       if (adminBranchId === 1) branchId = 2
       if (adminBranchId === 2) branchId = 3
 
-      const product = db
+      const [product] = await db
         .select({ id: products.id })
         .from(products)
         .where(eq(products.branchId, branchId))
-        .get()
+        .limit(1)
 
       const _response = await app.request(`${path}/${product!.id}`, {
         headers: generateTestHeader(user.Admin.token)
@@ -159,11 +183,11 @@ describe('Product', () => {
     })
 
     test('As Admin This Branch', async () => {
-      const product = db
+      const [product] = await db
         .select({ id: products.id })
         .from(products)
         .where(eq(products.branchId, user.Admin.user.branchId))
-        .get()
+        .limit(1)
 
       const _response = await app.request(`${path}/${product!.id}`, {
         headers: generateTestHeader(user.Admin.token)
@@ -205,7 +229,7 @@ describe('Product', () => {
         headers: generateTestHeader(user.Admin.token)
       })
 
-      const response = await _response.json()
+      const response: ApiResponse = await _response.json()
 
       expect(response.code).toBe(422)
     })
@@ -241,11 +265,11 @@ describe('Product', () => {
       expect(response.code).toBe(200)
       expect(response.data.name).toBe(payload.name)
 
-      const product = db
+      const [product] = await db
         .select({ id: products.id })
         .from(products)
         .where(eq(products.id, response.data.id))
-        .get()
+        .limit(1)
 
       expect(product?.id).toBeTruthy()
 
@@ -266,8 +290,137 @@ describe('Product', () => {
       expect(response.code).toBe(404)
     })
 
-    test.todo('Bad Request')
-    test.todo('Other Branch Admin')
-    test.todo('This Branch Admin')
+    test('Bad Request', async () => {
+      const _response = await app.request(`${path}/${testedProduct.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          name: 1,
+        }),
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(422)
+    })
+
+    test('Deleted', async () => {
+      await db.update(products).set({ deletedAt: dayjs().unix() }).where(eq(products.id, testedProduct.id));
+
+      const _response = await app.request(`${path}/${testedProduct.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(404)
+
+      await db.update(products).set({ deletedAt: null }).where(eq(products.id, testedProduct.id));
+    })
+
+    test('Other Branch Admin', async () => {
+      const _response = await app.request(`${path}/${testedOtherProduct.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(404)
+    })
+
+    test('This Branch Admin Wrong Branch Payload', async () => {
+      const _response = await app.request(`${path}/${testedProduct.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(404)
+    })
+
+    test('This Branch Admin Success', async () => {
+      const _response = await app.request(`${path}/${testedProduct.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          ...payload,
+          branchId: testedProduct.branchId
+        }),
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponseData<Product> = await _response.json()
+
+      expect(response.code).toBe(200)
+      expect(response.data.id).toBe(testedProduct.id)
+      expect(response.data.name).toBe(payload.name)
+
+      await db
+        .update(products)
+        .set({
+          branchId: testedProduct.branchId,
+          name: testedProduct.name,
+          rentalTimeIncrement: testedProduct.rentalTimeIncrement,
+        })
+        .where(eq(products.id, testedProduct.id))
+    })
+  })
+
+  describe('Delete', () => {
+    test('Not Found', async () => {
+      const _response = await app.request(`${path}/99999999`, {
+        method: 'DELETE',
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(404)
+    })
+
+    test('Deleted', async () => {
+      await db.update(products).set({ deletedAt: dayjs().unix() }).where(eq(products.id, testedProduct.id));
+
+      const _response = await app.request(`${path}/${testedProduct.id}`, {
+        method: 'DELETE',
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(404)
+
+      await db.update(products).set({ deletedAt: null }).where(eq(products.id, testedProduct.id));
+    })
+
+    test('Other Branch Admin', async () => {
+      const _response = await app.request(`${path}/${testedOtherProduct.id}`, {
+        method: 'DELETE',
+        body: JSON.stringify(payload),
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(404)
+    })
+
+    test('This Branch Admin', async () => {
+      const _response = await app.request(`${path}/${testedProduct.id}`, {
+        method: 'DELETE',
+        headers: generateTestHeader(user.Admin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(200)
+
+      await db.update(products).set({ deletedAt: null }).where(eq(products.id, testedProduct.id));
+    })
   })
 })
