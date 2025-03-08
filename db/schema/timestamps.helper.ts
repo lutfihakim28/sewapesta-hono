@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
-import { int } from 'drizzle-orm/mysql-core';
+import { bigint } from 'drizzle-orm/mysql-core';
 
 export const timestamps = {
-  createdAt: int('created_at').notNull().$defaultFn(() => dayjs().unix()),
-  updatedAt: int('updated_at').$onUpdateFn(() => dayjs().unix()),
-  deletedAt: int('deleted_at'),
+  createdAt: bigint('created_at', { mode: 'number', unsigned: true }).notNull().$defaultFn(() => dayjs().unix()),
+  updatedAt: bigint('updated_at', { mode: 'number', unsigned: true }).$onUpdateFn(() => dayjs().unix()),
+  deletedAt: bigint('deleted_at', { mode: 'number', unsigned: true }),
 }
