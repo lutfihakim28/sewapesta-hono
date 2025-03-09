@@ -13,10 +13,10 @@
 8. ~~Tes location (unit/e2e test?)~~
 9. ~~Improve auth, save token to db~~
 10. ~~Restructure folder~~
-11. Finish product.test
+11. ~~Finish product.test~~
 12. create item crud
 13. create item test
-14. debug with all test
+14. ~~debug with all test~~
 
 ## WHO
 
@@ -33,7 +33,6 @@
    - Confirm new user request (Owner, Employee, Customer, Agent)
    - Confirm new item request (Owner)
 3. Owner: Who own items for rent
-   - Create or list new items (request)
    - Manage items
    - See their items rent history
    - See their total income or per items
@@ -49,14 +48,10 @@
    - See their income total
    - See their income per period
 5. Customer: Who rent items
-   - Request order
-   - Make payment
    - See their order schedule
    - See their order status
    - See their order history
 6. Agent: Who give recommendation to customer
-   - Request order for unregistered customer
-   - Make payment
    - See their order schedule
    - See their order status
    - See their order history

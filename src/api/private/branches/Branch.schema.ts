@@ -33,10 +33,10 @@ export const BranchExtendedSchema = BranchSchema
 
 export const BranchFilterSchema = z
   .object({
-    provinceCode: z.string().optional().openapi({ example: '33' }),
-    cityCode: z.string().optional().openapi({ example: '33.74' }),
-    districtCode: z.string().optional().openapi({ example: '33.74.12' }),
-    subdistrictCode: z.string().optional().openapi({ example: '33.74.12.1001' })
+    provinceCode: z.string().optional().openapi({ description: 'example: 33' }),
+    cityCode: z.string().optional().openapi({ description: 'example: 33.74' }),
+    districtCode: z.string().optional().openapi({ description: 'example: 33.74.12' }),
+    subdistrictCode: z.string().optional().openapi({ description: 'example: 33.74.12.1001' })
   })
   .merge(SearchSchema)
   .merge(PaginationSchema)
