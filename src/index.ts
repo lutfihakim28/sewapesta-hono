@@ -21,6 +21,7 @@ import CategoryController from './api/private/categories/Category.controller'
 import ProductController from './api/private/products/Product.controller'
 import { adminMiddleware } from './lib/middlewares/admin.middleware'
 import { superadminMiddleware } from './lib/middlewares/superadmin.middleware'
+import UnitController from './api/private/units/Unit.controller'
 
 const app = honoApp()
 
@@ -70,10 +71,13 @@ app.use('/static/*', serveStatic({ root: './' }))
 app.post('/api/private/branches', superadminMiddleware)
 app.delete('/api/private/branches', superadminMiddleware)
 app.use('/api/private/branches/*', adminMiddleware)
+app.use('/api/private/products/*', adminMiddleware)
 app.post('/api/private/categories', superadminMiddleware)
 app.put('/api/private/categories/*', superadminMiddleware)
 app.delete('/api/private/categories/*', superadminMiddleware)
-app.use('/api/private/products/*', adminMiddleware)
+app.post('/api/private/units', superadminMiddleware)
+app.put('/api/private/units/*', superadminMiddleware)
+app.delete('/api/private/units/*', superadminMiddleware)
 
 // AUTH
 app.route('/api/auth', AuthController)
@@ -81,6 +85,7 @@ app.route('/api/auth', AuthController)
 // PRIVATE PATH
 app.route('/api/private/branches', BranchController)
 app.route('/api/private/categories', CategoryController)
+app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
 
 // PUBLIC PATH
