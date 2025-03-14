@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryUpdateRoute } from './Category.route';
+import { CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryUpdateRoute } from './Category.routes';
 import { CategoryService } from './Category.service';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';

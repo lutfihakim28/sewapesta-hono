@@ -1,7 +1,7 @@
 import { messages } from '@/lib/constants/messages';
 import { honoApp } from '@/lib/utils/hono';
 import { Meta } from '@/lib/dtos/Meta.dto';
-import { DistrictRoute } from './District.route';
+import { DistrictRoute } from './District.routes';
 import { DistrictService } from './District.service';
 import { ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 

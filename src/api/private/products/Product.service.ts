@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, getTableColumns, isNull, like, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
 import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
 import { products } from 'db/schema/products';
 import { SortEnum } from '@/lib/enums/SortEnum';
@@ -9,8 +9,7 @@ import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
 import { User } from '../users/User.schema';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
-
-const { createdAt, deletedAt, updatedAt, ...columns } = getTableColumns(products)
+import { productColumns } from './Product.column';
 
 export abstract class ProductService {
   static async list(user: User, query: ProductFilter): Promise<[Product[], number]> {
@@ -32,7 +31,7 @@ export abstract class ProductService {
     const where = this.buildWhereClause(user, query);
 
     const result = await Promise.all([
-      db.select(columns)
+      db.select(productColumns)
         .from(products)
         .where(where)
         .orderBy(orderBy)
@@ -54,7 +53,7 @@ export abstract class ProductService {
       conditions.push(eq(products.branchId, user.branchId))
     }
     const [product] = await db
-      .select(columns)
+      .select(productColumns)
       .from(products)
       .where(and(...conditions))
       .limit(1)
@@ -79,7 +78,7 @@ export abstract class ProductService {
 
   static async update(_id: number, payload: ProductRequest, user: User): Promise<Product> {
     await this.get(_id, user)
-    const { id, ..._ } = columns;
+    const { id, ..._ } = productColumns;
 
     await db
       .update(products)

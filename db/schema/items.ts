@@ -13,7 +13,10 @@ export const items = mysqlTable('items', {
   categoryId: int('category_id').references(() => categories.id),
   ownerId: int('owner_id').references(() => users.id).notNull(),
   ...timestamps,
-}, (table) => [
-  index('item_category_index').on(table.categoryId),
-  index('item_owner_index').on(table.ownerId),
+}, () => [
+  itemCategoryIndex,
+  itemOwnerIndex
 ])
+
+export const itemCategoryIndex = index('item_category_index').on(items.categoryId);
+export const itemOwnerIndex = index('item_owner_index').on(items.ownerId);

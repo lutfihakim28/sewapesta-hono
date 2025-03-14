@@ -10,6 +10,6 @@ export const branches = mysqlTable('branches', {
   address: varchar('address', { length: 255 }).notNull(),
   subdistrictCode: varchar('subdistrict_code', { length: 13 }).references(() => subdistricts.code).notNull(),
   ...timestamps,
-}, (table) => [
-  index('branch_subdistrict_code_index').on(table.subdistrictCode)
-])
+}, () => [branchSubdistrictIndex])
+
+export const branchSubdistrictIndex = index('branch_subdistrict_index').on(branches.subdistrictCode)

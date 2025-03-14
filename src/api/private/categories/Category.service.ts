@@ -1,4 +1,4 @@
-import { and, count, eq, getTableColumns, isNull, like, SQL } from 'drizzle-orm';
+import { and, count, eq, isNull, like, SQL } from 'drizzle-orm';
 import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
@@ -6,14 +6,13 @@ import { countOffset } from '@/lib/utils/countOffset';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
-
-const { createdAt, deletedAt, updatedAt, ...columns } = getTableColumns(categories)
+import { categoryColumns } from './Category.column';
 
 export abstract class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
     const where = this.buildWhereClause(query);
     const result = await Promise.all([
-      db.select(columns)
+      db.select(categoryColumns)
         .from(categories)
         .where(where)
         .limit(Number(query.pageSize || 5))
@@ -56,7 +55,7 @@ export abstract class CategoryService {
 
   private static async check(id: number) {
     const [category] = await db
-      .select(columns)
+      .select(categoryColumns)
       .from(categories)
       .where(and(
         eq(categories.id, id),

@@ -1,5 +1,5 @@
 import { cors } from 'hono/cors'
-import { honoApp } from './lib/utils/hono'
+import { honoApp } from './src/lib/utils/hono'
 import { HTTPException } from 'hono/http-exception'
 import { jwt, } from 'hono/jwt'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
@@ -9,19 +9,21 @@ import { messages } from '@/lib/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/bun'
 import { apiReference } from '@scalar/hono-api-reference'
-import CityController from './api/public/locations/cities/City.controller'
-import DistrictController from './api/public/locations/districts/District.controller'
-import ProvinceController from './api/public/locations/provinces/Province.controller'
-import SubdistrictController from './api/public/locations/subdistricts/Subdistrict.controller'
-import { ApiResponse } from './lib/dtos/ApiResponse.dto'
-import BranchController from './api/private/branches/Branch.controller'
-import { authMiddleware } from './lib/middlewares/auth.middleware'
-import AuthController from './api/auth/Auth.controller'
-import CategoryController from './api/private/categories/Category.controller'
-import ProductController from './api/private/products/Product.controller'
-import { adminMiddleware } from './lib/middlewares/admin.middleware'
-import { superadminMiddleware } from './lib/middlewares/superadmin.middleware'
-import UnitController from './api/private/units/Unit.controller'
+import CityController from './src/api/public/locations/cities/City.controller'
+import DistrictController from './src/api/public/locations/districts/District.controller'
+import ProvinceController from './src/api/public/locations/provinces/Province.controller'
+import SubdistrictController from './src/api/public/locations/subdistricts/Subdistrict.controller'
+import { ApiResponse } from './src/lib/dtos/ApiResponse.dto'
+import BranchController from './src/api/private/branches/Branch.controller'
+import { authMiddleware } from './src/lib/middlewares/auth.middleware'
+import AuthController from './src/api/auth/Auth.controller'
+import CategoryController from './src/api/private/categories/Category.controller'
+import ProductController from './src/api/private/products/Product.controller'
+import { adminMiddleware } from './src/lib/middlewares/admin.middleware'
+import { superadminMiddleware } from './src/lib/middlewares/superadmin.middleware'
+import UnitController from './src/api/private/units/Unit.controller'
+import ImageController from '@/api/private/images/Image.controller'
+// import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
 
@@ -53,7 +55,14 @@ app.onError((error, context) => {
       messages: ['Token expired.']
     }), 401)
   }
-  pinoLogger.error({ error: error.message, stack: error.stack }, 'Unhandled Error')
+
+  // if ('code' in error) {
+  //   if (error.code === MysqlErrorKeys.ER_NO_REFERENCED_ROW_2 || error.code === MysqlErrorKeys.ER_NO_REFERENCED_ROW) {
+
+  //   }
+  // }
+
+  pinoLogger.error({ error: error.message, stack: error.stack, name: error.name }, 'Unhandled Error')
   return context.json(new ApiResponse({
     code: 500,
     messages: [messages.errorServer]
@@ -87,6 +96,7 @@ app.route('/api/private/branches', BranchController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
+app.route('/api/private/images', ImageController)
 
 // PUBLIC PATH
 app.route('/api/public/locations/provinces', ProvinceController)

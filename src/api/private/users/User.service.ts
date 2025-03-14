@@ -1,14 +1,12 @@
 import { db } from 'db';
 import { users } from 'db/schema/users';
-import { and, eq, getTableColumns, isNull } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { User, UserCreate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { messages } from '@/lib/constants/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-
-const { createdAt, deletedAt, password, profileId, refreshToken, updatedAt, ...columns } = getTableColumns(users)
 
 export abstract class UserService {
   static async create(request: UserCreate): Promise<User> {

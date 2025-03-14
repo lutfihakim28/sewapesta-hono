@@ -1,4 +1,4 @@
 import { showRoutes } from 'hono/dev';
-import app from '.';
+import app from '..';
 
 showRoutes(app);

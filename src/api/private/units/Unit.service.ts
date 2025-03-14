@@ -1,4 +1,4 @@
-import { and, count, eq, getTableColumns, isNull, like, SQL } from 'drizzle-orm';
+import { and, count, eq, isNull, like, SQL } from 'drizzle-orm';
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
@@ -6,14 +6,13 @@ import dayjs from 'dayjs';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import { units } from 'db/schema/units';
-
-const { createdAt, deletedAt, updatedAt, ...columns } = getTableColumns(units)
+import { unitColumns } from './Unit.column';
 
 export abstract class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
     const where = this.buildWhereClause(query);
     const result = await Promise.all([
-      db.select(columns)
+      db.select(unitColumns)
         .from(units)
         .where(where)
         .limit(Number(query.pageSize || 5))
@@ -56,7 +55,7 @@ export abstract class UnitService {
 
   private static async check(id: number) {
     const [category] = await db
-      .select(columns)
+      .select(unitColumns)
       .from(units)
       .where(and(
         eq(units.id, id),

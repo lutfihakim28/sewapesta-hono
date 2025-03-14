@@ -9,7 +9,6 @@ import { profiles } from 'db/schema/profiles'
 export const ProfileSchema = createSelectSchema(profiles)
   .pick({
     address: true,
-    id: true,
     name: true,
     phone: true,
     subdistrictCode: true,
@@ -42,8 +41,8 @@ export const UserSchema = createSelectSchema(users)
 export const UserExtendedSchema = UserSchema
   .extend({
     branch: BranchExtendedSchema,
-    profile: ProfileExtendedSchema,
   })
+  .merge(ProfileExtendedSchema.omit({ location: true }))
   .openapi('UserExtended')
 export const UserCreateSchema = createInsertSchema(users)
   .pick({

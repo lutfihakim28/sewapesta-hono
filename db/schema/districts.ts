@@ -5,6 +5,6 @@ export const districts = mysqlTable('districts', {
   code: varchar('code', { length: 8 }).primaryKey(),
   name: varchar('name', { length: 150 }).notNull(),
   cityCode: varchar('city_code', { length: 5 }).references(() => cities.code).notNull()
-}, (table) => [
-  index('district_city_code_index').on(table.cityCode)
-])
+}, () => [districtCityIndex])
+
+export const districtCityIndex = index('district_city_index').on(districts.cityCode)

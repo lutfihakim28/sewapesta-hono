@@ -1,4 +1,4 @@
-import app from '@/index'
+import app from 'index'
 import { ApiResponse, ApiResponseData } from '@/lib/dtos/ApiResponse.dto'
 import { describe, test, expect, beforeEach } from 'bun:test'
 import { LoginData } from './Auth.schema'

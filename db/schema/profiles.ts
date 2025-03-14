@@ -9,6 +9,6 @@ export const profiles = mysqlTable('profiles', {
   address: varchar('address', { length: 255 }),
   subdistrictCode: varchar('subdistrict_code', { length: 15 }).references(() => subdistricts.code).notNull(),
   ...timestamps,
-}, (table) => ([
-  index('profile_subdistrict_code_index').on(table.subdistrictCode),
-]))
+}, () => ([profileSubdistrictIndex]))
+
+export const profileSubdistrictIndex = index('profile_subdistrict_index').on(profiles.subdistrictCode);

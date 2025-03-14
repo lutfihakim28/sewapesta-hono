@@ -17,7 +17,9 @@ export const itemMutations = mysqlTable('item_mutations', {
   quantity: int('quantity').notNull(),
   description: text('description'),
   ...timestamps,
-}, (table) => [
-  index('mutation_type_index').on(table.type),
-  index('mutation_item_index').on(table.itemId),
+}, () => [
+  mutationItemIndex,
+  mutationTypeIndex
 ])
+export const mutationTypeIndex = index('mutation_type_index').on(itemMutations.type);
+export const mutationItemIndex = index('mutation_item_index').on(itemMutations.itemId);

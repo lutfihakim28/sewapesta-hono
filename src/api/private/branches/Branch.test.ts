@@ -1,5 +1,5 @@
 import { login } from '@/api/auth/Auth.test'
-import app from '@/index'
+import app from 'index'
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto'
 import { RoleEnum } from '@/lib/enums/RoleEnum'
 import { beforeAll, describe, expect, test } from 'bun:test'

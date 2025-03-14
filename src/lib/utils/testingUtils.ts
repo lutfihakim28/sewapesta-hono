@@ -31,9 +31,9 @@ async function getUserLogin(role: RoleEnum) {
   return response.data;
 }
 
-export function generateTestHeader(token?: string) {
+export function generateTestHeader(token?: string, contentType = 'application/json') {
   const header = new Headers({
-    'Content-Type': 'application/json'
+    'Content-Type': contentType
   })
 
   if (token) {

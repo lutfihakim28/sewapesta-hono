@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { BranchCreateRoute, BranchDeleteRoute, BranchDetailRoute, BranchListRoute, BranchUpdateRoute } from './Branch.route';
+import { BranchCreateRoute, BranchDeleteRoute, BranchDetailRoute, BranchListRoute, BranchUpdateRoute } from './Branch.routes';
 import { BranchService } from './Branch.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';

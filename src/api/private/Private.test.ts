@@ -1,4 +1,4 @@
-import app from '@/index'
+import app from 'index'
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { describe, expect, setSystemTime, test } from 'bun:test'
 import { login } from '../auth/Auth.test';

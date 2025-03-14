@@ -18,4 +18,5 @@ export const messages = {
   successUpdate: (data: string) => `${data.charAt(0).toUpperCase() + data.slice(1)} updated successfully.`,
   successPatch: (data: string, field: string) => `${data.charAt(0).toUpperCase() + data.slice(1)}'s ${field} updated successfully.`,
   successDelete: (data: string) => `${data.charAt(0).toUpperCase() + data.slice(1)} deleted successfully.`,
+  successUpload: (data: string) => `${data} uploaded successfully.`,
 }

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, getTableColumns, isNull, like, or, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
 import { BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
@@ -10,12 +10,10 @@ import { locationQuery } from '@/api/public/locations/Location.query';
 import { SortEnum } from '@/lib/enums/SortEnum';
 import { SubdistrictService } from '@/api/public/locations/subdistricts/Subdistrict.service';
 import { logger } from '@/lib/utils/logger';
-
-const { createdAt, updatedAt, deletedAt, ...columns } = getTableColumns(branches);
-
+import { branchColumns } from './Branch.column';
 export abstract class BranchService {
   static async list(query: BranchFilter): Promise<[BranchExtended[], number]> {
-    const { subdistrictCode, ...selectedColumns } = columns
+    const { subdistrictCode, ...selectedColumns } = branchColumns
 
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: BranchColumn = 'id';
@@ -62,7 +60,7 @@ export abstract class BranchService {
   }
 
   static async get(id: number): Promise<BranchExtended> {
-    const { subdistrictCode, ...selectedColumns } = columns
+    const { subdistrictCode, ...selectedColumns } = branchColumns
     const [branch] = await db
       .with(locationQuery)
       .select({
@@ -94,7 +92,7 @@ export abstract class BranchService {
   }
 
   static async create(payload: BranchRequest): Promise<BranchExtended> {
-    const { id, ..._ } = columns;
+    const { id, ..._ } = branchColumns;
 
     await SubdistrictService.checkCode(payload.subdistrictCode)
 
@@ -114,7 +112,7 @@ export abstract class BranchService {
   }
 
   static async update(_id: number, payload: BranchRequest): Promise<BranchExtended> {
-    const { id, ..._ } = columns;
+    const { id, ..._ } = branchColumns;
 
     const updatedBranch = await this.get(_id)
     await SubdistrictService.checkCode(payload.subdistrictCode)

@@ -18,6 +18,7 @@
 13. create item test
 14. ~~debug with all test~~
 15. make category and unit name unique
+16. handle SQL error
 
 ## WHO
 

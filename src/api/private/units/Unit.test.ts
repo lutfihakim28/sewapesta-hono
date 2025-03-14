@@ -1,6 +1,6 @@
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 import { beforeAll, describe, expect, test } from 'bun:test'
-import app from '@/index';
+import app from 'index';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { generateTestHeader, getTestUsers } from '@/lib/utils/testingUtils';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
@@ -19,7 +19,7 @@ beforeAll(async () => {
   user = await getTestUsers()
 })
 
-describe.only('Unit', () => {
+describe('Unit', () => {
   test('List', async () => {
     const query: UnitFilter = {
       keyword: 'pcs'
