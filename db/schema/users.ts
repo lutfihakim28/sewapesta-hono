@@ -20,15 +20,12 @@ export const users = mysqlTable('users', {
       RoleEnum.SuperAdmin,
     ]
   }).notNull(),
-  profileId: int('profile_id').references(() => profiles.id).unique().notNull(),
   refreshToken: varchar('refresh_token', { length: 255 }).unique(),
   ...timestamps,
 }, () => ([
   userBranchIndex,
-  userProfileIndex,
   userRoleIndex
 ]))
 
 export const userBranchIndex = index('user_branch_index').on(users.branchId);
-export const userProfileIndex = index('user_profile_index').on(users.profileId);
 export const userRoleIndex = index('user_role_index').on(users.role);

@@ -15,7 +15,6 @@ import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
 import { profiles } from 'db/schema/profiles';
 import { locationQuery } from '@/api/public/locations/Location.query';
 import { itemColumns } from './Item.column';
-import { profileColumns } from '../users/User.column';
 
 export abstract class ItemService {
   static async list(user: User, query: ItemFilter): Promise<ItemExtended> {

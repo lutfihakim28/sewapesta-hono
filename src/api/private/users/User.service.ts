@@ -11,18 +11,20 @@ import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 export abstract class UserService {
   static async create(request: UserCreate): Promise<User> {
     const user = await db.transaction(async (tx) => {
-      const [profile] = await tx
-        .insert(profiles)
-        .values(request.profile)
-        .$returningId()
-
       const [user] = await tx
         .insert(users)
-        .values({
-          ...request,
-          profileId: profile.id,
-        })
+        .values(request)
         .$returningId()
+
+      if (request.profile) {
+        await tx
+          .insert(profiles)
+          .values({
+            ...request.profile,
+            userId: user.id
+          })
+          .$returningId()
+      }
 
       return user
     })

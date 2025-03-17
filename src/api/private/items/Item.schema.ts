@@ -6,7 +6,7 @@ import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum';
 import { SearchSchema } from '@/lib/schemas/Search.schema';
 import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
 import { SortSchema } from '@/lib/schemas/Sort.schema';
-import { UserExtendedSchema } from '../users/User.schema';
+import { ProfileSchema } from '../users/User.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { messages } from '@/lib/constants/messages';
 import { validationMessages } from '@/lib/constants/validationMessage';
@@ -37,8 +37,8 @@ export const ProductItemSchema = createSelectSchema(productsItems).pick({
 export const ItemExtendedSchema = ItemSchema.omit({
   ownerId: true,
 }).extend({
-  products: z.array(ProductItemSchema),
-  owner: UserExtendedSchema,
+  // products: z.array(ProductItemSchema),
+  owner: ProfileSchema,
   images: z.array(ImageSchema)
 })
   .openapi('ItemExtended')

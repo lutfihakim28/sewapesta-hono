@@ -12,6 +12,7 @@ export const ProfileSchema = createSelectSchema(profiles)
     name: true,
     phone: true,
     subdistrictCode: true,
+    userId: true,
   })
   .openapi('Profile')
 export const ProfileExtendedSchema = ProfileSchema
@@ -52,10 +53,10 @@ export const UserCreateSchema = createInsertSchema(users)
     username: true
   })
   .extend({
-    profile: ProfileCreateSchema
+    profile: ProfileCreateSchema.optional()
   }).openapi('UserCreate')
 export const UserUpdateSchema = UserCreateSchema.extend({
-  profile: ProfileUpdateSchema
+  profile: ProfileUpdateSchema.optional()
 }).optional().openapi('UserUpdate')
 
 export type User = z.infer<typeof UserSchema>
