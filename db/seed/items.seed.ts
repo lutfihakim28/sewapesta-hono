@@ -19,10 +19,6 @@ export async function seedItems({
   categories,
 }: ItemSeedProp) {
   console.log('Seeding items...');
-  const price = faker.number.int({
-    min: 100,
-    max: 10000000,
-  }).toFixed(2)
   const [item] = await db
     .insert(items)
     .values({
@@ -34,7 +30,10 @@ export async function seedItems({
         strategy: 'any-length',
       }),
       categoryId: faker.helpers.arrayElement(categories),
-      price,
+      price: faker.number.int({
+        min: 100,
+        max: 10000000,
+      }),
       unitId: faker.helpers.arrayElement(units),
       quantity: faker.number.int({
         min: 1,
@@ -42,7 +41,10 @@ export async function seedItems({
       }),
       ownerId: owner,
     })
-    .$returningId();
+    .returning({
+      id: items.id,
+      price: items.price,
+    });
 
   await Promise.all(products.map(async (product) => {
     return db
@@ -51,9 +53,9 @@ export async function seedItems({
         itemId: item.id,
         productId: product,
         overtimeType: faker.helpers.enumValue(OvertimeTypeEnum),
-        overtimeMultiplier: (Math.round((faker.number.float({ min: 0, max: 0.3 }) + Number.EPSILON) * 100) / 100).toFixed(2),
-        overtimePrice: faker.number.int({ min: 0, max: Number(price) }).toFixed(2),
-        overtimeRatio: (Math.round((faker.number.float({ min: 0, max: 0.8 }) + Number.EPSILON) * 100) / 100).toFixed(2),
+        overtimeMultiplier: (Math.round((faker.number.float({ min: 0, max: 0.3 }) + Number.EPSILON) * 100) / 100),
+        overtimePrice: faker.number.int({ min: 0, max: Number(item.price) }),
+        overtimeRatio: (Math.round((faker.number.float({ min: 0, max: 0.8 }) + Number.EPSILON) * 100) / 100),
       });
   }))
 }

@@ -20,15 +20,6 @@ export const ProductSchema = createSelectSchema(products)
   })
   .openapi('Product')
 
-export const ProductExtendedSchema = ProductSchema
-  .omit({
-    branchId: true,
-  })
-  .extend({
-    branch: BranchExtendedSchema,
-  })
-  .openapi('ProductExtended')
-
 export const ProductFilterSchema = z.object({
   branchId: z.string().optional()
 })
@@ -64,10 +55,8 @@ export const ProductRequestSchema = createInsertSchema(products, {
   name: true,
 }).openapi('ProductRequest')
 
-export const ProductResponseExtendedDataSchema = ApiResponseDataSchema(ProductExtendedSchema, messages.successDetail('product'))
 export const ProductResponseDataSchema = ApiResponseDataSchema(ProductSchema, messages.successDetail('product'))
 
 export type Product = z.infer<typeof ProductSchema>
-export type ProductExtended = z.infer<typeof ProductExtendedSchema>
 export type ProductFilter = z.infer<typeof ProductFilterSchema>
 export type ProductRequest = z.infer<typeof ProductRequestSchema>

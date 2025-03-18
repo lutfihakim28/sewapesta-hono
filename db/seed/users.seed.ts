@@ -17,26 +17,30 @@ export async function seedUsers(branchId: number, subdistrictsCode: string[], ro
   })
   console.log(`Seeding ${username} for branch ${branchId}...`)
   return await db.transaction(async (tx) => {
-    const [profile] = await tx
-      .insert(profiles)
-      .values({
-        name,
-        phone: faker.helpers.fromRegExp('628[1-9][0-9]{8,9}'),
-        address: faker.location.streetAddress(),
-        subdistrictCode: faker.helpers.arrayElement(subdistrictsCode),
-      })
-      .$returningId()
-
     const [user] = await tx
       .insert(users)
       .values({
         password: await Bun.password.hash('password'),
-        profileId: profile.id,
         username,
         role,
         branchId,
       })
-      .$returningId()
+      .returning({
+        id: users.id
+      })
+
+    await tx
+      .insert(profiles)
+      .values({
+        name,
+        userId: user.id,
+        phone: faker.helpers.fromRegExp('628[1-9][0-9]{8,9}'),
+        address: faker.location.streetAddress(),
+        subdistrictCode: faker.helpers.arrayElement(subdistrictsCode),
+      })
+      .returning({
+        id: profiles.id
+      })
 
     id++
 

@@ -48,8 +48,8 @@ export const ItemFilterSchema = z.object({
   ownerId: z.number().optional(),
   productId: z.number().optional(),
   branchId: z.number().optional(),
-  minPrice: NumericSchema('Min. Price').optional(),
-  maxPrice: NumericSchema('Max. Price').optional(),
+  minPrice: z.number().optional(),
+  maxPrice: z.number().optional(),
   overtimeType: z.nativeEnum(OvertimeTypeEnum).optional(),
 })
   .merge(SearchSchema)

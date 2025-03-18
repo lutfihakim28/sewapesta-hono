@@ -1,14 +1,14 @@
 import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
 import dayjs from 'dayjs';
-import { bigint, index, int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const images = mysqlTable('images', {
-  id: int('id').primaryKey().autoincrement(),
-  path: varchar('path', { length: 255 }).notNull().unique(),
-  url: varchar('url', { length: 255 }).notNull().unique(),
-  reference: varchar('reference', { length: 7, enum: [ImageReferenceEnum.PROFILE, ImageReferenceEnum.ITEM] }).notNull(),
-  referenceId: int('reference_id').notNull(),
-  createdAt: bigint('created_at', { mode: 'number' }).notNull().$defaultFn(() => dayjs().unix()),
+export const images = sqliteTable('images', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  path: text('path').notNull().unique(),
+  url: text('url').notNull().unique(),
+  reference: text('reference', { enum: [ImageReferenceEnum.PROFILE, ImageReferenceEnum.ITEM] }).notNull(),
+  referenceId: integer('reference_id').notNull(),
+  createdAt: integer('created_at').notNull().$defaultFn(() => dayjs().unix()),
 }, () => [
   imageReferenceIndex,
   imageReferenceIdIndex,

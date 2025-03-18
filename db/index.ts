@@ -1,14 +1,8 @@
 import { logger } from '@/lib/utils/logger';
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
+import { Database } from 'bun:sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
 
-const connection = await mysql.createPool({
-  host: Bun.env.DB_HOST,
-  user: Bun.env.DB_USER,
-  password: Bun.env.DB_PASSWORD,
-  database: Bun.env.DB_DATABASE,
-});
-
+const connection = new Database('sewapesta.db')
 export const db = drizzle(connection, {
   logger: {
     logQuery: (query, params) => {

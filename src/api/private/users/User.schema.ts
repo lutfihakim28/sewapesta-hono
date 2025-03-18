@@ -12,7 +12,6 @@ export const ProfileSchema = createSelectSchema(profiles)
     name: true,
     phone: true,
     subdistrictCode: true,
-    userId: true,
   })
   .openapi('Profile')
 export const ProfileExtendedSchema = ProfileSchema
@@ -39,12 +38,11 @@ export const UserSchema = createSelectSchema(users)
     branchId: true,
   })
   .openapi('User')
+
 export const UserExtendedSchema = UserSchema
-  .extend({
-    branch: BranchExtendedSchema,
-  })
-  .merge(ProfileExtendedSchema.omit({ location: true }))
+  .merge(ProfileExtendedSchema)
   .openapi('UserExtended')
+
 export const UserCreateSchema = createInsertSchema(users)
   .pick({
     branchId: true,
@@ -55,6 +53,7 @@ export const UserCreateSchema = createInsertSchema(users)
   .extend({
     profile: ProfileCreateSchema.optional()
   }).openapi('UserCreate')
+
 export const UserUpdateSchema = UserCreateSchema.extend({
   profile: ProfileUpdateSchema.optional()
 }).optional().openapi('UserUpdate')

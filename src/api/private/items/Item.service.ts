@@ -54,17 +54,16 @@ export abstract class ItemService {
           id: users.id,
         }
       })
-        .from(items, { useIndex: [itemCategoryIndex, itemOwnerIndex] })
+        .from(items)
         .innerJoin(productsItems, eq(productsItems.itemId, items.id))
         .innerJoin(products, eq(products.id, productsItems.productId))
-        .innerJoin(users, eq(users.id, items.ownerId), { useIndex: [userBranchIndex] })
-        .innerJoin(profiles, eq(profiles.id, users.profileId))
+        .innerJoin(users, eq(users.id, items.ownerId))
+        .innerJoin(profiles, eq(profiles.userId, users.id))
         .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
         .innerJoin(branches, eq(branches.id, users.branchId))
         .leftJoin(
           images,
           and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
-          { useIndex: [imageReferenceIdIndex, imageReferenceIndex] }
         )
         .where(where)
         .orderBy(orderBy)

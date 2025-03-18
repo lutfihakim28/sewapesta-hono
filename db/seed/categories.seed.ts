@@ -28,7 +28,9 @@ export async function seedCategories() {
         name: 'Others',
       },
     ])
-    .$returningId();
+    .returning({
+      id: categories.id
+    })
 
   return _categories.map((category) => category.id);
 }

@@ -14,7 +14,9 @@ export abstract class UserService {
       const [user] = await tx
         .insert(users)
         .values(request)
-        .$returningId()
+        .returning({
+          id: users.id
+        })
 
       if (request.profile) {
         await tx
@@ -23,7 +25,6 @@ export abstract class UserService {
             ...request.profile,
             userId: user.id
           })
-          .$returningId()
       }
 
       return user
