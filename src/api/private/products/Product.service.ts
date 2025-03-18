@@ -69,7 +69,9 @@ export abstract class ProductService {
     const [newProduct] = await db
       .insert(products)
       .values(payload)
-      .$returningId()
+      .returning({
+        id: products.id
+      })
 
     const product = await this.get(newProduct.id)
 

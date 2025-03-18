@@ -1,16 +1,15 @@
 import { branches } from 'db/schema/branches';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamps } from "db/schema/timestamps.helper";
 import { profiles } from './profiles';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { index, int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 
-export const users = mysqlTable('users', {
-  id: int('id').primaryKey().autoincrement(),
-  username: varchar('username', { length: 100 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
-  branchId: int('branch_id').references(() => branches.id).notNull(),
-  role: varchar('role', {
-    length: 10,
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  username: text('username').notNull().unique(),
+  password: text('password').notNull(),
+  branchId: integer('branch_id').references(() => branches.id).notNull(),
+  role: text('role', {
     enum: [
       RoleEnum.Admin,
       RoleEnum.Agent,
@@ -20,7 +19,7 @@ export const users = mysqlTable('users', {
       RoleEnum.SuperAdmin,
     ]
   }).notNull(),
-  refreshToken: varchar('refresh_token', { length: 255 }).unique(),
+  refreshToken: text('refresh_token').unique(),
   ...timestamps,
 }, () => ([
   userBranchIndex,

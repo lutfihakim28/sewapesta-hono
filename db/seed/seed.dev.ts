@@ -63,5 +63,3 @@ await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
     )
   }))
 }))
-
-db.$client.end()

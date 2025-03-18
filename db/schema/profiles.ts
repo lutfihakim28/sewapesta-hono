@@ -1,15 +1,15 @@
 import { subdistricts } from 'db/schema/subdistricts';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamps } from './timestamps.helper';
-import { index, int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 import { users } from './users';
 
-export const profiles = mysqlTable('profiles', {
-  id: int('id').primaryKey().autoincrement(),
-  name: varchar('name', { length: 100 }).notNull(),
-  phone: varchar('phone', { length: 15 }).notNull(),
-  address: varchar('address', { length: 255 }),
-  subdistrictCode: varchar('subdistrict_code', { length: 15 }).references(() => subdistricts.code).notNull(),
-  userId: int('user_id').references(() => users.id).unique().notNull(),
+export const profiles = sqliteTable('profiles', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  phone: text('phone').notNull(),
+  address: text('address'),
+  subdistrictCode: text('subdistrict_code').references(() => subdistricts.code).notNull(),
+  userId: integer('user_id').references(() => users.id).unique().notNull(),
   ...timestamps,
 }, () => ([
   profileSubdistrictIndex,

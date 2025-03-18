@@ -99,7 +99,9 @@ export abstract class BranchService {
     const [_branch] = await db
       .insert(branches)
       .values(payload)
-      .$returningId()
+      .returning({
+        id: branches.id
+      })
 
     const newBranch = await this.get(_branch.id)
 
@@ -124,6 +126,7 @@ export abstract class BranchService {
         eq(branches.id, _id),
         isNull(branches.deletedAt)
       ))
+      .returning()
 
     logger.debug({
       id: _id,
@@ -146,6 +149,7 @@ export abstract class BranchService {
         eq(branches.id, id),
         isNull(branches.deletedAt)
       ))
+      .returning()
 
     logger.debug({
       id,
