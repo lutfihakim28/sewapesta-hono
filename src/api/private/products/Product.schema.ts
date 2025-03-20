@@ -6,7 +6,6 @@ import { SearchSchema } from '@/lib/schemas/Search.schema';
 import { z } from '@hono/zod-openapi';
 import { products } from 'db/schema/products';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { BranchExtendedSchema } from '../branches/Branch.schema';
 import { SortSchema } from '@/lib/schemas/Sort.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect

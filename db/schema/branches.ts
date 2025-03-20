@@ -10,6 +10,4 @@ export const branches = sqliteTable('branches', {
   address: text('address').notNull(),
   subdistrictCode: text('subdistrict_code').references(() => subdistricts.code).notNull(),
   ...timestamps,
-}, () => [branchSubdistrictIndex])
-
-export const branchSubdistrictIndex = index('branch_subdistrict_index').on(branches.subdistrictCode)
+}, (table) => [index('branch_subdistrict_index').on(table.subdistrictCode)])

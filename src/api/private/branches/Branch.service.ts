@@ -1,5 +1,5 @@
 import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
-import { BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
+import { Branch, BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
@@ -11,6 +11,10 @@ import { SortEnum } from '@/lib/enums/SortEnum';
 import { SubdistrictService } from '@/api/public/locations/subdistricts/Subdistrict.service';
 import { logger } from '@/lib/utils/logger';
 import { branchColumns } from './Branch.column';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { User } from '../users/User.schema';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { ForbiddenException } from '@/lib/exceptions/ForbiddenException';
 export abstract class BranchService {
   static async list(query: BranchFilter): Promise<[BranchExtended[], number]> {
     const { subdistrictCode, ...selectedColumns } = branchColumns
@@ -115,23 +119,22 @@ export abstract class BranchService {
 
   static async update(_id: number, payload: BranchRequest): Promise<BranchExtended> {
     const { id, ..._ } = branchColumns;
-
-    const updatedBranch = await this.get(_id)
     await SubdistrictService.checkCode(payload.subdistrictCode)
 
-    const [_branch] = await db
+    await db
       .update(branches)
       .set(payload)
       .where(and(
         eq(branches.id, _id),
         isNull(branches.deletedAt)
       ))
-      .returning()
+
+    const updatedBranch = await this.get(_id)
 
     logger.debug({
       id: _id,
       payload,
-      result: _branch,
+      result: updatedBranch,
     }, 'BranchService.update ')
 
     return updatedBranch
@@ -155,6 +158,24 @@ export abstract class BranchService {
       id,
       result: branch,
     }, 'BranchService.delete ')
+  }
+
+  static async check(id: number, user: User) {
+    if (user.role !== RoleEnum.SuperAdmin && user.branchId !== id) {
+      throw new ForbiddenException('Selected Branch ID not match with your Branch ID.')
+    }
+    const [branch] = await db
+      .select(branchColumns)
+      .from(branches)
+      .where(and(
+        eq(branches.id, id),
+        isNull(branches.deletedAt)
+      ))
+      .limit(1)
+
+    if (!branch) {
+      throw new BadRequestException(messages.errorConstraint('Branch'))
+    }
   }
 
   private static async count(query?: SQL<unknown>) {

@@ -1,6 +1,5 @@
 import { users } from 'db/schema/users'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { BranchExtendedSchema } from '../branches/Branch.schema'
 import { z } from 'zod'
 
 import { LocationSchema } from '@/api/public/locations/Location.schema'

@@ -10,13 +10,10 @@ export const items = sqliteTable('items', {
   quantity: integer('quantity').notNull().default(1),
   price: real('price').notNull().default(0),
   unitId: integer('unit').references(() => units.id).notNull(),
-  categoryId: integer('category_id').references(() => categories.id),
+  categoryId: integer('category_id').references(() => categories.id).notNull(),
   ownerId: integer('owner_id').references(() => users.id).notNull(),
   ...timestamps,
-}, () => [
-  itemCategoryIndex,
-  itemOwnerIndex
+}, (table) => [
+  index('item_category_index').on(table.categoryId),
+  index('item_owner_index').on(table.ownerId),
 ])
-
-export const itemCategoryIndex = index('item_category_index').on(items.categoryId);
-export const itemOwnerIndex = index('item_owner_index').on(items.ownerId);

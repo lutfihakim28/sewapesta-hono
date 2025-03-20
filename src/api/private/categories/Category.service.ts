@@ -1,4 +1,4 @@
-import { and, count, eq, isNull, like, SQL } from 'drizzle-orm';
+import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import { categoryColumns } from './Category.column';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 
 export abstract class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
@@ -24,13 +25,17 @@ export abstract class CategoryService {
   }
 
   static async create(payload: CategoryRequest): Promise<void> {
+    await this.checkAvailability(payload.name)
     await db
       .insert(categories)
       .values(payload)
   }
 
   static async update(id: number, payload: CategoryRequest): Promise<void> {
-    await this.check(id)
+    await Promise.all([
+      this.check(id),
+      this.checkAvailability(payload.name, id)
+    ])
     await db
       .update(categories)
       .set(payload)
@@ -53,7 +58,7 @@ export abstract class CategoryService {
       ))
   }
 
-  private static async check(id: number) {
+  static async check(id: number) {
     const [category] = await db
       .select(categoryColumns)
       .from(categories)
@@ -63,7 +68,28 @@ export abstract class CategoryService {
       ))
 
     if (!category) {
-      throw new NotFoundException(messages.errorNotFound(`Category with ID ${id}`))
+      throw new NotFoundException(messages.errorConstraint('Category'))
+    }
+  }
+
+  static async checkAvailability(name: string, id?: number) {
+    const conditions = [
+      isNull(categories.deletedAt),
+      eq(categories.name, name)
+    ]
+
+    if (id) {
+      conditions.push(not(eq(categories.id, id)))
+    }
+    const available = await db
+      .select()
+      .from(categories)
+      .where(and(
+        ...conditions
+      ))
+
+    if (available.length) {
+      throw new BadRequestException(messages.uniqueConstraint(`Category\'s name (${name})`))
     }
   }
 

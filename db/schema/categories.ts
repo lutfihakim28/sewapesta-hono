@@ -3,6 +3,6 @@ import { timestamps } from "db/schema/timestamps.helper";
 
 export const categories = sqliteTable('categories', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
+  name: text('name').notNull().unique(),
   ...timestamps,
 })

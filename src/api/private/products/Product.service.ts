@@ -10,6 +10,8 @@ import dayjs from 'dayjs';
 import { User } from '../users/User.schema';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { productColumns } from './Product.column';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { BranchService } from '../branches/Branch.service';
 
 export abstract class ProductService {
   static async list(user: User, query: ProductFilter): Promise<[Product[], number]> {
@@ -43,13 +45,13 @@ export abstract class ProductService {
     return result
   }
 
-  static async get(id: number, user?: User): Promise<Product> {
+  static async get(id: number, user: User): Promise<Product> {
     const conditions = [
       eq(products.id, id),
       isNull(products.deletedAt),
     ]
 
-    if (user?.role === RoleEnum.Admin) {
+    if (user.role === RoleEnum.Admin) {
       conditions.push(eq(products.branchId, user.branchId))
     }
     const [product] = await db
@@ -65,7 +67,8 @@ export abstract class ProductService {
     return product
   }
 
-  static async create(payload: ProductRequest): Promise<Product> {
+  static async create(payload: ProductRequest, user: User): Promise<Product> {
+    await BranchService.check(payload.branchId, user)
     const [newProduct] = await db
       .insert(products)
       .values(payload)
@@ -73,27 +76,34 @@ export abstract class ProductService {
         id: products.id
       })
 
-    const product = await this.get(newProduct.id)
+    const product = await this.get(newProduct.id, user)
 
     return product
   }
 
-  static async update(_id: number, payload: ProductRequest, user: User): Promise<Product> {
-    await this.get(_id, user)
-    const { id, ..._ } = productColumns;
+  static async update(id: number, payload: ProductRequest, user: User): Promise<Product> {
+    await BranchService.check(payload.branchId, user)
+    const conditions = [
+      eq(products.id, id),
+      isNull(products.deletedAt),
+    ]
+
+    if (user.role === RoleEnum.Admin) {
+      conditions.push(eq(products.branchId, user.branchId))
+    }
 
     await db
       .update(products)
       .set(payload)
-      .where(eq(products.id, _id))
+      .where(and(...conditions))
 
-    const product = await this.get(_id, user)
+    const product = await this.get(id, user)
 
     return product
   }
 
-  static async delete(_id: number, user: User): Promise<void> {
-    const product = await this.get(_id)
+  static async delete(id: number, user: User): Promise<void> {
+    const product = await this.get(id, user)
     if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
       throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
     }
@@ -103,6 +113,29 @@ export abstract class ProductService {
       .where(and(
         eq(products.id, product.id)
       ))
+  }
+
+  static async check(id: number, user: User) {
+    const conditions: ReturnType<typeof and>[] = [
+      eq(products.id, id),
+      isNull(products.deletedAt)
+    ]
+
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(eq(products.branchId, user.branchId))
+    }
+
+    const [product] = await db
+      .select(productColumns)
+      .from(products)
+      .where(and(
+        ...conditions
+      ))
+      .limit(1)
+
+    if (!product) {
+      throw new BadRequestException(messages.errorConstraint('Product'))
+    }
   }
 
   private static async count(query?: SQL<unknown>): Promise<number> {

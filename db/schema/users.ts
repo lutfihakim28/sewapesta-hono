@@ -21,10 +21,7 @@ export const users = sqliteTable('users', {
   }).notNull(),
   refreshToken: text('refresh_token').unique(),
   ...timestamps,
-}, () => ([
-  userBranchIndex,
-  userRoleIndex
+}, (table) => ([
+  index('user_branch_index').on(table.branchId),
+  index('user_role_index').on(table.role),
 ]))
-
-export const userBranchIndex = index('user_branch_index').on(users.branchId);
-export const userRoleIndex = index('user_role_index').on(users.role);

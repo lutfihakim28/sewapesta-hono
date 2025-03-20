@@ -6,12 +6,12 @@ export class Meta {
 
   constructor(data: {
     page: number | string
-    pageSize: number | string
+    pageSize?: number | string
     total: number
   }) {
     this.page = Number(data.page);
-    this.pageSize = Number(data.pageSize);
-    this.pageCount = Math.ceil(data.total / Number(data.pageSize));
+    this.pageSize = Number(data.pageSize || 5);
+    this.pageCount = Math.ceil(data.total / Number(data.pageSize || 5));
     this.totalData = data.total
   }
 }

@@ -7,11 +7,12 @@ import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { messages } from '@/lib/constants/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
 
 export abstract class UserService {
   static async create(request: UserCreate): Promise<User> {
-    const user = await db.transaction(async (tx) => {
-      const [user] = await tx
+    const user = await db.transaction(async (transaction) => {
+      const [user] = await transaction
         .insert(users)
         .values(request)
         .returning({
@@ -19,7 +20,7 @@ export abstract class UserService {
         })
 
       if (request.profile) {
-        await tx
+        await transaction
           .insert(profiles)
           .values({
             ...request.profile,
@@ -71,18 +72,26 @@ export abstract class UserService {
     return user
   }
 
-  static async check(id: number) {
+  static async check(id: number, loggedUser: User) {
+    const conditions: ReturnType<typeof and>[] = [
+      eq(users.id, id),
+      isNull(users.deletedAt)
+    ]
+
+    if (loggedUser.role !== RoleEnum.SuperAdmin) {
+      conditions.push(eq(users.branchId, loggedUser.branchId))
+    }
+
     const [user] = await db
       .select({ id: users.id })
       .from(users)
       .where(and(
-        eq(users.id, id),
-        isNull(users.deletedAt)
+        ...conditions
       ))
       .limit(1)
 
     if (!user) {
-      throw new NotFoundException(messages.errorNotFound(`User with ID ${id}`))
+      throw new NotFoundException(messages.errorConstraint('User'))
     }
   }
 }

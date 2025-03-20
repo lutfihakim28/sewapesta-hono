@@ -37,7 +37,7 @@ export const ProductItemSchema = createSelectSchema(productsItems).pick({
 export const ItemExtendedSchema = ItemSchema.omit({
   ownerId: true,
 }).extend({
-  // products: z.array(ProductItemSchema),
+  products: z.array(ProductItemSchema),
   owner: ProfileSchema,
   images: z.array(ImageSchema)
 })
@@ -72,9 +72,18 @@ const ProductItemRequestSchema = createInsertSchema(productsItems, {
     invalid_type_error: validationMessages.number('Product ID'),
     required_error: validationMessages.required('Product ID'),
   }),
-  overtimeMultiplier: NumericSchema('Overime Multiplier'),
-  overtimePrice: NumericSchema('Overtime Price'),
-  overtimeRatio: NumericSchema('Overtime Ratio'),
+  overtimeMultiplier: z.number({
+    invalid_type_error: validationMessages.number('Overtime Multiplier'),
+    required_error: validationMessages.required('Price'),
+  }),
+  overtimePrice: z.number({
+    invalid_type_error: validationMessages.number('Overtime Price'),
+    required_error: validationMessages.required('Overtime Price'),
+  }),
+  overtimeRatio: z.number({
+    invalid_type_error: validationMessages.number('Overtime Ratio'),
+    required_error: validationMessages.required('Overtime Ratio'),
+  }),
   overtimeType: z.nativeEnum(OvertimeTypeEnum, {
     invalid_type_error: validationMessages.enum('Overtime Type', OvertimeTypeEnum),
     required_error: validationMessages.required('Overtime Type'),
@@ -108,7 +117,10 @@ export const ItemRequestSchema = createInsertSchema(items, {
     invalid_type_error: validationMessages.number('Unit ID'),
     required_error: validationMessages.required('Unit ID'),
   }),
-  price: NumericSchema('Price'),
+  price: z.number({
+    invalid_type_error: validationMessages.number('Price'),
+    required_error: validationMessages.required('Price'),
+  }),
 })
   .pick({
     categoryId: true,
@@ -119,7 +131,7 @@ export const ItemRequestSchema = createInsertSchema(items, {
     unitId: true,
   })
   .extend({
-    products: z.array(ProductItemRequestSchema, {
+    products: z.array(z.union([ProductItemRequestSchema, z.number()]), {
       invalid_type_error: validationMessages.array('Products'),
       required_error: validationMessages.required('Products')
     }),
@@ -130,3 +142,4 @@ export const ItemRequestSchema = createInsertSchema(items, {
 export type ItemExtended = z.infer<typeof ItemExtendedSchema>
 export type ItemFilter = z.infer<typeof ItemFilterSchema>
 export type ItemRequest = z.infer<typeof ItemRequestSchema>
+export type ProductItem = z.infer<typeof ProductItemSchema>

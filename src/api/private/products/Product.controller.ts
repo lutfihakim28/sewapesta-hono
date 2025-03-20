@@ -30,8 +30,8 @@ ProductController.openapi(ProductListRoute, async (context) => {
 
 ProductController.openapi(ProductDetailRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwt = new JwtPayload(context.get('jwtPayload'))
-  const product = await ProductService.get(+param.id, jwt.user)
+  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
+  const product = await ProductService.get(+param.id, jwtPayload.user)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -48,7 +48,7 @@ ProductController.openapi(ProductCreateRoute, async (context) => {
     throw new BadRequestException('Requested Branch ID is not match with yours.')
   }
 
-  const product = await ProductService.create(payload)
+  const product = await ProductService.create(payload, jwtPayload.user)
 
   return context.json(new ApiResponseData({
     code: 200,

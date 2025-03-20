@@ -8,7 +8,7 @@ import { logger as pinoLogger } from '@/lib/utils/logger'
 import { messages } from '@/lib/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/bun'
-import { apiReference } from '@scalar/hono-api-reference'
+import { swaggerUI } from '@hono/swagger-ui'
 import CityController from './src/api/public/locations/cities/City.controller'
 import DistrictController from './src/api/public/locations/districts/District.controller'
 import ProvinceController from './src/api/public/locations/provinces/Province.controller'
@@ -23,6 +23,7 @@ import { adminMiddleware } from './src/lib/middlewares/admin.middleware'
 import { superadminMiddleware } from './src/lib/middlewares/superadmin.middleware'
 import UnitController from './src/api/private/units/Unit.controller'
 import ImageController from '@/api/private/images/Image.controller'
+import ItemController from '@/api/private/items/Item.controller'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -81,6 +82,7 @@ app.post('/api/private/branches', superadminMiddleware)
 app.delete('/api/private/branches', superadminMiddleware)
 app.use('/api/private/branches/*', adminMiddleware)
 app.use('/api/private/products/*', adminMiddleware)
+app.use('/api/private/items/*', adminMiddleware)
 app.post('/api/private/categories', superadminMiddleware)
 app.put('/api/private/categories/*', superadminMiddleware)
 app.delete('/api/private/categories/*', superadminMiddleware)
@@ -96,6 +98,7 @@ app.route('/api/private/branches', BranchController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
+app.route('/api/private/items', ItemController)
 app.route('/api/private/images', ImageController)
 
 // PUBLIC PATH
@@ -106,12 +109,10 @@ app.route('/api/public/locations/subdistricts', SubdistrictController)
 
 
 app.get(
-  '/scalar',
-  apiReference({
-    theme: 'deepSpace',
-    spec: { url: '/docs' },
-    pageTitle: 'Sewapesta API',
-    darkMode: true,
+  '/swagger',
+  swaggerUI({
+    url: '/docs',
+    persistAuthorization: true,
   })
 )
 

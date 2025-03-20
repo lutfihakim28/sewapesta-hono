@@ -9,10 +9,7 @@ export const images = sqliteTable('images', {
   reference: text('reference', { enum: [ImageReferenceEnum.PROFILE, ImageReferenceEnum.ITEM] }).notNull(),
   referenceId: integer('reference_id').notNull(),
   createdAt: integer('created_at').notNull().$defaultFn(() => dayjs().unix()),
-}, () => [
-  imageReferenceIndex,
-  imageReferenceIdIndex,
+}, (table) => [
+  index('image_reference_index').on(table.reference),
+  index('image_reference_id_index').on(table.referenceId)
 ])
-
-export const imageReferenceIndex = index('image_reference_index').on(images.reference)
-export const imageReferenceIdIndex = index('image_reference_id_index').on(images.referenceId)

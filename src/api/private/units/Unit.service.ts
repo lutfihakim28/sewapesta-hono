@@ -1,4 +1,4 @@
-import { and, count, eq, isNull, like, SQL } from 'drizzle-orm';
+import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
@@ -7,6 +7,7 @@ import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import { units } from 'db/schema/units';
 import { unitColumns } from './Unit.column';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 
 export abstract class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
@@ -24,13 +25,17 @@ export abstract class UnitService {
   }
 
   static async create(payload: UnitRequest): Promise<void> {
+    await this.checkAvailability(payload.name)
     await db
       .insert(units)
       .values(payload)
   }
 
   static async update(id: number, payload: UnitRequest): Promise<void> {
-    await this.check(id)
+    await Promise.all([
+      this.check(id),
+      this.checkAvailability(payload.name, id)
+    ])
     await db
       .update(units)
       .set(payload)
@@ -53,7 +58,7 @@ export abstract class UnitService {
       ))
   }
 
-  private static async check(id: number) {
+  static async check(id: number) {
     const [category] = await db
       .select(unitColumns)
       .from(units)
@@ -63,7 +68,28 @@ export abstract class UnitService {
       ))
 
     if (!category) {
-      throw new NotFoundException(messages.errorNotFound(`Unit with ID ${id}`))
+      throw new NotFoundException(messages.errorConstraint('Unit'))
+    }
+  }
+
+  static async checkAvailability(name: string, id?: number) {
+    const conditions = [
+      isNull(units.deletedAt),
+      eq(units.name, name)
+    ]
+
+    if (id) {
+      conditions.push(not(eq(units.id, id)))
+    }
+    const available = await db
+      .select()
+      .from(units)
+      .where(and(
+        ...conditions
+      ))
+
+    if (available.length) {
+      throw new BadRequestException(messages.uniqueConstraint(`Unit\'s name "${name}"`))
     }
   }
 

@@ -6,12 +6,13 @@
     "db:init": "bun db:generate && bun db:migrate && bun db:seed",
     "db:drop": "drizzle-kit drop",
     "db:reset": "bun db:drop && rm -r sewapesta.db && bun db:generate && bun db:migrate && bun db:seed",
-    "test:only": "bun test --only",
+    "test:only": "bun test --only --watch",
     "test:all": "bun test",
     "route:list": "bun run src/routeLists.ts",
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot index.ts"
   },
   "dependencies": {
+    "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.12.2",
     "@scalar/hono-api-reference": "^0.5.183",
     "dayjs": "^1.11.13",

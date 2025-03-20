@@ -25,7 +25,7 @@ export const ImageRequestSchema = z.object({
     required_error: validationMessages.required('Image')
   })
     .refine((file) => file.size < MAX_FILE_SIZE, 'Max size 10MB.')
-    .refine((file) => checkFileType(file.type), 'Available for .png, .jpeg, or .jpg.')
+    .refine((file) => checkFileType(file.type), 'Your file\'s type is not supported.')
     .openapi({
       type: 'string',
       format: 'binary',
@@ -38,7 +38,7 @@ export const ImageFilterSchema = createSelectSchema(images).pick({
   referenceId: true,
 })
 
-export const ImageUploadSchema = z.object({
+export const ImageSaveSchema = z.object({
   reference: z.nativeEnum(ImageReferenceEnum, {
     required_error: validationMessages.required('Image Reference'),
     invalid_type_error: validationMessages.enum('Image Reference', ImageReferenceEnum),
@@ -47,14 +47,16 @@ export const ImageUploadSchema = z.object({
     required_error: validationMessages.required('Image Reference ID'),
     invalid_type_error: validationMessages.string('Image Reference ID'),
   }).transform((value) => Number(value)),
-}).merge(ImageRequestSchema)
+}).openapi('ImageSave')
 
-export const ImageUploadResponse = ApiResponseDataSchema(ImageSchema.pick({ path: true }), messages.successUpdate('Image'))
+export const ImageUploadSchema = ImageSchema.pick({ path: true })
+export const ImageUploadResponse = ApiResponseDataSchema(ImageUploadSchema, messages.successUpload('Image'))
 
-export type ImageUpload = z.infer<typeof ImageUploadSchema>
+export type ImageSave = z.infer<typeof ImageSaveSchema>
 
 export type ImageRequest = {
-  images: Blob[] | Blob
+  image: Blob
 }
 export type ImageFilter = z.infer<typeof ImageFilterSchema>
 export type Image = z.infer<typeof ImageSchema>
+export type ImageUpload = z.infer<typeof ImageUploadSchema>

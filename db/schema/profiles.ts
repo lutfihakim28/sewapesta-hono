@@ -11,10 +11,7 @@ export const profiles = sqliteTable('profiles', {
   subdistrictCode: text('subdistrict_code').references(() => subdistricts.code).notNull(),
   userId: integer('user_id').references(() => users.id).unique().notNull(),
   ...timestamps,
-}, () => ([
-  profileSubdistrictIndex,
-  profileUserIndex
+}, (table) => ([
+  index('profile_subdistrict_index').on(table.subdistrictCode),
+  index('user_profile_index').on(table.userId),
 ]))
-
-export const profileSubdistrictIndex = index('profile_subdistrict_index').on(profiles.subdistrictCode);
-export const profileUserIndex = index('user_profile_index').on(profiles.userId);

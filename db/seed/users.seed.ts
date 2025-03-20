@@ -16,8 +16,8 @@ export async function seedUsers(branchId: number, subdistrictsCode: string[], ro
     lastName: user.lastName + '_' + randomId,
   })
   console.log(`Seeding ${username} for branch ${branchId}...`)
-  return await db.transaction(async (tx) => {
-    const [user] = await tx
+  return await db.transaction(async (transaction) => {
+    const [user] = await transaction
       .insert(users)
       .values({
         password: await Bun.password.hash('password'),
@@ -29,7 +29,7 @@ export async function seedUsers(branchId: number, subdistrictsCode: string[], ro
         id: users.id
       })
 
-    await tx
+    await transaction
       .insert(profiles)
       .values({
         name,

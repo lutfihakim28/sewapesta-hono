@@ -10,6 +10,7 @@ export const messages = {
   successRefresh: 'Success refresh the token.',
   successLogout: 'Logout successfully.',
   forbidden: 'You do not have permission. Please contact admin.',
+  uniqueConstraint: (data: string) => `${data} is already exists.`,
   errorConstraint: (data: string) => `Selected ${data.charAt(0).toUpperCase() + data.slice(1)} not found.`,
   errorNotFound: (data: string) => `${data.charAt(0).toUpperCase() + data.slice(1)} not found.`,
   successList: (data: string) => `Success get list ${data}.`,

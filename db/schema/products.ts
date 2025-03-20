@@ -6,6 +6,6 @@ export const products = sqliteTable('products', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   rentalTimeIncrement: integer('rental_time_increment').notNull(), // Base time in hour
-  branchId: integer('branch').references(() => branches.id).notNull(),
+  branchId: integer('branch_id').references(() => branches.id).notNull(),
   ...timestamps,
 })

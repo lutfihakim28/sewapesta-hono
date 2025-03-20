@@ -16,9 +16,7 @@ export const itemMutations = sqliteTable('item_mutations', {
   quantity: integer('quantity').notNull(),
   description: text('description'),
   ...timestamps,
-}, () => [
-  mutationItemIndex,
-  mutationTypeIndex
+}, (table) => [
+  index('mutation_type_index').on(table.type),
+  index('mutation_item_index').on(table.itemId)
 ])
-export const mutationTypeIndex = index('mutation_type_index').on(itemMutations.type);
-export const mutationItemIndex = index('mutation_item_index').on(itemMutations.itemId);

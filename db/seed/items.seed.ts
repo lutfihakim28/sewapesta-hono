@@ -22,13 +22,7 @@ export async function seedItems({
   const [item] = await db
     .insert(items)
     .values({
-      name: faker.word.noun({
-        length: {
-          min: 3,
-          max: 20,
-        },
-        strategy: 'any-length',
-      }),
+      name: faker.commerce.product(),
       categoryId: faker.helpers.arrayElement(categories),
       price: faker.number.int({
         min: 100,

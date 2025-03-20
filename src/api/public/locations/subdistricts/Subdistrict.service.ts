@@ -21,15 +21,6 @@ export class SubdistrictService {
     return _subdistricts
   }
 
-  static async count(query: SubdistrictFilter): Promise<number> {
-    const [item] = await db
-      .select({ count: count() })
-      .from(subdistricts)
-      .where(this.buildWhereClause(query))
-
-    return item?.count || 0;
-  }
-
   static async checkCode(code: string): Promise<Subdistrict> {
     const [subdistrict] = await db
       .select({
@@ -45,6 +36,15 @@ export class SubdistrictService {
     }
 
     return subdistrict
+  }
+
+  static async count(query: SubdistrictFilter): Promise<number> {
+    const [item] = await db
+      .select({ count: count() })
+      .from(subdistricts)
+      .where(this.buildWhereClause(query))
+
+    return item?.count || 0;
   }
 
   private static buildWhereClause(query: SubdistrictFilter) {

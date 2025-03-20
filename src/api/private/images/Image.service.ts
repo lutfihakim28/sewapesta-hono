@@ -4,8 +4,7 @@ import { db } from 'db';
 import { images } from 'db/schema/images';
 import { eq, and } from 'drizzle-orm';
 import { unlink } from "node:fs/promises";
-import { Image, ImageFilter, ImageUpload } from './Image.schema';
-import { ParamId } from '@/lib/schemas/ParamId.schema';
+import { Image, ImageFilter, ImageRequest, ImageSave, ImageUpload } from './Image.schema';
 import { logger } from '@/lib/utils/logger';
 import { imageColumns } from './Image.column';
 
@@ -22,59 +21,28 @@ export abstract class ImageService {
     return _images;
   }
 
-  static async upload(request: ImageUpload) {
-    const formatedDate = dayjs().format('YYYYMMDD');
+  static async upload(request: ImageRequest): Promise<ImageUpload> {
+    const [fileName, ext] = request.image.name.split('.');
+    const name = `${fileName}_${dayjs().unix()}.${ext}`
+    const path = `static/.temp/${name}`
+    await Bun.write(path, request.image);
 
-    const [latestImage] = await db
-      .select({ path: images.path })
-      .from(images)
-      .where(and(
-        eq(images.reference, request.reference),
-        eq(images.referenceId, request.referenceId),
-      ))
-      .limit(1)
-
-    let currentIndex = 0;
-
-    if (latestImage) {
-      const name = latestImage.path.split('/').at(-1)
-      const nameIndex = name?.split('_').at(-1);
-      currentIndex = Number(nameIndex || 0) + 1
-    }
-
-    const ext = (request.image as Blob).name.split('.')[1];
-    const name = `${request.reference}_${request.referenceId}_${formatedDate}_${currentIndex}.${ext}`;
-    await Bun.write(`static/.temp/${name}`, (request.image as Blob));
+    return { path }
   }
 
-  static async delete(param: ParamId) {
-    await db.transaction(async (transaction) => {
-      const [image] = await db
-        .select({ id: images.id, path: images.path })
-        .from(images)
-        .where(eq(images.id, Number(param.id)))
-        .limit(1);
-
-
-      if (!image) {
-        throw new NotFoundException('Image not found.')
-      }
-
-      await unlink(image.path);
-
-      await transaction.delete(images).where(eq(images.id, image.id))
-
-    })
-  }
-
-  static async save(paths: string[], request: ImageUpload) {
+  static async save(transaction: Parameters<Parameters<typeof db.transaction>[0]>[0], paths: string[], request: ImageSave) {
     async function processFile(path: string, attempt = 1): Promise<void> {
       try {
         const file = Bun.file(path);
-        const newPath = path.replace('.temp', 'images');
+        const name = path.split('/').at(-1)
+        const _newPath = ['static/images']
+        if (name) {
+          _newPath.push(`${request.reference}_${request.referenceId}_${name}`)
+        }
+        const newPath = _newPath.join('/');
         await Bun.write(newPath, file);
 
-        await db.insert(images).values({
+        await transaction.insert(images).values({
           path: newPath,
           url: `${Bun.env.APP_URL}/${newPath}`,
           reference: request.reference,
@@ -100,5 +68,24 @@ export abstract class ImageService {
     }
 
     await Promise.all(paths.map((path) => processFile(path)));
+  }
+
+  static async delete(transaction: Parameters<Parameters<typeof db.transaction>[0]>[0], ids: number[]) {
+    await Promise.all(ids.map(async (id) => {
+      const [image] = await transaction
+        .select({ id: images.id, path: images.path })
+        .from(images)
+        .where(eq(images.id, Number(id)))
+        .limit(1);
+
+
+      if (!image) {
+        throw new NotFoundException('Image not found.')
+      }
+
+      await unlink(image.path);
+
+      await transaction.delete(images).where(eq(images.id, image.id))
+    }))
   }
 }

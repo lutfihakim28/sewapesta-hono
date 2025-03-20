@@ -14,7 +14,7 @@
 9. ~~Improve auth, save token to db~~
 10. ~~Restructure folder~~
 11. ~~Finish product.test~~
-12. create item crud
+12. ~~create item crud~~
 13. create item test
 14. ~~debug with all test~~
 15. make category and unit name unique
