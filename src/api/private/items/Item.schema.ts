@@ -64,8 +64,8 @@ export const ItemFilterSchema = z.object({
   ]))
   .openapi('ItemFilter')
 
-export const ItemListSchema = ApiResponseListSchema(ItemExtendedSchema, messages.successList('Item'))
-export const ItemDetailSchema = ApiResponseDataSchema(ItemExtendedSchema, messages.successDetail('Item'))
+export const ItemResponseListSchema = ApiResponseListSchema(ItemExtendedSchema, messages.successList('Item'))
+export const ItemResponseDataSchema = ApiResponseDataSchema(ItemExtendedSchema, messages.successDetail('Item'))
 
 const ProductItemRequestSchema = createInsertSchema(productsItems, {
   productId: z.number({

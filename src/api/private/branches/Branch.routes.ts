@@ -37,7 +37,7 @@ export const BranchCreateRoute = createRoute({
   request: {
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: BranchRequestSchema
         }
       },
@@ -57,7 +57,7 @@ export const BranchUpdateRoute = createRoute({
     params: ParamIdSchema,
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: BranchRequestSchema
         }
       },

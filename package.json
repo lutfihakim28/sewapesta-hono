@@ -1,4 +1,10 @@
 {
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "peerDependencies": {
+    "typescript": "^5.8.2"
+  },
   "scripts": {
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run db/migrate.ts",
@@ -14,11 +20,10 @@
   "dependencies": {
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.12.2",
-    "@scalar/hono-api-reference": "^0.5.183",
     "dayjs": "^1.11.13",
-    "drizzle-orm": "^0.40.0",
+    "drizzle-orm": "^0.40.1",
     "drizzle-zod": "^0.5.1",
-    "hono": "^4.7.4",
+    "hono": "^4.7.5",
     "pino": "^9.6.0",
     "zod": "^3.24.2"
   },

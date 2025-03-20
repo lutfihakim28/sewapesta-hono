@@ -45,7 +45,7 @@ class OpenApiResponseStatus implements ResponseConfig {
   constructor(schema: ZodType<unknown>, description: string) {
     this.description = description;
     this.content = {
-      "application/json": { schema }
+      'application/json': { schema }
     }
   }
 }

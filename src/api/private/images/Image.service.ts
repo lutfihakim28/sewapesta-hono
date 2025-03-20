@@ -42,6 +42,13 @@ export abstract class ImageService {
         const newPath = _newPath.join('/');
         await Bun.write(newPath, file);
 
+        logger.debug({
+          path: newPath,
+          url: `${Bun.env.APP_URL}/${newPath}`,
+          reference: request.reference,
+          referenceId: request.referenceId,
+        }, 'Image.save')
+
         await transaction.insert(images).values({
           path: newPath,
           url: `${Bun.env.APP_URL}/${newPath}`,

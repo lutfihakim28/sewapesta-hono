@@ -37,7 +37,7 @@ export const ProductCreateRoute = createRoute({
   request: {
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: ProductRequestSchema
         }
       },
@@ -57,7 +57,7 @@ export const ProductUpdateRoute = createRoute({
     params: ParamIdSchema,
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: ProductRequestSchema
         }
       },

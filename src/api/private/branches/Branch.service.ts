@@ -14,7 +14,7 @@ import { branchColumns } from './Branch.column';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { User } from '../users/User.schema';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { ForbiddenException } from '@/lib/exceptions/ForbiddenException';
+
 export abstract class BranchService {
   static async list(query: BranchFilter): Promise<[BranchExtended[], number]> {
     const { subdistrictCode, ...selectedColumns } = branchColumns
@@ -162,7 +162,7 @@ export abstract class BranchService {
 
   static async check(id: number, user: User) {
     if (user.role !== RoleEnum.SuperAdmin && user.branchId !== id) {
-      throw new ForbiddenException('Selected Branch ID not match with your Branch ID.')
+      throw new BadRequestException('Requested Branch ID not match with yours.')
     }
     const [branch] = await db
       .select(branchColumns)

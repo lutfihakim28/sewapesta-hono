@@ -24,7 +24,7 @@ export const UnitCreateRoute = createRoute({
   request: {
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: UnitRequestSchema
         }
       },
@@ -44,7 +44,7 @@ export const UnitUpdateRoute = createRoute({
     params: ParamIdSchema,
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: UnitRequestSchema
         }
       },

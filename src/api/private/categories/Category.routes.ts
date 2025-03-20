@@ -24,7 +24,7 @@ export const CategoryCreateRoute = createRoute({
   request: {
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: CategoryRequestSchema
         }
       },
@@ -44,7 +44,7 @@ export const CategoryUpdateRoute = createRoute({
     params: ParamIdSchema,
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: CategoryRequestSchema
         }
       },
