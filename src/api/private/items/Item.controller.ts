@@ -40,9 +40,8 @@ ItemController.openapi(ItemDetailRoute, async (context) => {
 
 ItemController.openapi(ItemCreateRoute, async (context) => {
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemService.create(payload, jwtPayload.user)
+  const item = await ItemService.create(payload)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -54,9 +53,8 @@ ItemController.openapi(ItemCreateRoute, async (context) => {
 ItemController.openapi(ItemUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemService.update(+param.id, payload, jwtPayload.user)
+  const item = await ItemService.update(+param.id, payload)
 
   return context.json(new ApiResponseData({
     code: 200,

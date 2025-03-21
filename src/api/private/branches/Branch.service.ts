@@ -1,5 +1,5 @@
 import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
-import { Branch, BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
+import { BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/countOffset';
@@ -8,7 +8,6 @@ import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
 import { locationQuery } from '@/api/public/locations/Location.query';
 import { SortEnum } from '@/lib/enums/SortEnum';
-import { SubdistrictService } from '@/api/public/locations/subdistricts/Subdistrict.service';
 import { logger } from '@/lib/utils/logger';
 import { branchColumns } from './Branch.column';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
@@ -98,8 +97,6 @@ export abstract class BranchService {
   static async create(payload: BranchRequest): Promise<BranchExtended> {
     const { id, ..._ } = branchColumns;
 
-    await SubdistrictService.checkCode(payload.subdistrictCode)
-
     const [_branch] = await db
       .insert(branches)
       .values(payload)
@@ -119,7 +116,6 @@ export abstract class BranchService {
 
   static async update(_id: number, payload: BranchRequest): Promise<BranchExtended> {
     const { id, ..._ } = branchColumns;
-    await SubdistrictService.checkCode(payload.subdistrictCode)
 
     await db
       .update(branches)

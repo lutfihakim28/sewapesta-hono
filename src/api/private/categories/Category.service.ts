@@ -8,6 +8,7 @@ import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import { categoryColumns } from './Category.column';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { UniqueCheck } from '@/lib/schemas/UniqueCheck.schema';
 
 export abstract class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
@@ -25,7 +26,7 @@ export abstract class CategoryService {
   }
 
   static async create(payload: CategoryRequest): Promise<void> {
-    await this.checkAvailability(payload.name)
+    await this.checkAvailability({ unique: payload.name })
     await db
       .insert(categories)
       .values(payload)
@@ -34,7 +35,7 @@ export abstract class CategoryService {
   static async update(id: number, payload: CategoryRequest): Promise<void> {
     await Promise.all([
       this.check(id),
-      this.checkAvailability(payload.name, id)
+      this.checkAvailability({ unique: payload.name, id: id.toString() })
     ])
     await db
       .update(categories)
@@ -72,14 +73,14 @@ export abstract class CategoryService {
     }
   }
 
-  static async checkAvailability(name: string, id?: number) {
+  static async checkAvailability(query: UniqueCheck) {
     const conditions = [
       isNull(categories.deletedAt),
-      eq(categories.name, name)
+      eq(categories.name, query.unique)
     ]
 
-    if (id) {
-      conditions.push(not(eq(categories.id, id)))
+    if (query.id) {
+      conditions.push(not(eq(categories.id, +query.id)))
     }
     const available = await db
       .select()

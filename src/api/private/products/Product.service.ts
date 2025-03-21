@@ -68,7 +68,6 @@ export abstract class ProductService {
   }
 
   static async create(payload: ProductRequest, user: User): Promise<Product> {
-    await BranchService.check(payload.branchId, user)
     const [newProduct] = await db
       .insert(products)
       .values(payload)
@@ -82,7 +81,6 @@ export abstract class ProductService {
   }
 
   static async update(id: number, payload: ProductRequest, user: User): Promise<Product> {
-    await BranchService.check(payload.branchId, user)
     const conditions = [
       eq(products.id, id),
       isNull(products.deletedAt),

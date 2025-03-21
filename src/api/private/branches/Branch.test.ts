@@ -13,7 +13,6 @@ import { cities } from 'db/schema/cities'
 import { provinces } from 'db/schema/provinces'
 import dayjs from 'dayjs'
 import { faker } from '@faker-js/faker/locale/id_ID'
-import { users } from 'db/schema/users'
 import { SortEnum } from '@/lib/enums/SortEnum'
 import { generateTestHeader, getTestUsers } from '@/lib/utils/testingUtils'
 import { LoginData } from '@/api/auth/Auth.schema'
@@ -68,7 +67,8 @@ describe('Branch', () => {
         // PROVINCES
 
         let filter: BranchFilter = {
-          provinceCode: location!.provinceCode
+          provinceCode: location!.provinceCode,
+          page: '1',
         }
         let searchParam = new URLSearchParams(filter)
 
@@ -85,7 +85,8 @@ describe('Branch', () => {
 
         // CITIES
         filter = {
-          cityCode: location!.cityCode
+          cityCode: location!.cityCode,
+          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -102,7 +103,8 @@ describe('Branch', () => {
 
         // DISTRICTS
         filter = {
-          districtCode: location!.districtCode
+          districtCode: location!.districtCode,
+          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -119,7 +121,8 @@ describe('Branch', () => {
 
         // SUBDISTRICTS
         filter = {
-          subdistrictCode: location!.subdistrictCode
+          subdistrictCode: location!.subdistrictCode,
+          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -140,6 +143,7 @@ describe('Branch', () => {
           districtCode: location!.districtCode,
           subdistrictCode: location!.subdistrictCode,
           provinceCode: location!.provinceCode,
+          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -175,7 +179,8 @@ describe('Branch', () => {
       test('Sort', async () => {
         const query: BranchFilter = {
           sort: SortEnum.Descending,
-          sortBy: 'id'
+          sortBy: 'id',
+          page: '1',
         }
         const searchParam = new URLSearchParams(query)
 

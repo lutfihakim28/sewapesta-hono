@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from './Unit.routes';
+import { UnitCheckRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from './Unit.routes';
 import { UnitService } from './Unit.service';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
@@ -55,6 +55,17 @@ UnitController.openapi(UnitDeleteRoute, async (context) => {
   return context.json(new ApiResponse({
     code: 200,
     messages: [messages.successDelete(`Unit with ID ${param.id}`)]
+  }), 200)
+})
+
+UnitController.openapi(UnitCheckRoute, async (context) => {
+  const query = context.req.valid('query')
+
+  await UnitService.checkAvailability(query)
+
+  return context.json(new ApiResponse({
+    code: 200,
+    messages: ['Unit\'s name is available.']
   }), 200)
 })
 

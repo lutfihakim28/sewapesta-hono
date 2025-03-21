@@ -157,8 +157,7 @@ export abstract class ItemService {
     }
   }
 
-  static async create(payload: ItemRequest, user: User): Promise<ItemExtended> {
-    await this.checkConstraint(payload, user)
+  static async create(payload: ItemRequest): Promise<ItemExtended> {
     const { products: productsData, images: imagesData, ...itemsData } = payload
 
     const itemId = await db.transaction(async (transaction) => {
@@ -190,8 +189,7 @@ export abstract class ItemService {
     return await this.get(itemId)
   }
 
-  static async update(id: number, payload: ItemRequest, user: User): Promise<ItemExtended> {
-    await this.checkConstraint(payload, user)
+  static async update(id: number, payload: ItemRequest): Promise<ItemExtended> {
     const { products: productsData, images: imagesData, ...itemsData } = payload
 
     await db.transaction(async (transaction) => {
@@ -299,18 +297,5 @@ export abstract class ItemService {
     }
 
     return and(...conditions)
-  }
-
-  private static async checkConstraint(payload: ItemRequest, user: User) {
-    const productsConstraint = payload
-      .products
-      .filter((product) => typeof product !== 'number')
-      .map((product) => ProductService.check(product.productId, user))
-    await Promise.all([
-      UnitService.check(payload.unitId),
-      CategoryService.check(payload.categoryId),
-      UserService.check(payload.ownerId, user),
-      ...productsConstraint,
-    ])
   }
 }

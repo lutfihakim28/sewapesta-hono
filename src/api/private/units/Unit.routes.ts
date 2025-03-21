@@ -3,6 +3,7 @@ import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { UnitFilterSchema, UnitRequestSchema, UnitResponseSchema } from './Unit.schema'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
+import { UniqueCheckSchema } from '@/lib/schemas/UniqueCheck.schema'
 
 export const UnitListRoute = createRoute({
   method: 'get',
@@ -12,7 +13,7 @@ export const UnitListRoute = createRoute({
     query: UnitFilterSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: UnitResponseSchema, description: 'Retrieve list categories' },
+    successResponse: { schema: UnitResponseSchema, description: 'Retrieve list units' },
     codes: [401, 403],
   }),
 })
@@ -66,5 +67,18 @@ export const UnitDeleteRoute = createRoute({
   responses: new OpenApiResponse({
     successResponse: { schema: SuccessSchema, description: 'Unit deleted' },
     codes: [401, 403, 404]
+  }),
+})
+
+export const UnitCheckRoute = createRoute({
+  method: 'get',
+  path: '/check-uniques',
+  tags: ['Unit'],
+  request: {
+    query: UniqueCheckSchema,
+  },
+  responses: new OpenApiResponse({
+    successResponse: { schema: SuccessSchema, description: 'Unit\'s name is available' },
+    codes: [401, 403, 404, 422],
   }),
 })

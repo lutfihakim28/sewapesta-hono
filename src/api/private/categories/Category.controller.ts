@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryUpdateRoute } from './Category.routes';
+import { CategoryCheckRoute, CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryUpdateRoute } from './Category.routes';
 import { CategoryService } from './Category.service';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
@@ -55,6 +55,17 @@ CategoryController.openapi(CategoryDeleteRoute, async (context) => {
   return context.json(new ApiResponse({
     code: 200,
     messages: [messages.successDelete(`Category with ID ${param.id}`)]
+  }), 200)
+})
+
+CategoryController.openapi(CategoryCheckRoute, async (context) => {
+  const query = context.req.valid('query')
+
+  await CategoryService.checkAvailability(query)
+
+  return context.json(new ApiResponse({
+    code: 200,
+    messages: ['Category\'s name is available.']
   }), 200)
 })
 

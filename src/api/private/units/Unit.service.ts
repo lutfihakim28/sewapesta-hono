@@ -8,6 +8,7 @@ import { messages } from '@/lib/constants/messages';
 import { units } from 'db/schema/units';
 import { unitColumns } from './Unit.column';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { UniqueCheck } from '@/lib/schemas/UniqueCheck.schema';
 
 export abstract class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
@@ -25,7 +26,7 @@ export abstract class UnitService {
   }
 
   static async create(payload: UnitRequest): Promise<void> {
-    await this.checkAvailability(payload.name)
+    await this.checkAvailability({ unique: payload.name })
     await db
       .insert(units)
       .values(payload)
@@ -34,7 +35,7 @@ export abstract class UnitService {
   static async update(id: number, payload: UnitRequest): Promise<void> {
     await Promise.all([
       this.check(id),
-      this.checkAvailability(payload.name, id)
+      this.checkAvailability({ unique: payload.name, id: id.toString() })
     ])
     await db
       .update(units)
@@ -72,14 +73,14 @@ export abstract class UnitService {
     }
   }
 
-  static async checkAvailability(name: string, id?: number) {
+  static async checkAvailability(query: UniqueCheck) {
     const conditions = [
       isNull(units.deletedAt),
-      eq(units.name, name)
+      eq(units.name, query.unique)
     ]
 
-    if (id) {
-      conditions.push(not(eq(units.id, id)))
+    if (query.id) {
+      conditions.push(not(eq(units.id, +query.id)))
     }
     const available = await db
       .select()

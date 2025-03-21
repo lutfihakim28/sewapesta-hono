@@ -3,6 +3,7 @@ import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { CategoryFilterSchema, CategoryRequestSchema, CategoryResponseSchema } from './Category.schema'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
+import { UniqueCheckSchema } from '@/lib/schemas/UniqueCheck.schema'
 
 export const CategoryListRoute = createRoute({
   method: 'get',
@@ -66,5 +67,18 @@ export const CategoryDeleteRoute = createRoute({
   responses: new OpenApiResponse({
     successResponse: { schema: SuccessSchema, description: 'Category deleted' },
     codes: [401, 403, 404]
+  }),
+})
+
+export const CategoryCheckRoute = createRoute({
+  method: 'get',
+  path: '/check-uniques',
+  tags: ['Category'],
+  request: {
+    query: UniqueCheckSchema,
+  },
+  responses: new OpenApiResponse({
+    successResponse: { schema: SuccessSchema, description: 'Category\'s name is available' },
+    codes: [401, 403, 404, 422],
   }),
 })
