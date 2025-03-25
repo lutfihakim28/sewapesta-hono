@@ -22,7 +22,8 @@ beforeAll(async () => {
 describe('Category', () => {
   test('List', async () => {
     const query: CategoryFilter = {
-      keyword: 'equip'
+      keyword: 'equip',
+
     };
     const searchParam = new URLSearchParams(query)
 

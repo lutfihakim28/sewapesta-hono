@@ -39,7 +39,7 @@ describe('Private API', () => {
 
   test('Valid Token', async () => {
     const loginResponse = await login();
-    const _response = await app.request('/api/private/branches', {
+    const _response = await app.request('/api/private/branches?page=1', {
       headers: generateTestHeader(loginResponse.data.token)
     });
 

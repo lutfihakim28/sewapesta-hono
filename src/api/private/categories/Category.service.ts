@@ -35,7 +35,7 @@ export abstract class CategoryService {
   static async update(id: number, payload: CategoryRequest): Promise<void> {
     await Promise.all([
       this.check(id),
-      this.checkAvailability({ unique: payload.name, id: id.toString() })
+      this.checkAvailability({ unique: payload.name, selectedId: id.toString() })
     ])
     await db
       .update(categories)
@@ -79,8 +79,8 @@ export abstract class CategoryService {
       eq(categories.name, query.unique)
     ]
 
-    if (query.id) {
-      conditions.push(not(eq(categories.id, +query.id)))
+    if (query.selectedId) {
+      conditions.push(not(eq(categories.id, +query.selectedId)))
     }
     const available = await db
       .select()
@@ -90,7 +90,7 @@ export abstract class CategoryService {
       ))
 
     if (available.length) {
-      throw new BadRequestException(messages.uniqueConstraint(`Category\'s name (${name})`))
+      throw new BadRequestException(messages.uniqueConstraint(`Category\'s name (${query.unique})`))
     }
   }
 

@@ -35,7 +35,7 @@ export abstract class UnitService {
   static async update(id: number, payload: UnitRequest): Promise<void> {
     await Promise.all([
       this.check(id),
-      this.checkAvailability({ unique: payload.name, id: id.toString() })
+      this.checkAvailability({ unique: payload.name, selectedId: id.toString() })
     ])
     await db
       .update(units)
@@ -79,8 +79,8 @@ export abstract class UnitService {
       eq(units.name, query.unique)
     ]
 
-    if (query.id) {
-      conditions.push(not(eq(units.id, +query.id)))
+    if (query.selectedId) {
+      conditions.push(not(eq(units.id, +query.selectedId)))
     }
     const available = await db
       .select()
@@ -90,7 +90,7 @@ export abstract class UnitService {
       ))
 
     if (available.length) {
-      throw new BadRequestException(messages.uniqueConstraint(`Unit\'s name "${name}"`))
+      throw new BadRequestException(messages.uniqueConstraint(`Unit\'s name "${query.unique}"`))
     }
   }
 

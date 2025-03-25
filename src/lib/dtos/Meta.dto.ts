@@ -9,9 +9,9 @@ export class Meta {
     pageSize?: number | string
     total: number
   }) {
-    this.page = Number(data.page);
+    this.page = Number(data.page || 1);
     this.pageSize = Number(data.pageSize || 5);
-    this.pageCount = Math.ceil(data.total / Number(data.pageSize || 5));
     this.totalData = data.total
+    this.pageCount = Math.ceil(this.totalData / this.pageSize);
   }
 }

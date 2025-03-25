@@ -1,4 +1,3 @@
-import { login } from '@/api/auth/Auth.test'
 import app from 'index'
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto'
 import { RoleEnum } from '@/lib/enums/RoleEnum'
@@ -7,15 +6,12 @@ import { db } from 'db'
 import { and, eq, isNull } from 'drizzle-orm'
 import { Branch, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema'
 import { branches } from 'db/schema/branches'
-import { subdistricts } from 'db/schema/subdistricts'
-import { districts } from 'db/schema/districts'
-import { cities } from 'db/schema/cities'
-import { provinces } from 'db/schema/provinces'
 import dayjs from 'dayjs'
 import { faker } from '@faker-js/faker/locale/id_ID'
 import { SortEnum } from '@/lib/enums/SortEnum'
 import { generateTestHeader, getTestUsers } from '@/lib/utils/testingUtils'
 import { LoginData } from '@/api/auth/Auth.schema'
+import { locationQuery } from '@/api/public/locations/Location.query'
 
 
 const path = '/api/private/branches';
@@ -47,28 +43,25 @@ describe('Branch', () => {
     describe('Filter', async () => {
       test('By Location', async () => {
         const [location] = await db
+          .with(locationQuery)
           .select({
-            subdistrictCode: subdistricts.code,
-            subdistrict: subdistricts.name,
-            districtCode: districts.code,
-            district: districts.name,
-            cityCode: cities.code,
-            city: cities.name,
-            provinceCode: provinces.code,
-            province: provinces.name,
+            subdistrictCode: locationQuery.subdistrictCode,
+            subdistrict: locationQuery.subdistrict,
+            districtCode: locationQuery.districtCode,
+            district: locationQuery.district,
+            cityCode: locationQuery.cityCode,
+            city: locationQuery.city,
+            provinceCode: locationQuery.provinceCode,
+            province: locationQuery.province,
           })
           .from(branches)
-          .innerJoin(subdistricts, eq(branches.subdistrictCode, subdistricts.code))
-          .innerJoin(districts, eq(subdistricts.districtCode, districts.code))
-          .innerJoin(cities, eq(districts.cityCode, cities.code))
-          .innerJoin(provinces, eq(cities.provinceCode, provinces.code))
+          .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, branches.subdistrictCode))
           .limit(1)
 
         // PROVINCES
 
         let filter: BranchFilter = {
           provinceCode: location!.provinceCode,
-          page: '1',
         }
         let searchParam = new URLSearchParams(filter)
 
@@ -86,7 +79,6 @@ describe('Branch', () => {
         // CITIES
         filter = {
           cityCode: location!.cityCode,
-          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -104,7 +96,6 @@ describe('Branch', () => {
         // DISTRICTS
         filter = {
           districtCode: location!.districtCode,
-          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -122,7 +113,6 @@ describe('Branch', () => {
         // SUBDISTRICTS
         filter = {
           subdistrictCode: location!.subdistrictCode,
-          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -143,7 +133,6 @@ describe('Branch', () => {
           districtCode: location!.districtCode,
           subdistrictCode: location!.subdistrictCode,
           provinceCode: location!.provinceCode,
-          page: '1',
         }
         searchParam = new URLSearchParams(filter)
 
@@ -180,7 +169,6 @@ describe('Branch', () => {
         const query: BranchFilter = {
           sort: SortEnum.Descending,
           sortBy: 'id',
-          page: '1',
         }
         const searchParam = new URLSearchParams(query)
 
