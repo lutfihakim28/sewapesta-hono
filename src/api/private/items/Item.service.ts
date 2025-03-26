@@ -1,13 +1,13 @@
 import { db } from 'db';
-import { SQL, count, and, isNull, eq, like, gte, lte, asc, desc, sql, notInArray } from 'drizzle-orm';
+import { SQL, count, and, isNull, eq, like, gte, lte, asc, desc, notInArray } from 'drizzle-orm';
 import { ItemColumn, ItemExtended, ItemFilter, ItemRequest, ProductItemColumn, ProductItemSchema } from './Item.schema';
 import { items } from 'db/schema/items';
 import { User } from '../users/User.schema';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { branches } from 'db/schema/branches';
-import { productsItems } from 'db/schema/productsItems';
+import { productsItems } from 'db/schema/products-items';
 import { SortEnum } from '@/lib/enums/SortEnum';
-import { countOffset } from '@/lib/utils/countOffset';
+import { countOffset } from '@/lib/utils/count-offset';
 import { users } from 'db/schema/users';
 import { products } from 'db/schema/products';
 import { images } from 'db/schema/images';
@@ -16,7 +16,7 @@ import { profiles } from 'db/schema/profiles';
 import { itemColumns } from './Item.column';
 import { profileColumns } from '../users/User.column';
 import { Image, ImageSchema } from '../images/Image.schema';
-import { buildJsonGroupArray } from '@/lib/utils/buildJsonGroupArray';
+import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import { ImageService } from '../images/Image.service';
@@ -24,7 +24,6 @@ import { CategoryService } from '../categories/Category.service';
 import { UnitService } from '../units/Unit.service';
 import { UserService } from '../users/User.service';
 import { ProductService } from '../products/Product.service';
-import { ItemListRoute } from './Item.routes';
 import dayjs from 'dayjs';
 
 export abstract class ItemService {

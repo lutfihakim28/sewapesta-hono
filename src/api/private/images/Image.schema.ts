@@ -1,5 +1,5 @@
 import { messages } from '@/lib/constants/messages';
-import { validationMessages } from '@/lib/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validation-message';
 import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
 import { ApiResponseDataSchema } from '@/lib/schemas/ApiResponse.schema';
 import { images } from 'db/schema/images';

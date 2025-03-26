@@ -1,5 +1,5 @@
 import { messages } from '@/lib/constants/messages';
-import { validationMessages } from '@/lib/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validation-message';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
 import { SearchSchema } from '@/lib/schemas/Search.schema';
@@ -7,6 +7,7 @@ import { z } from '@hono/zod-openapi';
 import { products } from 'db/schema/products';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { SortSchema } from '@/lib/schemas/Sort.schema';
+import { NumericSchema } from '@/lib/schemas/Numeric.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
@@ -20,7 +21,7 @@ export const ProductSchema = createSelectSchema(products)
   .openapi('Product')
 
 export const ProductFilterSchema = z.object({
-  branchId: z.string().optional()
+  branchId: NumericSchema('Branch ID').optional()
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)

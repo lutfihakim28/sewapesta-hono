@@ -1,7 +1,7 @@
 import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 import { db } from 'db';
-import { countOffset } from '@/lib/utils/countOffset';
+import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';

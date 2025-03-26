@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { validationMessages } from '../constants/validationMessage';
+import { validationMessages } from '../constants/validation-message';
 
 export function NumericSchema(field: string) {
   return z.string({

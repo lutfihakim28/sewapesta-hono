@@ -2,7 +2,7 @@ import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
 import { BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
-import { countOffset } from '@/lib/utils/countOffset';
+import { countOffset } from '@/lib/utils/count-offset';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';

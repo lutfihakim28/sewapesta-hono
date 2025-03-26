@@ -1,6 +1,6 @@
 import { db } from 'db';
 import { and, count, eq, like } from 'drizzle-orm';
-import { countOffset } from '@/lib/utils/countOffset';
+import { countOffset } from '@/lib/utils/count-offset';
 import { subdistricts } from 'db/schema/subdistricts';
 import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';

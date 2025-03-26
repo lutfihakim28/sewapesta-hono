@@ -1,6 +1,6 @@
 import { db } from 'db';
 import { and, count, eq, like } from 'drizzle-orm';
-import { countOffset } from '@/lib/utils/countOffset';
+import { countOffset } from '@/lib/utils/count-offset';
 import { District, DistrictFilter } from './District.schema';
 import { districts } from 'db/schema/districts';
 

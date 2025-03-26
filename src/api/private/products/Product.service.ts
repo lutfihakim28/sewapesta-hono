@@ -3,7 +3,7 @@ import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product
 import { products } from 'db/schema/products';
 import { SortEnum } from '@/lib/enums/SortEnum';
 import { db } from 'db';
-import { countOffset } from '@/lib/utils/countOffset';
+import { countOffset } from '@/lib/utils/count-offset';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import dayjs from 'dayjs';
@@ -30,7 +30,7 @@ export abstract class ProductService {
       ? asc(products[sortBy])
       : desc(products[sortBy])
 
-    const where = this.buildWhereClause(user, query);
+    const where = this.buildWhereClause(query, user);
 
     const result = await Promise.all([
       db.select(productColumns)
@@ -144,10 +144,10 @@ export abstract class ProductService {
       .from(products)
       .where(query)
 
-    return item?.count || 0
+    return item.count
   }
 
-  private static buildWhereClause(user: User, query: ProductFilter) {
+  private static buildWhereClause(query: ProductFilter, user: User) {
     const conditions: ReturnType<typeof and>[] = [
       isNull(products.deletedAt),
     ]

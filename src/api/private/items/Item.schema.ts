@@ -1,5 +1,5 @@
 import { items } from 'db/schema/items';
-import { productsItems } from 'db/schema/productsItems';
+import { productsItems } from 'db/schema/products-items';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum';
@@ -9,9 +9,8 @@ import { SortSchema } from '@/lib/schemas/Sort.schema';
 import { ProfileSchema } from '../users/User.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { messages } from '@/lib/constants/messages';
-import { validationMessages } from '@/lib/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validation-message';
 import { ImageSchema } from '../images/Image.schema';
-import { NumericSchema } from '@/lib/schemas/Numeric.schema';
 
 export type ItemColumn = keyof typeof items.$inferSelect
 export type ProductItemColumn = keyof typeof productsItems.$inferSelect

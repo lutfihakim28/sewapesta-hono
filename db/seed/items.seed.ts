@@ -1,6 +1,6 @@
 import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum';
 import dayjs from 'dayjs';
-import { productsItems } from 'db/schema/productsItems';
+import { productsItems } from 'db/schema/products-items';
 import { db } from '..';
 import { items } from 'db/schema/items';
 import { faker } from '@faker-js/faker/locale/id_ID';

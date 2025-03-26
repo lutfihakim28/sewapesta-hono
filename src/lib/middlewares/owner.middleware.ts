@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory';
 import { JwtPayload } from '../dtos/JwtPayload.dto';
 import { RoleEnum } from '../enums/RoleEnum';
-import { checkPermissions } from '../utils/checkPermissions';
+import { checkPermissions } from '../utils/check-permissions';
 
 export const ownerMiddleware = createMiddleware(async (context, next) => {
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))

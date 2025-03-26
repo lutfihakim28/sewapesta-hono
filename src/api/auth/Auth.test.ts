@@ -5,7 +5,7 @@ import { LoginData } from './Auth.schema'
 import { db } from 'db'
 import { users } from 'db/schema/users'
 import { eq } from 'drizzle-orm'
-import { generateTestHeader } from '@/lib/utils/testingUtils'
+import { generateTestHeader } from '@/lib/utils/testing-utils'
 import { branches } from 'db/schema/branches'
 
 const username = 'superadmin'

@@ -2,7 +2,7 @@ import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 import { beforeAll, describe, expect, test } from 'bun:test'
 import app from 'index';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { generateTestHeader, getTestUsers } from '@/lib/utils/testingUtils';
+import { generateTestHeader, getTestUsers } from '@/lib/utils/testing-utils';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { db } from 'db';
 import { and, eq, isNull } from 'drizzle-orm';

@@ -1,6 +1,6 @@
 import { LocationSchema } from '@/api/public/locations/Location.schema';
 import { messages } from '@/lib/constants/messages';
-import { validationMessages } from '@/lib/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validation-message';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
 import { SearchSchema } from '@/lib/schemas/Search.schema';

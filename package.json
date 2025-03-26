@@ -14,7 +14,7 @@
     "db:reset": "bun db:drop && rm -r sewapesta.db && bun db:generate && bun db:migrate && bun db:seed",
     "test:only": "bun test --only --watch",
     "test:all": "bun test",
-    "route:list": "bun run src/routeLists.ts",
+    "route:list": "bun run src/route-lists.ts",
     "dev": "bun run --hot index.ts"
   },
   "dependencies": {

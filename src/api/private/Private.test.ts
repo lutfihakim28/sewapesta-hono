@@ -4,7 +4,7 @@ import { describe, expect, setSystemTime, test } from 'bun:test'
 import { login } from '../auth/Auth.test';
 import dayjs from 'dayjs';
 import { Branch } from './branches/Branch.schema';
-import { generateTestHeader } from '@/lib/utils/testingUtils';
+import { generateTestHeader } from '@/lib/utils/testing-utils';
 
 describe('Private API', () => {
   test('Without Token', async () => {

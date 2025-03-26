@@ -6,7 +6,7 @@ import { z } from '@hono/zod-openapi';
 import { districts } from 'db/schema/districts';
 import { createSelectSchema } from 'drizzle-zod';
 import { CityExtendedSchema } from '../cities/City.schema';
-import { validationMessages } from '@/lib/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validation-message';
 
 export const DistrictSchema = createSelectSchema(districts)
   .omit({ cityCode: true })

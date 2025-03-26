@@ -6,7 +6,7 @@ import { z } from '@hono/zod-openapi';
 import { cities } from 'db/schema/cities';
 import { createSelectSchema } from 'drizzle-zod';
 import { ProvinceSchema } from '../provinces/Province.schema';
-import { validationMessages } from '@/lib/constants/validationMessage';
+import { validationMessages } from '@/lib/constants/validation-message';
 
 export const CitySchema = createSelectSchema(cities)
   .omit({ provinceCode: true })

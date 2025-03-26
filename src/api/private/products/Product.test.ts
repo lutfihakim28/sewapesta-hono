@@ -1,5 +1,5 @@
 import { RoleEnum } from '@/lib/enums/RoleEnum'
-import { generateTestHeader, getTestUsers } from '@/lib/utils/testingUtils'
+import { generateTestHeader, getTestUsers } from '@/lib/utils/testing-utils'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { Product, ProductRequest } from './Product.schema'
 import app from 'index'

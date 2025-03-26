@@ -2,7 +2,7 @@ import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
-import { countOffset } from '@/lib/utils/countOffset';
+import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';

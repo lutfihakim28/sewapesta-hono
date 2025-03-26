@@ -9,7 +9,7 @@ import { branches } from 'db/schema/branches'
 import dayjs from 'dayjs'
 import { faker } from '@faker-js/faker/locale/id_ID'
 import { SortEnum } from '@/lib/enums/SortEnum'
-import { generateTestHeader, getTestUsers } from '@/lib/utils/testingUtils'
+import { generateTestHeader, getTestUsers } from '@/lib/utils/testing-utils'
 import { LoginData } from '@/api/auth/Auth.schema'
 import { locationQuery } from '@/api/public/locations/Location.query'
 
