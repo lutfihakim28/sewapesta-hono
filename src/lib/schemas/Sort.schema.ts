@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 import { SortEnum } from '../enums/SortEnum';
 
 export function SortSchema<T extends string>(columns: [T, ...T[]]) {

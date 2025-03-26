@@ -4,23 +4,25 @@ import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
 
+const tag = 'Branch'
+
 export const BranchListRoute = createRoute({
   method: 'get',
   path: '/',
-  tags: ['Branch'],
+  tags: [tag],
   request: {
     query: BranchFilterSchema,
   },
   responses: new OpenApiResponse({
     successResponse: { schema: BranchResponseListSchema, description: 'Retrieve list branches' },
-    codes: [401, 403],
+    codes: [401, 403, 422],
   }),
 })
 
 export const BranchDetailRoute = createRoute({
   method: 'get',
   path: '/{id}',
-  tags: ['Branch'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
   },
@@ -33,7 +35,7 @@ export const BranchDetailRoute = createRoute({
 export const BranchCreateRoute = createRoute({
   method: 'post',
   path: '/',
-  tags: ['Branch'],
+  tags: [tag],
   request: {
     body: {
       content: {
@@ -52,7 +54,7 @@ export const BranchCreateRoute = createRoute({
 export const BranchUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}',
-  tags: ['Branch'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
     body: {
@@ -72,7 +74,7 @@ export const BranchUpdateRoute = createRoute({
 export const BranchDeleteRoute = createRoute({
   method: 'delete',
   path: '/{id}',
-  tags: ['Branch'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
   },

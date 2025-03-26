@@ -1,6 +1,6 @@
 import { users } from 'db/schema/users'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
+import { z } from '@hono/zod-openapi'
 
 import { LocationSchema } from '@/api/public/locations/Location.schema'
 import { profiles } from 'db/schema/profiles'
@@ -13,7 +13,7 @@ export const ProfileSchema = createSelectSchema(profiles)
     subdistrictCode: true,
   })
   .openapi('Profile')
-export const ProfileExtendedSchema = ProfileSchema
+const ProfileExtendedSchema = ProfileSchema
   .omit({ subdistrictCode: true })
   .extend({
     location: LocationSchema
@@ -26,8 +26,8 @@ export const ProfileCreateSchema = createInsertSchema(profiles).pick({
 }).openapi('ProfileCreate')
 export const ProfileUpdateSchema = ProfileCreateSchema.optional().openapi('ProfileUpdate')
 
-export type ProfilCreate = z.infer<typeof ProfileCreateSchema>
-export type ProfilUpdate = z.infer<typeof ProfileUpdateSchema>
+// export type ProfileCreate = z.infer<typeof ProfileCreateSchema>
+// export type ProfileUpdate = z.infer<typeof ProfileUpdateSchema>
 
 export const UserSchema = createSelectSchema(users)
   .pick({
@@ -38,7 +38,7 @@ export const UserSchema = createSelectSchema(users)
   })
   .openapi('User')
 
-export const UserExtendedSchema = UserSchema
+const UserExtendedSchema = UserSchema
   .merge(ProfileExtendedSchema)
   .openapi('UserExtended')
 

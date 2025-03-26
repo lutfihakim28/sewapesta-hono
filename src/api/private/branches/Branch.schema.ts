@@ -11,7 +11,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 export type BranchColumn = keyof typeof branches.$inferSelect;
 
-export const BranchSchema = createSelectSchema(branches)
+const BranchSchema = createSelectSchema(branches)
   .pick({
     address: true,
     cpName: true,
@@ -22,7 +22,7 @@ export const BranchSchema = createSelectSchema(branches)
   })
   .openapi('Branch')
 
-export const BranchExtendedSchema = BranchSchema
+const BranchExtendedSchema = BranchSchema
   .omit({
     subdistrictCode: true,
   })
@@ -30,6 +30,8 @@ export const BranchExtendedSchema = BranchSchema
     location: LocationSchema,
   })
   .openapi('BranchExtended')
+
+const BranchListSchema = z.array(BranchExtendedSchema)
 
 export const BranchFilterSchema = z
   .object({
@@ -46,8 +48,6 @@ export const BranchFilterSchema = z
     'name',
   ]))
   .openapi('BranchFilter')
-
-const BranchListSchema = z.array(BranchExtendedSchema)
 
 export const BranchResponseListSchema = ApiResponseListSchema(BranchListSchema, messages.successList('branches'))
 

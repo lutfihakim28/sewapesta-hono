@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 
 export const MetaSchema = z.object({
   page: z.number().positive().openapi({ example: 1 }),

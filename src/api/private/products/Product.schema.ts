@@ -11,7 +11,7 @@ import { NumericSchema } from '@/lib/schemas/Numeric.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
-export const ProductSchema = createSelectSchema(products)
+const ProductSchema = createSelectSchema(products)
   .pick({
     id: true,
     name: true,

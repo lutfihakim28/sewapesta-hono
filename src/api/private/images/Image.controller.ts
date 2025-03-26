@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { ImageUploadRoute } from './Image.routes';
+import { ImageUploadRoute } from 'src/api/private/images/Image.route';
 import { ImageService } from './Image.service';
 import { ApiResponseData } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';

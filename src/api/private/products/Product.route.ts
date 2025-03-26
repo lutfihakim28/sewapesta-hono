@@ -4,23 +4,25 @@ import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
 import { ProductFilterSchema, ProductRequestSchema, ProductResponseDataSchema, ProductResponseListSchema } from './Product.schema'
 
+const tag = 'Product'
+
 export const ProductListRoute = createRoute({
   method: 'get',
   path: '/',
-  tags: ['Product'],
+  tags: [tag],
   request: {
     query: ProductFilterSchema,
   },
   responses: new OpenApiResponse({
     successResponse: { schema: ProductResponseListSchema, description: 'Retrieve list branches' },
-    codes: [401, 403],
+    codes: [401, 403, 422],
   }),
 })
 
 export const ProductDetailRoute = createRoute({
   method: 'get',
   path: '/{id}',
-  tags: ['Product'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
   },
@@ -33,7 +35,7 @@ export const ProductDetailRoute = createRoute({
 export const ProductCreateRoute = createRoute({
   method: 'post',
   path: '/',
-  tags: ['Product'],
+  tags: [tag],
   request: {
     body: {
       content: {
@@ -52,7 +54,7 @@ export const ProductCreateRoute = createRoute({
 export const ProductUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}',
-  tags: ['Product'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
     body: {
@@ -72,7 +74,7 @@ export const ProductUpdateRoute = createRoute({
 export const ProductDeleteRoute = createRoute({
   method: 'delete',
   path: '/{id}',
-  tags: ['Product'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
   },

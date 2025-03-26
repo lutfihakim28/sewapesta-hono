@@ -5,7 +5,7 @@ export class Meta {
   totalData: number
 
   constructor(data: {
-    page: number | string
+    page?: number | string
     pageSize?: number | string
     total: number
   }) {

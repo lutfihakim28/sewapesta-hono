@@ -5,15 +5,15 @@ import { SearchSchema } from '@/lib/schemas/Search.schema';
 import { z } from '@hono/zod-openapi';
 import { cities } from 'db/schema/cities';
 import { createSelectSchema } from 'drizzle-zod';
-import { ProvinceSchema } from '../provinces/Province.schema';
+// import { ProvinceSchema } from '../provinces/Province.schema';
 import { validationMessages } from '@/lib/constants/validation-message';
 
-export const CitySchema = createSelectSchema(cities)
+const CitySchema = createSelectSchema(cities)
   .omit({ provinceCode: true })
   .openapi('City');
-export const CityExtendedSchema = CitySchema
-  .extend({ province: ProvinceSchema })
-  .openapi('CityExtended')
+// export const CityExtendedSchema = CitySchema
+//   .extend({ province: ProvinceSchema })
+//   .openapi('CityExtended')
 export const CityFilterSchema = z
   .object({
     provinceCode: z.string({ message: validationMessages.required('Province code') }).openapi({ example: '33' })

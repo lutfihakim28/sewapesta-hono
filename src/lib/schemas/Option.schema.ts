@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 
 export const OptionSchema = z.object({
   value: z.union([z.string(), z.number()]),

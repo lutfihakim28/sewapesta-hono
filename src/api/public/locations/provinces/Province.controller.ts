@@ -1,6 +1,6 @@
 import { messages } from '@/lib/constants/messages';
 import { honoApp } from '@/lib/utils/hono';
-import { ProvinceRoute } from './Province.routes';
+import { ProvinceRoute } from 'src/api/public/locations/provinces/Province.route';
 import { ProvinceService } from './Province.service';
 import { Meta } from '@/lib/dtos/Meta.dto';
 import { ApiResponseList } from '@/lib/dtos/ApiResponse.dto';

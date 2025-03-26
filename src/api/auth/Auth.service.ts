@@ -8,7 +8,7 @@ import { messages } from '@/lib/constants/messages';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { LoginData, RefreshRequest } from './Auth.schema';
 
-const { createdAt, deletedAt, password, profileId, refreshToken, updatedAt, ...columns } = getTableColumns(users)
+const { createdAt, deletedAt, password, refreshToken, updatedAt, ...columns } = getTableColumns(users)
 
 export abstract class AuthService {
   static async login(userId: number): Promise<LoginData> {

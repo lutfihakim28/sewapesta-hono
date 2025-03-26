@@ -1,7 +1,7 @@
 import { messages } from '@/lib/constants/messages';
 import { honoApp } from '@/lib/utils/hono';
 import { Meta } from '@/lib/dtos/Meta.dto';
-import { SubdistrictRoute } from './Subdistrict.routes';
+import { SubdistrictRoute } from 'src/api/public/locations/subdistricts/Subdistrict.route';
 import { SubdistrictService } from './Subdistrict.service';
 import { ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 

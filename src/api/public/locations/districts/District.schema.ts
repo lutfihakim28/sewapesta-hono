@@ -5,17 +5,16 @@ import { SearchSchema } from '@/lib/schemas/Search.schema';
 import { z } from '@hono/zod-openapi';
 import { districts } from 'db/schema/districts';
 import { createSelectSchema } from 'drizzle-zod';
-import { CityExtendedSchema } from '../cities/City.schema';
 import { validationMessages } from '@/lib/constants/validation-message';
 
-export const DistrictSchema = createSelectSchema(districts)
+const DistrictSchema = createSelectSchema(districts)
   .omit({ cityCode: true })
   .openapi('District');
-export const DistrictExtendedSchema = DistrictSchema
-  .extend({
-    city: CityExtendedSchema,
-  })
-  .openapi('DistrictExtended');
+// export const DistrictExtendedSchema = DistrictSchema
+//   .extend({
+//     city: CityExtendedSchema,
+//   })
+//   .openapi('DistrictExtended');
 export const DistrictFilterSchema = z
   .object({
     cityCode: z.string({ message: validationMessages.required('City code') }).openapi({ example: '33.74' })

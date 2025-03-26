@@ -1,10 +1,9 @@
 import { honoApp } from '@/lib/utils/hono';
-import { BranchCreateRoute, BranchDeleteRoute, BranchDetailRoute, BranchListRoute, BranchUpdateRoute } from './Branch.routes';
+import { BranchCreateRoute, BranchDeleteRoute, BranchDetailRoute, BranchListRoute, BranchUpdateRoute } from 'src/api/private/branches/Branch.route';
 import { BranchService } from './Branch.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
 import { Meta } from '@/lib/dtos/Meta.dto';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { UserService } from '../users/User.service';
 import { ForbiddenException } from '@/lib/exceptions/ForbiddenException';

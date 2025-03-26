@@ -1,19 +1,19 @@
-import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
-import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
-import { db } from 'db';
+import { messages } from '@/lib/constants/messages';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { UniqueCheck } from '@/lib/schemas/UniqueCheck.schema';
 import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { messages } from '@/lib/constants/messages';
+import { db } from 'db';
 import { units } from 'db/schema/units';
+import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { unitColumns } from './Unit.column';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
-import { UniqueCheck } from '@/lib/schemas/UniqueCheck.schema';
+import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 
 export abstract class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
     const where = this.buildWhereClause(query);
-    const result = await Promise.all([
+    return await Promise.all([
       db.select(unitColumns)
         .from(units)
         .where(where)
@@ -21,8 +21,6 @@ export abstract class UnitService {
         .offset(countOffset(query.page, query.pageSize)),
       this.count(where)
     ])
-
-    return result
   }
 
   static async create(payload: UnitRequest): Promise<void> {

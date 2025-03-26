@@ -1,17 +1,17 @@
-import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
-import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
-import { products } from 'db/schema/products';
-import { SortEnum } from '@/lib/enums/SortEnum';
-import { db } from 'db';
-import { countOffset } from '@/lib/utils/count-offset';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
-import dayjs from 'dayjs';
-import { User } from '../users/User.schema';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { productColumns } from './Product.column';
+import { SortEnum } from '@/lib/enums/SortEnum';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { countOffset } from '@/lib/utils/count-offset';
+import dayjs from 'dayjs';
+import { db } from 'db';
+import { products } from 'db/schema/products';
+import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
 import { BranchService } from '../branches/Branch.service';
+import { User } from '../users/User.schema';
+import { productColumns } from './Product.column';
+import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
 
 export abstract class ProductService {
   static async list(user: User, query: ProductFilter): Promise<[Product[], number]> {
@@ -32,7 +32,7 @@ export abstract class ProductService {
 
     const where = this.buildWhereClause(query, user);
 
-    const result = await Promise.all([
+    return await Promise.all([
       db.select(productColumns)
         .from(products)
         .where(where)
@@ -41,8 +41,6 @@ export abstract class ProductService {
         .offset(countOffset(query.page, query.pageSize)),
       this.count(where)
     ])
-
-    return result
   }
 
   static async get(id: number, user: User): Promise<Product> {
@@ -76,9 +74,7 @@ export abstract class ProductService {
         id: products.id
       })
 
-    const product = await this.get(newProduct.id, user)
-
-    return product
+    return await this.get(newProduct.id, user)
   }
 
   static async update(id: number, payload: ProductRequest, user: User): Promise<Product> {
@@ -92,12 +88,15 @@ export abstract class ProductService {
       conditions.push(eq(products.branchId, user.branchId))
     }
 
-    await db
+    const [product] = await db
       .update(products)
       .set(payload)
       .where(and(...conditions))
+      .returning(productColumns)
 
-    const product = await this.get(id, user)
+    if (!product) {
+      throw new NotFoundException(messages.errorNotFound(`Product with ID ${id}`));
+    }
 
     return product
   }

@@ -1,7 +1,8 @@
+import { NumericSchema } from '@/lib/schemas/Numeric.schema';
 import { items } from 'db/schema/items';
 import { productsItems } from 'db/schema/products-items';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum';
 import { SearchSchema } from '@/lib/schemas/Search.schema';
 import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
@@ -33,7 +34,7 @@ export const ProductItemSchema = createSelectSchema(productsItems).pick({
   overtimeType: true,
 }).openapi('ProductItem')
 
-export const ItemExtendedSchema = ItemSchema.omit({
+const ItemExtendedSchema = ItemSchema.omit({
   ownerId: true,
 }).extend({
   products: z.array(ProductItemSchema),
@@ -43,12 +44,12 @@ export const ItemExtendedSchema = ItemSchema.omit({
   .openapi('ItemExtended')
 
 export const ItemFilterSchema = z.object({
-  categoryId: z.number().optional(),
-  ownerId: z.number().optional(),
-  productId: z.number().optional(),
-  branchId: z.number().optional(),
-  minPrice: z.number().optional(),
-  maxPrice: z.number().optional(),
+  categoryId: NumericSchema('Category ID').optional(),
+  ownerId: NumericSchema('Owner ID').optional(),
+  productId: NumericSchema('Product ID').optional(),
+  branchId: NumericSchema('Branch ID').optional(),
+  minPrice: NumericSchema('Min Price').optional(),
+  maxPrice: NumericSchema('Max Price').optional(),
   overtimeType: z.nativeEnum(OvertimeTypeEnum).optional(),
 })
   .merge(SearchSchema)

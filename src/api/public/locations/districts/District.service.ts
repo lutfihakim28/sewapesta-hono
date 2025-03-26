@@ -1,12 +1,12 @@
-import { db } from 'db';
-import { and, count, eq, like } from 'drizzle-orm';
 import { countOffset } from '@/lib/utils/count-offset';
-import { District, DistrictFilter } from './District.schema';
+import { db } from 'db';
 import { districts } from 'db/schema/districts';
+import { and, count, eq, like } from 'drizzle-orm';
+import { District, DistrictFilter } from './District.schema';
 
 export class DistrictService {
   static async list(query: DistrictFilter): Promise<District[]> {
-    const _districts = await db
+    return db
       .select({
         code: districts.code,
         name: districts.name,
@@ -15,8 +15,6 @@ export class DistrictService {
       .where(this.buildWhereClause(query))
       .limit(Number(query.pageSize || 5))
       .offset(countOffset(query.page, query.pageSize))
-
-    return _districts
   }
 
   static async count(query: DistrictFilter): Promise<number> {

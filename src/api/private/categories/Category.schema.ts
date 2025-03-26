@@ -5,9 +5,9 @@ import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
 import { SearchSchema } from '@/lib/schemas/Search.schema';
 import { categories } from 'db/schema/categories';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 
-export const CategorySchema = createSelectSchema(categories)
+const CategorySchema = createSelectSchema(categories)
   .pick({
     id: true,
     name: true,

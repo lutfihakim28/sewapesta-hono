@@ -1,30 +1,30 @@
-import { db } from 'db';
-import { SQL, count, and, isNull, eq, like, gte, lte, asc, desc, notInArray } from 'drizzle-orm';
-import { ItemColumn, ItemExtended, ItemFilter, ItemRequest, ProductItemColumn, ProductItemSchema } from './Item.schema';
-import { items } from 'db/schema/items';
-import { User } from '../users/User.schema';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { branches } from 'db/schema/branches';
-import { productsItems } from 'db/schema/products-items';
-import { SortEnum } from '@/lib/enums/SortEnum';
-import { countOffset } from '@/lib/utils/count-offset';
-import { users } from 'db/schema/users';
-import { products } from 'db/schema/products';
-import { images } from 'db/schema/images';
-import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
-import { profiles } from 'db/schema/profiles';
-import { itemColumns } from './Item.column';
-import { profileColumns } from '../users/User.column';
-import { Image, ImageSchema } from '../images/Image.schema';
-import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
-import { ImageService } from '../images/Image.service';
-import { CategoryService } from '../categories/Category.service';
-import { UnitService } from '../units/Unit.service';
-import { UserService } from '../users/User.service';
-import { ProductService } from '../products/Product.service';
+import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { SortEnum } from '@/lib/enums/SortEnum';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
+import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
+import { db } from 'db';
+import { branches } from 'db/schema/branches';
+import { images } from 'db/schema/images';
+import { items } from 'db/schema/items';
+import { products } from 'db/schema/products';
+import { productsItems } from 'db/schema/products-items';
+import { profiles } from 'db/schema/profiles';
+import { users } from 'db/schema/users';
+import { and, asc, count, desc, eq, gte, isNull, like, lte, notInArray, SQL } from 'drizzle-orm';
+import { CategoryService } from '../categories/Category.service';
+import { Image, ImageSchema } from '../images/Image.schema';
+import { ImageService } from '../images/Image.service';
+import { ProductService } from '../products/Product.service';
+import { UnitService } from '../units/Unit.service';
+import { profileColumns } from '../users/User.column';
+import { User } from '../users/User.schema';
+import { UserService } from '../users/User.service';
+import { itemColumns } from './Item.column';
+import { ItemColumn, ItemExtended, ItemFilter, ItemRequest, ProductItemColumn, ProductItemSchema } from './Item.schema';
 
 export abstract class ItemService {
   static async list(user: User, query: ItemFilter): Promise<[ItemExtended[], number]> {
@@ -221,13 +221,11 @@ export abstract class ItemService {
       ])
     })
 
-    const item = await this.get(id)
-
-    return item
+    return await this.get(id)
   }
 
   static async delete(id: number) {
-    const item = await db
+    const [item] = await db
       .update(items)
       .set({
         deletedAt: dayjs().unix(),
@@ -237,6 +235,27 @@ export abstract class ItemService {
         isNull(items.deletedAt)
       ))
       .returning({ id: items.id })
+
+    if (!item) {
+      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
+    }
+  }
+
+  static async check(id: number, user: User) {
+    const conditions = [
+      isNull(items.deletedAt),
+      eq(items.id, id),
+    ]
+
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(eq(users.branchId, user.branchId))
+    }
+
+    const [item] = await db.select()
+      .from(items)
+      .innerJoin(users, eq(users.id, items.ownerId))
+      .where(and(...conditions))
+      .limit(1)
 
     if (!item) {
       throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
@@ -263,12 +282,12 @@ export abstract class ItemService {
       )
     } else if (query.branchId) {
       conditions.push(
-        eq(branches.id, query.branchId)
+        eq(branches.id, +query.branchId)
       )
     }
 
     if (query.categoryId) {
-      conditions.push(eq(items.categoryId, query.categoryId))
+      conditions.push(eq(items.categoryId, +query.categoryId))
     }
 
     if (query.overtimeType) {
@@ -276,19 +295,19 @@ export abstract class ItemService {
     }
 
     if (query.ownerId) {
-      conditions.push(eq(items.ownerId, query.ownerId))
+      conditions.push(eq(items.ownerId, +query.ownerId))
     }
 
     if (query.productId) {
-      conditions.push(eq(productsItems.productId, query.productId))
+      conditions.push(eq(productsItems.productId, +query.productId))
     }
 
     if (query.minPrice) {
-      conditions.push(gte(items.price, query.minPrice))
+      conditions.push(gte(items.price, +query.minPrice))
     }
 
     if (query.maxPrice) {
-      conditions.push(lte(items.price, query.maxPrice))
+      conditions.push(lte(items.price, +query.maxPrice))
     }
 
     if (query.keyword) {

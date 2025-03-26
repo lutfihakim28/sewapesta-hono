@@ -4,14 +4,13 @@ import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
 import { ApiResponseDataSchema } from '@/lib/schemas/ApiResponse.schema';
 import { images } from 'db/schema/images';
 import { createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 
 const MAX_FILE_SIZE = 10000000;
 const accept = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];
 
 function checkFileType(type: string) {
-  if (accept.includes(type)) return true;
-  return false;
+  return accept.includes(type);
 }
 
 export const ImageSchema = createSelectSchema(images).pick({
@@ -33,12 +32,12 @@ export const ImageRequestSchema = z.object({
     })
 });
 
-export const ImageFilterSchema = createSelectSchema(images).pick({
+const ImageFilterSchema = createSelectSchema(images).pick({
   reference: true,
   referenceId: true,
 })
 
-export const ImageSaveSchema = z.object({
+const ImageSaveSchema = z.object({
   reference: z.nativeEnum(ImageReferenceEnum, {
     required_error: validationMessages.required('Image Reference'),
     invalid_type_error: validationMessages.enum('Image Reference', ImageReferenceEnum),
@@ -49,7 +48,7 @@ export const ImageSaveSchema = z.object({
   }).transform((value) => Number(value)),
 }).openapi('ImageSave')
 
-export const ImageUploadSchema = ImageSchema.pick({ path: true })
+const ImageUploadSchema = ImageSchema.pick({ path: true })
 export const ImageUploadResponse = ApiResponseDataSchema(ImageUploadSchema, messages.successUpload('Image'))
 
 export type ImageSave = z.infer<typeof ImageSaveSchema>

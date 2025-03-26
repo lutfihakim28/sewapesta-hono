@@ -2,7 +2,7 @@ import { itemMutations } from 'db/schema/item-mutations';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { ItemSchema } from '../items/Item.schema';
 import { ProfileSchema } from '../users/User.schema';
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { messages } from '@/lib/constants/messages';
 import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
@@ -23,7 +23,7 @@ const ItemMutationSchema = createSelectSchema(itemMutations).pick({
   itemId: true,
 })
 
-export const ItemMutationExtendedSchema = ItemMutationSchema
+const ItemMutationExtendedSchema = ItemMutationSchema
   .omit({ itemId: true })
   .extend({
     item: ItemSchema,
@@ -49,7 +49,7 @@ export const ItemMutationFilterSchema = z
   .openapi('ItemMutationFilter')
 
 export const ItemMutationResponseListSchema = ApiResponseListSchema(z.array(ItemMutationExtendedSchema), messages.successList('Item Mutation'))
-export const ItemMutationResponseDatachema = ApiResponseDataSchema(ItemMutationSchema, messages.successDetail('Item Mutation'))
+export const ItemMutationResponseDataSchema = ApiResponseDataSchema(ItemMutationSchema, messages.successDetail('Item Mutation'))
 
 export const ItemMutationRequestSchema = createInsertSchema(itemMutations).pick({
   description: true,
@@ -58,6 +58,7 @@ export const ItemMutationRequestSchema = createInsertSchema(itemMutations).pick(
   type: true,
 }).openapi('ItemMutationRequest')
 
+export type ItemMutation = z.infer<typeof ItemMutationSchema>
 export type ItemMutationExtended = z.infer<typeof ItemMutationExtendedSchema>
 export type ItemMutationFilter = z.infer<typeof ItemMutationFilterSchema>
 export type ItemMutationRequest = z.infer<typeof ItemMutationRequestSchema>

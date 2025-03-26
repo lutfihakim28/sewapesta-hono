@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { UnitCheckRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from './Unit.routes';
+import { UnitCheckRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from 'src/api/private/units/Unit.route';
 import { UnitService } from './Unit.service';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';

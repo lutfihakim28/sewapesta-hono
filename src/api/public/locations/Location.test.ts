@@ -2,7 +2,6 @@ import app from 'index'
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto'
 import { describe, expect, test } from 'bun:test'
 import { Province } from './provinces/Province.schema'
-import { validationMessages } from '@/lib/constants/validation-message'
 import { City } from './cities/City.schema'
 
 describe('Location', () => {

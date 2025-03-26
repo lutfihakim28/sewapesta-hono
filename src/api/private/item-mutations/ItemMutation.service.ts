@@ -1,18 +1,27 @@
-import { SortEnum } from '@/lib/enums/SortEnum';
-import { ItemMutationColumn, ItemMutationExtended, ItemMutationFilter } from './ItemMutation.schema';
-import { and, asc, count, desc, eq, gte, isNull, like, lte, not } from 'drizzle-orm';
-import { itemMutations } from 'db/schema/item-mutations';
+import { ItemService } from '@/api/private/items/Item.service';
+import { messages } from '@/lib/constants/messages';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { User } from '../users/User.schema';
-import { users } from 'db/schema/users';
-import { items } from 'db/schema/items';
+import { SortEnum } from '@/lib/enums/SortEnum';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
 import { db } from 'db';
-import { itemMutationsColumns } from './ItemMutation.column';
+import { itemMutations } from 'db/schema/item-mutations';
+import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
-import { countOffset } from '@/lib/utils/count-offset';
+import { users } from 'db/schema/users';
+import { and, asc, count, desc, eq, gte, isNull, like, lte, not } from 'drizzle-orm';
 import { itemColumns } from '../items/Item.column';
 import { profileColumns } from '../users/User.column';
+import { User } from '../users/User.schema';
+import { itemMutationsColumns } from './ItemMutation.column';
+import {
+  ItemMutation,
+  ItemMutationColumn,
+  ItemMutationExtended,
+  ItemMutationFilter,
+  ItemMutationRequest,
+} from './ItemMutation.schema';
 
 export abstract class ItemMutationService {
   static async list(query: ItemMutationFilter, user: User): Promise<[ItemMutationExtended[], number]> {
@@ -33,7 +42,7 @@ export abstract class ItemMutationService {
 
     const conditions = this.buildWhereClause(query, user);
 
-    const result = await Promise.all([
+    return await Promise.all([
       db
         .select({
           ...itemMutationsColumns,
@@ -49,9 +58,84 @@ export abstract class ItemMutationService {
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       this.count(query, user),
-    ])
+    ]);
+  }
 
-    return result;
+  static async get(id: number, user: User): Promise<ItemMutation> {
+    const conditions: ReturnType<typeof and>[] = [
+      eq(itemMutations.id, id),
+      isNull(itemMutations.deletedAt),
+      not(isNull(items.quantity))
+    ]
+
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(
+        eq(users.branchId, user.branchId)
+      )
+    }
+
+    const [mutation] = await db
+      .select(itemMutationsColumns)
+      .from(itemMutations)
+      .innerJoin(items, eq(items.id, itemMutations.itemId))
+      .innerJoin(users, eq(users.id, items.ownerId))
+      .where(and(...conditions))
+      .limit(1)
+
+    if (!mutation) {
+      throw new NotFoundException(messages.errorNotFound(`Item mutation with ID ${id}`));
+    }
+
+    return mutation
+  }
+
+  static async create(payload: ItemMutationRequest, user: User): Promise<ItemMutation> {
+    await ItemService.check(payload.itemId, user)
+
+    const [mutation] = await db
+      .insert(itemMutations)
+      .values(payload)
+      .returning(itemMutationsColumns)
+
+    return mutation;
+  }
+
+  static async update(id: number, payload: ItemMutationRequest, user: User): Promise<ItemMutation> {
+    await ItemService.check(id, user)
+
+    const [mutation] = await db
+      .update(itemMutations)
+      .set(payload)
+      .where(and(
+        eq(itemMutations.id, id),
+        isNull(itemMutations.deletedAt),
+      ))
+      .returning(itemMutationsColumns)
+
+    if (!mutation) {
+      throw new NotFoundException(messages.errorNotFound(`Item mutation with ID ${id}`));
+    }
+
+    return mutation;
+  }
+
+  static async delete(id: number, user: User): Promise<void> {
+    await ItemService.check(id, user)
+
+    const [mutation] = await db
+      .update(itemMutations)
+      .set({
+        deletedAt: dayjs().unix()
+      })
+      .where(and(
+        eq(itemMutations.id, id),
+        isNull(itemMutations.deletedAt),
+      ))
+      .returning(itemMutationsColumns)
+
+    if (!mutation) {
+      throw new NotFoundException(messages.errorNotFound(`Item mutation with ID ${id}`));
+    }
   }
 
   private static async count(query: ItemMutationFilter, user: User): Promise<number> {

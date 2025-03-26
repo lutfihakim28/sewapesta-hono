@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 import { MetaSchema } from './Meta.schema';
 
 export function ApiResponseSchema(message: string, code: number = 200) {

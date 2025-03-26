@@ -1,12 +1,12 @@
-import { db } from 'db';
-import { and, count, eq, like } from 'drizzle-orm';
 import { countOffset } from '@/lib/utils/count-offset';
-import { City, CityFilter } from './City.schema';
+import { db } from 'db';
 import { cities } from 'db/schema/cities';
+import { and, count, eq, like } from 'drizzle-orm';
+import { City, CityFilter } from './City.schema';
 
 export class CityService {
   static async list(query: CityFilter): Promise<City[]> {
-    const _cities = await db
+    return db
       .select({
         code: cities.code,
         name: cities.name,
@@ -15,8 +15,6 @@ export class CityService {
       .where(this.buildWhereClause(query))
       .limit(Number(query.pageSize || 5))
       .offset(countOffset(query.page, query.pageSize))
-
-    return _cities
   }
 
   static async count(query: CityFilter): Promise<number> {

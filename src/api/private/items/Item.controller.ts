@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { ItemCreateRoute, ItemDeleteRoute, ItemDetailRoute, ItemListRoute, ItemUpdateRoute } from './Item.routes';
+import { ItemCreateRoute, ItemDeleteRoute, ItemDetailRoute, ItemListRoute, ItemUpdateRoute } from 'src/api/private/items/Item.route';
 import { ItemService } from './Item.service';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
@@ -18,7 +18,7 @@ ItemController.openapi(ItemListRoute, async (context) => {
     messages: [messages.successList('items')],
     meta: new Meta({
       page: query.page,
-      pageSize: query.pageSize!,
+      pageSize: query.pageSize,
       total: totalData
     }),
     data: items

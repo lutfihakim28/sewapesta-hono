@@ -137,8 +137,6 @@ export abstract class BranchService {
   }
 
   static async delete(id: number): Promise<void> {
-    await this.get(id)
-
     const [branch] = await db
       .update(branches)
       .set({
@@ -149,6 +147,10 @@ export abstract class BranchService {
         isNull(branches.deletedAt)
       ))
       .returning()
+
+    if (!branch) {
+      throw new NotFoundException(messages.errorNotFound(`Branch with ID ${id}`));
+    }
 
     logger.debug({
       id,

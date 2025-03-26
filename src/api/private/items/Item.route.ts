@@ -4,23 +4,25 @@ import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto';
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema';
 import { SuccessSchema } from '@/lib/schemas/Success.schema';
 
+const tag = 'Item'
+
 export const ItemListRoute = createRoute({
   method: 'get',
   path: '/',
-  tags: ['Item'],
+  tags: [tag],
   request: {
     query: ItemFilterSchema,
   },
   responses: new OpenApiResponse({
     successResponse: { schema: ItemResponseListSchema, description: 'Retrieve list items' },
-    codes: [401, 403],
+    codes: [401, 403, 422],
   }),
 })
 
 export const ItemDetailRoute = createRoute({
   method: 'get',
   path: '/{id}',
-  tags: ['Item'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
   },
@@ -33,7 +35,7 @@ export const ItemDetailRoute = createRoute({
 export const ItemCreateRoute = createRoute({
   method: 'post',
   path: '/',
-  tags: ['Item'],
+  tags: [tag],
   request: {
     body: {
       content: {
@@ -52,7 +54,7 @@ export const ItemCreateRoute = createRoute({
 export const ItemUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}',
-  tags: ['Item'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
     body: {
@@ -72,7 +74,7 @@ export const ItemUpdateRoute = createRoute({
 export const ItemDeleteRoute = createRoute({
   method: 'delete',
   path: '/{id}',
-  tags: ['Item'],
+  tags: [tag],
   request: {
     params: ParamIdSchema,
   },

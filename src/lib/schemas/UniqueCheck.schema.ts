@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 import { validationMessages } from '../constants/validation-message';
 import { NumericSchema } from './Numeric.schema';
 

@@ -1,24 +1,22 @@
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { logger } from '@/lib/utils/logger';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { images } from 'db/schema/images';
-import { eq, and } from 'drizzle-orm';
-import { unlink } from "node:fs/promises";
-import { Image, ImageFilter, ImageRequest, ImageSave, ImageUpload } from './Image.schema';
-import { logger } from '@/lib/utils/logger';
+import { and, eq } from 'drizzle-orm';
+import { unlink } from 'node:fs/promises';
 import { imageColumns } from './Image.column';
+import { Image, ImageFilter, ImageRequest, ImageSave, ImageUpload } from './Image.schema';
 
 export abstract class ImageService {
   static async getByReference(request: ImageFilter): Promise<Image[]> {
-    const _images = await db
+    return db
       .select(imageColumns)
       .from(images)
       .where(and(
         eq(images.reference, request.reference),
         eq(images.referenceId, request.referenceId)
-      ))
-
-    return _images;
+      ));
   }
 
   static async upload(request: ImageRequest): Promise<ImageUpload> {
