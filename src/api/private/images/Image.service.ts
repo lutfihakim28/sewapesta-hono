@@ -72,11 +72,16 @@ export abstract class ImageService {
       }
     }
 
-    await Promise.all(paths.map((path) => processFile(path)));
+    for (let index = 0; index < paths.length; index++) {
+      const path = paths[index];
+      await processFile(path)
+    }
   }
 
   static async delete(transaction: Parameters<Parameters<typeof db.transaction>[0]>[0], ids: number[]) {
-    await Promise.all(ids.map(async (id) => {
+    for (let index = 0; index < ids.length; index++) {
+      const id = ids[index];
+
       const [image] = await transaction
         .select({ id: images.id, path: images.path })
         .from(images)
@@ -91,6 +96,6 @@ export abstract class ImageService {
       await unlink(image.path);
 
       await transaction.delete(images).where(eq(images.id, image.id))
-    }))
+    }
   }
 }

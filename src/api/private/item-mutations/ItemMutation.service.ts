@@ -10,7 +10,7 @@ import { itemMutations } from 'db/schema/item-mutations';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
 import { users } from 'db/schema/users';
-import { and, asc, count, desc, eq, gte, isNull, like, lte, not } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, isNull, like, lte, not, sql } from 'drizzle-orm';
 import { itemColumns } from '../items/Item.column';
 import { profileColumns } from '../users/User.column';
 import { User } from '../users/User.schema';
@@ -22,6 +22,7 @@ import {
   ItemMutationFilter,
   ItemMutationRequest,
 } from './ItemMutation.schema';
+import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 
 export abstract class ItemMutationService {
   static async list(query: ItemMutationFilter, user: User): Promise<[ItemMutationExtended[], number]> {
@@ -65,7 +66,6 @@ export abstract class ItemMutationService {
     const conditions: ReturnType<typeof and>[] = [
       eq(itemMutations.id, id),
       isNull(itemMutations.deletedAt),
-      not(isNull(items.quantity))
     ]
 
     if (user.role !== RoleEnum.SuperAdmin) {
@@ -97,7 +97,8 @@ export abstract class ItemMutationService {
       .values(payload)
       .returning(itemMutationsColumns)
 
-    return mutation;
+    return mutation
+
   }
 
   static async update(id: number, payload: ItemMutationRequest, user: User): Promise<ItemMutation> {
@@ -156,7 +157,6 @@ export abstract class ItemMutationService {
   private static buildWhereClause(query: ItemMutationFilter, user: User) {
     const conditions: ReturnType<typeof and>[] = [
       isNull(itemMutations.deletedAt),
-      not(isNull(items.quantity))
     ]
 
     if (user.role !== RoleEnum.SuperAdmin) {

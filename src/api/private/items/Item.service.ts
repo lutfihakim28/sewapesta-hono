@@ -14,7 +14,7 @@ import { products } from 'db/schema/products';
 import { productsItems } from 'db/schema/products-items';
 import { profiles } from 'db/schema/profiles';
 import { users } from 'db/schema/users';
-import { and, asc, count, desc, eq, gte, isNull, like, lte, notInArray, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, isNull, like, lte, not, notInArray, SQL } from 'drizzle-orm';
 import { CategoryService } from '../categories/Category.service';
 import { Image, ImageSchema } from '../images/Image.schema';
 import { ImageService } from '../images/Image.service';
@@ -24,13 +24,14 @@ import { profileColumns } from '../users/User.column';
 import { User } from '../users/User.schema';
 import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
-import { ItemColumn, ItemExtended, ItemFilter, ItemRequest, ProductItemColumn, ProductItemSchema } from './Item.schema';
+import { ItemColumn, ItemExtended, ItemFilter, ItemRequest, ItemSort, ProductItemColumn, ProductItemSchema } from './Item.schema';
+import { itemQuantityQuery } from './Item.query';
 
 export abstract class ItemService {
   static async list(user: User, query: ItemFilter): Promise<[ItemExtended[], number]> {
     const { ownerId, ...selectedColumns } = itemColumns
     let sort: SortEnum = SortEnum.Ascending;
-    let sortBy: ItemColumn | ProductItemColumn = 'id';
+    let sortBy: ItemSort = 'id';
 
     if (query.sort) {
       sort = query.sort
@@ -43,12 +44,16 @@ export abstract class ItemService {
     let orderBy: SQL<unknown>
 
     if ([
-      "id", "name", "createdAt", "updatedAt", "deletedAt",
-      "categoryId", "ownerId", "quantity", "price", "unitId"
+      'id', 'name', 'createdAt', 'updatedAt', 'deletedAt',
+      'categoryId', 'ownerId', 'price', 'unitId'
     ].includes(sortBy as ItemColumn)) {
       orderBy = sort === SortEnum.Ascending
         ? asc(items[sortBy as ItemColumn])
         : desc(items[sortBy as ItemColumn])
+    } else if (sortBy === 'quantity') {
+      orderBy = sort === SortEnum.Ascending
+        ? asc(itemQuantityQuery[sortBy])
+        : desc(itemQuantityQuery[sortBy])
     } else {
       orderBy = sort === SortEnum.Ascending
         ? asc(productsItems[sortBy as ProductItemColumn])
@@ -58,28 +63,31 @@ export abstract class ItemService {
     const where = this.buildWhereClause(user, query);
 
     const [_items, totalData] = await Promise.all([
-      db.select({
-        ...selectedColumns,
-        owner: profileColumns,
-        products: buildJsonGroupArray([
-          productsItems.productId,
-          productsItems.overtimeMultiplier,
-          productsItems.overtimePrice,
-          productsItems.overtimeRatio,
-          productsItems.overtimeType,
-        ]),
-        images: buildJsonGroupArray([
-          images.id,
-          images.path,
-          images.url,
-        ]),
-      })
+      db.with(itemQuantityQuery)
+        .select({
+          ...selectedColumns,
+          owner: profileColumns,
+          products: buildJsonGroupArray([
+            productsItems.productId,
+            productsItems.overtimeMultiplier,
+            productsItems.overtimePrice,
+            productsItems.overtimeRatio,
+            productsItems.overtimeType,
+          ]),
+          images: buildJsonGroupArray([
+            images.id,
+            images.path,
+            images.url,
+          ]),
+          quantity: itemQuantityQuery.quantity,
+        })
         .from(items)
         .leftJoin(productsItems, eq(productsItems.itemId, items.id))
         .innerJoin(products, eq(products.id, productsItems.productId))
         .innerJoin(users, eq(users.id, items.ownerId))
         .innerJoin(profiles, eq(profiles.userId, users.id))
         .innerJoin(branches, eq(branches.id, users.branchId))
+        .innerJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
         .leftJoin(
           images,
           and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
@@ -115,6 +123,7 @@ export abstract class ItemService {
     }
 
     const [item] = await db
+      .with(itemQuantityQuery)
       .select({
         ...selectedColumns,
         owner: profileColumns,
@@ -130,6 +139,7 @@ export abstract class ItemService {
           images.path,
           images.url,
         ]),
+        quantity: itemQuantityQuery.quantity,
       })
       .from(items)
       .leftJoin(productsItems, eq(productsItems.itemId, items.id))
@@ -137,6 +147,7 @@ export abstract class ItemService {
       .innerJoin(users, eq(users.id, items.ownerId))
       .innerJoin(profiles, eq(profiles.userId, users.id))
       .innerJoin(branches, eq(branches.id, users.branchId))
+      .innerJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
       .leftJoin(
         images,
         and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
@@ -168,20 +179,18 @@ export abstract class ItemService {
           id: itemColumns.id
         })
 
-      await Promise.all([
-        ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
-          reference: ImageReferenceEnum.ITEM,
-          referenceId: item.id
-        }),
-        transaction.insert(productsItems)
-          .values(productsData
-            .filter((product) => typeof product !== 'number')
-            .map((product) => ({
-              ...product,
-              itemId: item.id
-            }))
-          )
-      ])
+      await ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
+        reference: ImageReferenceEnum.ITEM,
+        referenceId: item.id
+      })
+      await transaction.insert(productsItems)
+        .values(productsData
+          .filter((product) => typeof product !== 'number')
+          .map((product) => ({
+            ...product,
+            itemId: item.id
+          }))
+        )
 
       return item.id
     })
@@ -202,23 +211,21 @@ export abstract class ItemService {
           isNull(items.deletedAt)
         ))
 
-      await Promise.all([
-        transaction.delete(productsItems)
-          .where(notInArray(productsItems.productId, productsData.filter((product) => typeof product === 'number'))),
-        ImageService.delete(transaction, imagesData.filter((image) => typeof image === 'number')),
-        ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
-          reference: ImageReferenceEnum.ITEM,
-          referenceId: id
-        }),
-        transaction.insert(productsItems)
-          .values(productsData
-            .filter((product) => typeof product !== 'number')
-            .map((product) => ({
-              ...product,
-              itemId: id
-            }))
-          )
-      ])
+      await transaction.delete(productsItems)
+        .where(notInArray(productsItems.productId, productsData.filter((product) => typeof product === 'number')))
+      await ImageService.delete(transaction, imagesData.filter((image) => typeof image === 'number'))
+      await ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
+        reference: ImageReferenceEnum.ITEM,
+        referenceId: id
+      })
+      await transaction.insert(productsItems)
+        .values(productsData
+          .filter((product) => typeof product !== 'number')
+          .map((product) => ({
+            ...product,
+            itemId: id
+          }))
+        )
     })
 
     return await this.get(id)
@@ -245,6 +252,7 @@ export abstract class ItemService {
     const conditions = [
       isNull(items.deletedAt),
       eq(items.id, id),
+      not(eq(users.role, RoleEnum.SuperAdmin))
     ]
 
     if (user.role !== RoleEnum.SuperAdmin) {

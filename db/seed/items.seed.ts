@@ -4,6 +4,8 @@ import { productsItems } from 'db/schema/products-items';
 import { db } from '..';
 import { items } from 'db/schema/items';
 import { faker } from '@faker-js/faker/locale/id_ID';
+import { itemMutations } from 'db/schema/item-mutations';
+import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 
 type ItemSeedProp = {
   owner: number;
@@ -29,16 +31,75 @@ export async function seedItems({
         max: 10000000,
       }),
       unitId: faker.helpers.arrayElement(units),
-      quantity: faker.number.int({
-        min: 1,
-        max: 125,
-      }),
       ownerId: owner,
     })
     .returning({
       id: items.id,
       price: items.price,
     });
+
+  await db.insert(itemMutations).values([
+    {
+      quantity: faker.number.int({
+        min: 100,
+        max: 125,
+      }),
+      itemId: item.id,
+      type: ItemMutationTypeEnum.Adjustment,
+      createdAt: dayjs(faker.date.past()).unix(),
+      description: 'SEEDER'
+    },
+    {
+      quantity: faker.number.int({
+        min: 50,
+        max: 100,
+      }),
+      itemId: item.id,
+      type: ItemMutationTypeEnum.Addition,
+      createdAt: dayjs(faker.date.past()).unix(),
+      description: 'SEEDER'
+    },
+    {
+      quantity: faker.number.int({
+        min: 50,
+        max: 100,
+      }),
+      itemId: item.id,
+      type: ItemMutationTypeEnum.Reduction,
+      createdAt: dayjs(faker.date.past()).unix(),
+      description: 'SEEDER'
+    },
+    {
+      quantity: faker.number.int({
+        min: 100,
+        max: 125,
+      }),
+      itemId: item.id,
+      type: ItemMutationTypeEnum.Adjustment,
+      createdAt: dayjs(faker.date.past()).unix(),
+      description: 'SEEDER'
+    },
+    {
+      quantity: faker.number.int({
+        min: 50,
+        max: 100,
+      }),
+      itemId: item.id,
+      type: ItemMutationTypeEnum.Addition,
+      createdAt: dayjs(faker.date.past()).unix(),
+      description: 'SEEDER'
+    },
+    {
+      quantity: faker.number.int({
+        min: 50,
+        max: 100,
+      }),
+      itemId: item.id,
+      type: ItemMutationTypeEnum.Reduction,
+      createdAt: dayjs(faker.date.past()).unix(),
+      description: 'SEEDER'
+    },
+  ])
 
   await Promise.all(products.map(async (product) => {
     return db

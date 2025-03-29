@@ -22,7 +22,6 @@ export const ItemSchema = createSelectSchema(items).pick({
   name: true,
   ownerId: true,
   price: true,
-  quantity: true,
   unitId: true,
 }).openapi('Item')
 
@@ -39,9 +38,12 @@ const ItemExtendedSchema = ItemSchema.omit({
 }).extend({
   products: z.array(ProductItemSchema),
   owner: ProfileSchema,
+  quantity: z.number(),
   images: z.array(ImageSchema)
 })
   .openapi('ItemExtended')
+
+export type ItemSort = ItemColumn | ProductItemColumn | 'quantity'
 
 export const ItemFilterSchema = z.object({
   categoryId: NumericSchema('Category ID').optional(),
@@ -54,9 +56,9 @@ export const ItemFilterSchema = z.object({
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
-  .merge(SortSchema<ItemColumn | ProductItemColumn>([
-    'price',
+  .merge(SortSchema<ItemSort>([
     'quantity',
+    'price',
     'overtimeMultiplier',
     'overtimePrice',
     'overtimeRatio',
@@ -109,10 +111,6 @@ export const ItemRequestSchema = createInsertSchema(items, {
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID'),
   }),
-  quantity: z.number({
-    invalid_type_error: validationMessages.number('Quantity'),
-    required_error: validationMessages.required('Quantity'),
-  }),
   unitId: z.number({
     invalid_type_error: validationMessages.number('Unit ID'),
     required_error: validationMessages.required('Unit ID'),
@@ -127,7 +125,6 @@ export const ItemRequestSchema = createInsertSchema(items, {
     name: true,
     ownerId: true,
     price: true,
-    quantity: true,
     unitId: true,
   })
   .extend({

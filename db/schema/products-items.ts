@@ -3,7 +3,7 @@ import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum';
 import { items } from './items';
 import { products } from './products';
 
-export const productsItems = sqliteTable('product_items', {
+export const productsItems = sqliteTable('products_items', {
   itemId: integer('item_id').references(() => items.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
   overtimePrice: integer('overtime_price').notNull().default(0), // Exact amount per hour. e.g. 100.000 / hour

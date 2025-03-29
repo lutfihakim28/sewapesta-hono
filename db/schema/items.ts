@@ -7,7 +7,6 @@ import { users } from './users';
 export const items = sqliteTable('items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
-  quantity: integer('quantity'),
   price: real('price').notNull().default(0),
   unitId: integer('unit').references(() => units.id).notNull(),
   categoryId: integer('category_id').references(() => categories.id).notNull(),
