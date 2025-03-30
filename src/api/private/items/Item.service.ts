@@ -5,7 +5,6 @@ import { SortEnum } from '@/lib/enums/SortEnum';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
 import { countOffset } from '@/lib/utils/count-offset';
-import dayjs from 'dayjs';
 import { db } from 'db';
 import { branches } from 'db/schema/branches';
 import { images } from 'db/schema/images';
@@ -26,6 +25,10 @@ import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
 import { ItemColumn, ItemExtended, ItemFilter, ItemRequest, ItemSort, ProductItemColumn, ProductItemSchema } from './Item.schema';
 import { itemQuantityQuery } from './Item.query';
+import { itemMutations } from 'db/schema/item-mutations';
+import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
+import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
+import dayjs from 'dayjs';
 
 export abstract class ItemService {
   static async list(user: User, query: ItemFilter): Promise<[ItemExtended[], number]> {
@@ -87,7 +90,7 @@ export abstract class ItemService {
         .innerJoin(users, eq(users.id, items.ownerId))
         .innerJoin(profiles, eq(profiles.userId, users.id))
         .innerJoin(branches, eq(branches.id, users.branchId))
-        .innerJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
+        .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
         .leftJoin(
           images,
           and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
@@ -147,7 +150,7 @@ export abstract class ItemService {
       .innerJoin(users, eq(users.id, items.ownerId))
       .innerJoin(profiles, eq(profiles.userId, users.id))
       .innerJoin(branches, eq(branches.id, users.branchId))
-      .innerJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
+      .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
       .leftJoin(
         images,
         and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
@@ -191,6 +194,14 @@ export abstract class ItemService {
             itemId: item.id
           }))
         )
+
+      await transaction.insert(itemMutations)
+        .values({
+          itemId: item.id,
+          quantity: payload.quantity || 0,
+          description: ItemMutationDescriptionEnum.ItemCreation,
+          type: ItemMutationTypeEnum.Adjustment
+        })
 
       return item.id
     })

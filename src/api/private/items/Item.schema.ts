@@ -132,6 +132,10 @@ export const ItemRequestSchema = createInsertSchema(items, {
       invalid_type_error: validationMessages.array('Products'),
       required_error: validationMessages.required('Products')
     }),
+    quantity: z.number({
+      invalid_type_error: validationMessages.number('Quantity'),
+      required_error: validationMessages.required('Quantity'),
+    }).optional(),
     images: z.array(z.union([z.number(), z.string()]))
   })
   .openapi('ItemRequest')

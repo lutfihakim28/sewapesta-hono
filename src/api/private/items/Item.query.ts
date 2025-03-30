@@ -14,7 +14,7 @@ export const itemQuantityQuery = db.$with('itemQuantityQuery').as(
         `.mapWith(Number).as('quantity'),
   })
     .from(itemMutations)
-    .innerJoin(items, eq(items.id, itemMutations.itemId))
+    .leftJoin(items, eq(items.id, itemMutations.itemId))
     .where(and(
       isNull(itemMutations.deletedAt),
       gte(
