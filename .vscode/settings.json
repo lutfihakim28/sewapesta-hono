@@ -1,0 +1,8 @@
+{
+  "material-icon-theme.files.associations": {
+    "*.route.ts": "routing",
+    "*.schema.ts": "apiblueprint",
+    "*.column.ts": "database",
+    "*.service.ts": "brainfuck"
+  }
+}

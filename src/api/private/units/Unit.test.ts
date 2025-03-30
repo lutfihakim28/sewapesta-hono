@@ -65,6 +65,25 @@ describe('Unit', () => {
       expect(response.code).toBe(422)
     })
 
+    test('Unique Fail', async () => {
+      const [unit] = await db
+        .select({ name: units.name })
+        .from(units)
+        .limit(1)
+
+      const _response = await app.request(path, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: unit.name
+        }),
+        headers: generateTestHeader(user.SuperAdmin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(422)
+    })
+
     test('Success', async () => {
       const _response = await app.request(path, {
         method: 'POST',
@@ -75,6 +94,8 @@ describe('Unit', () => {
       const response: ApiResponse = await _response.json()
 
       expect(response.code).toBe(200)
+
+      await db.delete(units).where(eq(units.name, payload.name))
     })
   })
 
@@ -104,7 +125,7 @@ describe('Unit', () => {
     })
 
     test('Success', async () => {
-      const [oldCategory] = await db
+      const [oldUnit] = await db
         .select({ name: units.name })
         .from(units)
         .where(eq(units.id, 1))
@@ -120,17 +141,17 @@ describe('Unit', () => {
 
       expect(response.code).toBe(200)
 
-      const [newCategory] = await db
+      const [newUnit] = await db
         .select({ name: units.name })
         .from(units)
         .where(eq(units.id, 1))
         .limit(1)
 
-      expect(newCategory?.name).toBe(payload.name)
+      expect(newUnit?.name).toBe(payload.name)
 
       await db
         .update(units)
-        .set({ name: oldCategory!.name })
+        .set({ name: oldUnit!.name })
         .where(eq(units.id, 1))
     })
   })
@@ -168,7 +189,7 @@ describe('Unit', () => {
 
       expect(response.code).toBe(200)
 
-      const [newCategory] = await db
+      const [newUnit] = await db
         .select({ name: units.name })
         .from(units)
         .where(and(
@@ -177,7 +198,7 @@ describe('Unit', () => {
         ))
         .limit(1)
 
-      expect(newCategory).toBeFalsy()
+      expect(newUnit).toBeFalsy()
 
       await db
         .update(units)

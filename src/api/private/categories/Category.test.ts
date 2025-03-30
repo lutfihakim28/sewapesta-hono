@@ -66,6 +66,25 @@ describe('Category', () => {
       expect(response.code).toBe(422)
     })
 
+    test('Unique Fail', async () => {
+      const [category] = await db
+        .select({ name: categories.name })
+        .from(categories)
+        .limit(1)
+
+      const _response = await app.request(path, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: category.name
+        }),
+        headers: generateTestHeader(user.SuperAdmin.token)
+      })
+
+      const response: ApiResponse = await _response.json()
+
+      expect(response.code).toBe(422)
+    })
+
     test('Success', async () => {
       const _response = await app.request(path, {
         method: 'POST',
@@ -76,6 +95,8 @@ describe('Category', () => {
       const response: ApiResponse = await _response.json()
 
       expect(response.code).toBe(200)
+
+      await db.delete(categories).where(eq(categories.name, payload.name))
     })
   })
 
