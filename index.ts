@@ -33,6 +33,13 @@ app.use(logger(), prettyJSON())
 app.onError((error, context) => {
   if (error instanceof HTTPException) {
     if (error.status === 401 || error.status === 404) {
+      pinoLogger.error(error, 'Error 401')
+      if (error instanceof JwtTokenExpired) {
+        return context.json(new ApiResponse({
+          code: 401,
+          messages: ['Token expired.']
+        }), 401)
+      }
       return context.json(new ApiResponse({
         code: error.status,
         messages: [error.message]
@@ -51,18 +58,6 @@ app.onError((error, context) => {
       }), error.status)
     }
   }
-  if (error instanceof JwtTokenExpired) {
-    return context.json(new ApiResponse({
-      code: 401,
-      messages: ['Token expired.']
-    }), 401)
-  }
-
-  // if ('code' in error) {
-  //   if (error.code === MysqlErrorKeys.ER_NO_REFERENCED_ROW_2 || error.code === MysqlErrorKeys.ER_NO_REFERENCED_ROW) {
-
-  //   }
-  // }
 
   pinoLogger.error({ error: error.message, stack: error.stack, name: error.name }, 'Unhandled Error')
   return context.json(new ApiResponse({

@@ -1,5 +1,4 @@
-import { RoleEnum } from '@/lib/enums/RoleEnum'
-import { generateTestHeader, getTestUsers } from '@/lib/utils/testing-utils'
+import { generateTestHeader } from '@/lib/utils/testing-utils'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { Product, ProductRequest } from './Product.schema'
 import app from 'index'
@@ -8,11 +7,9 @@ import { SortEnum } from '@/lib/enums/SortEnum'
 import { db } from 'db'
 import { products } from 'db/schema/products'
 import { and, eq, isNull, not } from 'drizzle-orm'
-import { LoginData } from '@/api/auth/Auth.schema'
 import dayjs from 'dayjs'
 
 const path = '/api/private/products'
-let user: Record<RoleEnum, LoginData>
 const payload: ProductRequest = {
   name: 'Produk',
   branchId: 1,
@@ -21,36 +18,35 @@ const payload: ProductRequest = {
 let testedProduct: Product
 let testedOtherProduct: Product
 
-beforeAll(async () => {
-  user = await getTestUsers()
-  const [[product], [otherProduct]] = await Promise.all([
-    db
-      .select()
-      .from(products)
-      .where(and(
-        eq(products.branchId, user.Admin.user.branchId),
-        isNull(products.deletedAt)
-      ))
-      .limit(1),
-    db
-      .select()
-      .from(products)
-      .where(and(
-        not(eq(products.branchId, user.Admin.user.branchId)),
-        isNull(products.deletedAt)
-      ))
-      .limit(1)
-  ])
-
-  testedProduct = product
-  testedOtherProduct = otherProduct
-})
-
 describe('Product', () => {
+  beforeAll(async () => {
+    const [[product], [otherProduct]] = await Promise.all([
+      db
+        .select()
+        .from(products)
+        .where(and(
+          eq(products.branchId, globalThis.testAuthData.Admin.user.branchId),
+          isNull(products.deletedAt)
+        ))
+        .limit(1),
+      db
+        .select()
+        .from(products)
+        .where(and(
+          not(eq(products.branchId, globalThis.testAuthData.Admin.user.branchId)),
+          isNull(products.deletedAt)
+        ))
+        .limit(1)
+    ])
+
+    testedProduct = product
+    testedOtherProduct = otherProduct
+  })
+
   describe('List', () => {
     test('As Customer', async () => {
       const _response = await app.request(path, {
-        headers: generateTestHeader(user.Customer.token)
+        headers: generateTestHeader(globalThis.testAuthData.Customer.token)
       })
 
       const response: ApiResponse = await _response.json();
@@ -60,26 +56,26 @@ describe('Product', () => {
 
     test('As Admin', async () => {
       const _response = await app.request(path, {
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponseList<Product[]> = await _response.json()
 
       expect(response.code).toBe(200)
       expect(response.data).toBeArray()
-      expect(response.data.every((product) => product.branchId === user.Admin.user.branchId)).toBeTruthy()
+      expect(response.data.every((product) => product.branchId === globalThis.testAuthData.Admin.user.branchId)).toBeTruthy()
     })
 
     test('As SuperAdmin', async () => {
       const _response = await app.request(path, {
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponseList<Product[]> = await _response.json()
 
       expect(response.code).toBe(200)
       expect(response.data).toBeArray()
-      expect(response.data.every((product) => product.branchId === user.SuperAdmin.user.branchId)).toBeFalsy()
+      expect(response.data.every((product) => product.branchId === globalThis.testAuthData.SuperAdmin.user.branchId)).toBeFalsy()
     })
 
     describe('Filter', async () => {
@@ -90,7 +86,7 @@ describe('Product', () => {
         })
 
         const _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         const response: ApiResponseList<Product[]> = await _response.json()
@@ -101,7 +97,7 @@ describe('Product', () => {
       })
 
       test('By Branch as Admin', async () => {
-        const adminBranchId = user.Admin.user.branchId
+        const adminBranchId = globalThis.testAuthData.Admin.user.branchId
         let branchId = '1';
         if (adminBranchId === 1) branchId = '2'
         if (adminBranchId === 2) branchId = '3'
@@ -109,7 +105,7 @@ describe('Product', () => {
         const searchParam = new URLSearchParams({ branchId })
 
         const _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.Admin.token)
+          headers: generateTestHeader(globalThis.testAuthData.Admin.token)
         })
 
         const response: ApiResponseList<Product[]> = await _response.json()
@@ -122,7 +118,7 @@ describe('Product', () => {
         const searchParam = new URLSearchParams({ branchId: '2' })
 
         const _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         const response: ApiResponseList<Product[]> = await _response.json()
@@ -138,7 +134,7 @@ describe('Product', () => {
         })
 
         const _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         const response: ApiResponseList<Product[]> = await _response.json()
@@ -153,7 +149,7 @@ describe('Product', () => {
   describe('Detail', () => {
     test('Not Found', async () => {
       const _response = await app.request(`${path}/999999`, {
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -162,7 +158,7 @@ describe('Product', () => {
     })
 
     test('As Admin Other Branch', async () => {
-      const adminBranchId = user.Admin.user.branchId
+      const adminBranchId = globalThis.testAuthData.Admin.user.branchId
       let branchId = 1;
       if (adminBranchId === 1) branchId = 2
       if (adminBranchId === 2) branchId = 3
@@ -174,7 +170,7 @@ describe('Product', () => {
         .limit(1)
 
       const _response = await app.request(`${path}/${product!.id}`, {
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -186,18 +182,18 @@ describe('Product', () => {
       const [product] = await db
         .select({ id: products.id })
         .from(products)
-        .where(eq(products.branchId, user.Admin.user.branchId))
+        .where(eq(products.branchId, globalThis.testAuthData.Admin.user.branchId))
         .limit(1)
 
       const _response = await app.request(`${path}/${product!.id}`, {
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponseData<Product> = await _response.json()
 
       expect(response.code).toBe(200)
       expect(response.data.id).toBe(product!.id)
-      expect(response.data.branchId).toBe(user.Admin.user.branchId)
+      expect(response.data.branchId).toBe(globalThis.testAuthData.Admin.user.branchId)
     })
   })
 
@@ -206,7 +202,7 @@ describe('Product', () => {
       const _response = await app.request(path, {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Customer.token)
+        headers: generateTestHeader(globalThis.testAuthData.Customer.token)
       })
 
       const response = await _response.json()
@@ -215,7 +211,7 @@ describe('Product', () => {
     })
 
     test('Wrong Branch', async () => {
-      const adminBranchId = user.Admin.user.branchId
+      const adminBranchId = globalThis.testAuthData.Admin.user.branchId
       let branchId = 1;
       if (adminBranchId === 1) branchId = 2
       if (adminBranchId === 2) branchId = 3
@@ -226,7 +222,7 @@ describe('Product', () => {
           ...payload,
           branchId,
         }),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -242,7 +238,7 @@ describe('Product', () => {
           name: 1,
           branchId: '1'
         }),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response = await _response.json()
@@ -255,9 +251,9 @@ describe('Product', () => {
         method: 'POST',
         body: JSON.stringify({
           ...payload,
-          branchId: user.Admin.user.branchId,
+          branchId: globalThis.testAuthData.Admin.user.branchId,
         }),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponseData<Product> = await _response.json()
@@ -282,7 +278,7 @@ describe('Product', () => {
       const _response = await app.request(`${path}/99999999`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -296,7 +292,7 @@ describe('Product', () => {
         body: JSON.stringify({
           name: 1,
         }),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -310,7 +306,7 @@ describe('Product', () => {
       const _response = await app.request(`${path}/${testedProduct.id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -324,7 +320,7 @@ describe('Product', () => {
       const _response = await app.request(`${path}/${testedOtherProduct.id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -336,7 +332,7 @@ describe('Product', () => {
       const _response = await app.request(`${path}/${testedProduct.id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -351,7 +347,7 @@ describe('Product', () => {
           ...payload,
           branchId: testedProduct.branchId
         }),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponseData<Product> = await _response.json()
@@ -375,7 +371,7 @@ describe('Product', () => {
     test('Not Found', async () => {
       const _response = await app.request(`${path}/99999999`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -388,7 +384,7 @@ describe('Product', () => {
 
       const _response = await app.request(`${path}/${testedProduct.id}`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -402,7 +398,7 @@ describe('Product', () => {
       const _response = await app.request(`${path}/${testedOtherProduct.id}`, {
         method: 'DELETE',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -413,14 +409,14 @@ describe('Product', () => {
     test('This Branch Admin', async () => {
       const _response = await app.request(`${path}/${testedProduct.id}`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
 
       expect(response.code).toBe(200)
 
-      await db.update(products).set({ deletedAt: null }).where(eq(products.id, testedProduct.id));
+      await db.update(products).set({ deletedAt: null }).where(eq(products.id, testedProduct.id)).returning();
     })
   })
 })

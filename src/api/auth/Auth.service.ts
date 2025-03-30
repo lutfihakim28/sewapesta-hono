@@ -7,6 +7,8 @@ import { JWTPayload } from 'hono/utils/jwt/types';
 import { messages } from '@/lib/constants/messages';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { LoginData, RefreshRequest } from './Auth.schema';
+import { logger } from '@/lib/utils/logger';
+import dayjs from 'dayjs';
 
 const { createdAt, deletedAt, password, refreshToken, updatedAt, ...columns } = getTableColumns(users)
 

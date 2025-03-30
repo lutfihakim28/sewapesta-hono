@@ -1,3 +1,5 @@
+import { TestAuthData } from 'test-setup';
+
 declare module "bun" {
   interface Env {
     JWT_SECRET: string;
@@ -7,4 +9,8 @@ declare module "bun" {
     DB_USER: string;
     DB_PASSWORD: string;
   }
+}
+
+declare global {
+  var testAuthData: TestAuthData;
 }

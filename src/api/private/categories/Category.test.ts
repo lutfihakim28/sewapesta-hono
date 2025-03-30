@@ -2,24 +2,21 @@ import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { beforeAll, describe, expect, test } from 'bun:test'
 import app from 'index';
 import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { generateTestHeader, getTestUsers } from '@/lib/utils/testing-utils';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { generateTestHeader } from '@/lib/utils/testing-utils';
 import { db } from 'db';
 import { categories } from 'db/schema/categories';
 import { and, eq, isNull } from 'drizzle-orm';
-import { LoginData } from '@/api/auth/Auth.schema';
+import { logger } from '@/lib/utils/logger';
 
 const path = '/api/private/categories'
-let user: Record<RoleEnum, LoginData>
 const payload: CategoryRequest = {
   name: 'Kategori',
 }
 
-beforeAll(async () => {
-  user = await getTestUsers()
-})
-
 describe('Category', () => {
+  beforeAll(() => {
+    logger.debug(globalThis.testAuthData, 'Category Test')
+  })
   test('List', async () => {
     const query: CategoryFilter = {
       keyword: 'equip',
@@ -28,7 +25,7 @@ describe('Category', () => {
     const searchParam = new URLSearchParams(query)
 
     const _response = await app.request(`${path}?${searchParam.toString()}`, {
-      headers: generateTestHeader(user.SuperAdmin.token)
+      headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
     })
 
     const response: ApiResponseList<Category[]> = await _response.json()
@@ -44,7 +41,7 @@ describe('Category', () => {
       const _response = await app.request(path, {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -58,7 +55,7 @@ describe('Category', () => {
         body: JSON.stringify({
           name: 1
         }),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -77,7 +74,7 @@ describe('Category', () => {
         body: JSON.stringify({
           name: category.name
         }),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -89,7 +86,7 @@ describe('Category', () => {
       const _response = await app.request(path, {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -105,7 +102,7 @@ describe('Category', () => {
       const _response = await app.request(`${path}/1`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -117,7 +114,7 @@ describe('Category', () => {
       const _response = await app.request(`${path}/999999`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -135,7 +132,7 @@ describe('Category', () => {
       const _response = await app.request(`${path}/1`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -161,7 +158,7 @@ describe('Category', () => {
     test('By Admin', async () => {
       const _response = await app.request(`${path}/1`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -172,7 +169,7 @@ describe('Category', () => {
     test('Not Found', async () => {
       const _response = await app.request(`${path}/999999`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -183,7 +180,7 @@ describe('Category', () => {
     test('Success', async () => {
       const _response = await app.request(`${path}/1`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()

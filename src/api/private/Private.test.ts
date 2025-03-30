@@ -27,7 +27,8 @@ describe('Private API', () => {
 
   test('Expired Token', async () => {
     const loginResponse = await login();
-    setSystemTime(dayjs().add(1, 'week').toDate())
+    const now = dayjs()
+    setSystemTime(now.add(1, 'week').toDate())
     const _response = await app.request('/api/private/branches', {
       headers: generateTestHeader(loginResponse.data.token)
     });
@@ -35,6 +36,7 @@ describe('Private API', () => {
     const response: ApiResponse = await _response.json();
 
     expect(response.code).toBe(401)
+    setSystemTime(now.toDate())
   })
 
   test('Valid Token', async () => {

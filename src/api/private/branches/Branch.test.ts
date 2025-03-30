@@ -1,6 +1,5 @@
 import app from 'index'
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto'
-import { RoleEnum } from '@/lib/enums/RoleEnum'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { db } from 'db'
 import { and, eq, isNull } from 'drizzle-orm'
@@ -9,9 +8,9 @@ import { branches } from 'db/schema/branches'
 import dayjs from 'dayjs'
 import { faker } from '@faker-js/faker/locale/id_ID'
 import { SortEnum } from '@/lib/enums/SortEnum'
-import { generateTestHeader, getTestUsers } from '@/lib/utils/testing-utils'
-import { LoginData } from '@/api/auth/Auth.schema'
+import { generateTestHeader } from '@/lib/utils/testing-utils'
 import { locationQuery } from '@/api/public/locations/Location.query'
+import { logger } from '@/lib/utils/logger'
 
 
 const path = '/api/private/branches';
@@ -22,17 +21,15 @@ const payload: BranchRequest = {
   name: faker.company.name(),
   subdistrictCode: '33.74.12.1001'
 }
-let user: Record<RoleEnum, LoginData>
-
-beforeAll(async () => {
-  user = await getTestUsers()
-})
 
 describe('Branch', () => {
+  beforeAll(() => {
+    logger.debug(globalThis.testAuthData, 'Branch Test')
+  })
   describe('List', () => {
     test('As Customer', async () => {
       const _response = await app.request(path, {
-        headers: generateTestHeader(user.Customer.token)
+        headers: generateTestHeader(globalThis.testAuthData.Customer.token)
       })
 
       const response: ApiResponse = await _response.json();
@@ -66,7 +63,7 @@ describe('Branch', () => {
         let searchParam = new URLSearchParams(filter)
 
         let _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         let response: ApiResponseList<BranchExtended[]> = await _response.json()
@@ -83,7 +80,7 @@ describe('Branch', () => {
         searchParam = new URLSearchParams(filter)
 
         _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         response = await _response.json()
@@ -100,7 +97,7 @@ describe('Branch', () => {
         searchParam = new URLSearchParams(filter)
 
         _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         response = await _response.json()
@@ -117,7 +114,7 @@ describe('Branch', () => {
         searchParam = new URLSearchParams(filter)
 
         _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         response = await _response.json()
@@ -137,7 +134,7 @@ describe('Branch', () => {
         searchParam = new URLSearchParams(filter)
 
         _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         response = await _response.json()
@@ -155,7 +152,7 @@ describe('Branch', () => {
         })
 
         const _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         const response: ApiResponseList<BranchExtended[]> = await _response.json()
@@ -173,7 +170,7 @@ describe('Branch', () => {
         const searchParam = new URLSearchParams(query)
 
         const _response = await app.request(`${path}?${searchParam.toString()}`, {
-          headers: generateTestHeader(user.SuperAdmin.token)
+          headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
         })
 
         const response: ApiResponseList<BranchExtended[]> = await _response.json()
@@ -188,7 +185,7 @@ describe('Branch', () => {
   describe('Detail', () => {
     test('As Customer', async () => {
       const _response = await app.request(`${path}/1`, {
-        headers: generateTestHeader(user.Customer.token)
+        headers: generateTestHeader(globalThis.testAuthData.Customer.token)
       })
 
       const response: ApiResponse = await _response.json();
@@ -198,7 +195,7 @@ describe('Branch', () => {
 
     test('As SuperAdmin', async () => {
       const _response = await app.request(`${path}/1`, {
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponseList<Branch> = await _response.json();
@@ -209,7 +206,7 @@ describe('Branch', () => {
 
     test('Not Found', async () => {
       const _response = await app.request(`${path}/999999`, {
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -226,7 +223,7 @@ describe('Branch', () => {
         .where(eq(branches.id, branchId))
 
       const _response = await app.request(`${path}/${branchId}`, {
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -245,7 +242,7 @@ describe('Branch', () => {
       const _response = await app.request(path, {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -263,7 +260,7 @@ describe('Branch', () => {
           name: false,
           subdistrictCode: '33.74.12.1001'
         }),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -275,7 +272,7 @@ describe('Branch', () => {
       const _response = await app.request(path, {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponseData<Branch> = await _response.json()
@@ -292,7 +289,7 @@ describe('Branch', () => {
       const _response = await app.request(`${path}/999999`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -310,7 +307,7 @@ describe('Branch', () => {
           name: false,
           subdistrictCode: '33.74.12.1001'
         }),
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -319,7 +316,7 @@ describe('Branch', () => {
     })
 
     test('Admin Other Branch', async () => {
-      const adminBranchId = user.Admin.user.branchId;
+      const adminBranchId = globalThis.testAuthData.Admin.user.branchId;
 
       let branchId = 1;
       if (adminBranchId === 1) branchId = 2;
@@ -328,7 +325,7 @@ describe('Branch', () => {
       const _response = await app.request(`${path}/${branchId}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -340,13 +337,13 @@ describe('Branch', () => {
       const [branch] = await db
         .select()
         .from(branches)
-        .where(eq(branches.id, user.Admin.user.branchId))
+        .where(eq(branches.id, globalThis.testAuthData.Admin.user.branchId))
         .limit(1)
 
-      const _response = await app.request(`${path}/${user.Admin.user.branchId}`, {
+      const _response = await app.request(`${path}/${globalThis.testAuthData.Admin.user.branchId}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponseData<Branch> = await _response.json()
@@ -356,7 +353,7 @@ describe('Branch', () => {
       const [lastestBranch] = await db
         .select({ name: branches.name })
         .from(branches)
-        .where(eq(branches.id, user.Admin.user.branchId))
+        .where(eq(branches.id, globalThis.testAuthData.Admin.user.branchId))
         .limit(1)
 
       expect(lastestBranch?.name).toBe(payload.name)
@@ -378,7 +375,7 @@ describe('Branch', () => {
     test('Not Found', async () => {
       const _response = await app.request(`${path}/999999`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.SuperAdmin.token)
+        headers: generateTestHeader(globalThis.testAuthData.SuperAdmin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -387,7 +384,7 @@ describe('Branch', () => {
     })
 
     test('Admin Other Branch', async () => {
-      const adminBranchId = user.Admin.user.branchId;
+      const adminBranchId = globalThis.testAuthData.Admin.user.branchId;
 
       let branchId = 1;
       if (adminBranchId === 1) branchId = 2;
@@ -395,7 +392,7 @@ describe('Branch', () => {
 
       const _response = await app.request(`${path}/${branchId}`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponse = await _response.json()
@@ -404,11 +401,11 @@ describe('Branch', () => {
     })
 
     test('Admin This Branch', async () => {
-      const adminBranchId = user.Admin.user.branchId;
+      const adminBranchId = globalThis.testAuthData.Admin.user.branchId;
 
       const _response = await app.request(`${path}/${adminBranchId}`, {
         method: 'DELETE',
-        headers: generateTestHeader(user.Admin.token)
+        headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
 
       const response: ApiResponseData<Branch> = await _response.json()

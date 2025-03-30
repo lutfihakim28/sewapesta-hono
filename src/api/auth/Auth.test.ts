@@ -6,7 +6,6 @@ import { db } from 'db'
 import { users } from 'db/schema/users'
 import { eq } from 'drizzle-orm'
 import { generateTestHeader } from '@/lib/utils/testing-utils'
-import { branches } from 'db/schema/branches'
 
 const username = 'superadmin'
 let jwt: string | undefined;

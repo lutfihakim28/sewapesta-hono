@@ -12,8 +12,8 @@
     "db:init": "bun db:generate && bun db:migrate && bun db:seed",
     "db:drop": "drizzle-kit drop",
     "db:reset": "bun db:drop && rm -r sewapesta.db && bun db:generate && bun db:migrate && bun db:seed",
-    "test:only": "bun test --only --watch",
-    "test:all": "bun test",
+    "test:only": "bun test --only --watch --preload ./test-setup.ts",
+    "test:all": "bun test --preload ./test-setup.ts",
     "route:list": "bun run src/route-lists.ts",
     "dev": "bun run --hot index.ts"
   },
