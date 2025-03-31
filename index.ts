@@ -25,6 +25,8 @@ import { superadminMiddleware } from '@/lib/middlewares/superadmin.middleware'
 import UnitController from '@/api/private/units/Unit.controller'
 import ImageController from '@/api/private/images/Image.controller'
 import ItemController from '@/api/private/items/Item.controller'
+import { ownerMiddleware } from '@/lib/middlewares/owner.middleware';
+import { customerMiddleware } from '@/lib/middlewares/customer.middleware';
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -77,11 +79,17 @@ app.use('/static/*', serveStatic({ root: './' }))
 app.post('/api/private/branches', superadminMiddleware)
 app.delete('/api/private/branches', superadminMiddleware)
 app.use('/api/private/branches/*', adminMiddleware)
+
 app.use('/api/private/products/*', adminMiddleware)
-app.use('/api/private/items/*', adminMiddleware)
+
+app.post('/api/private/items', adminMiddleware)
+app.put('/api/private/items/*', adminMiddleware)
+app.delete('/api/private/items/*', adminMiddleware)
+
 app.post('/api/private/categories', superadminMiddleware)
 app.put('/api/private/categories/*', superadminMiddleware)
 app.delete('/api/private/categories/*', superadminMiddleware)
+
 app.post('/api/private/units', superadminMiddleware)
 app.put('/api/private/units/*', superadminMiddleware)
 app.delete('/api/private/units/*', superadminMiddleware)

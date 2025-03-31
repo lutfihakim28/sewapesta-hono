@@ -13,7 +13,7 @@ import { products } from 'db/schema/products';
 import { productsItems } from 'db/schema/products-items';
 import { profiles } from 'db/schema/profiles';
 import { users } from 'db/schema/users';
-import { and, asc, count, desc, eq, gte, isNull, like, lte, not, notInArray, SQL } from 'drizzle-orm';
+import { and, asc, countDistinct, desc, eq, gte, inArray, isNull, like, lte, not, notInArray, SQL } from 'drizzle-orm';
 import { CategoryService } from '../categories/Category.service';
 import { Image, ImageSchema } from '../images/Image.schema';
 import { ImageService } from '../images/Image.service';
@@ -31,7 +31,7 @@ import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescription
 import dayjs from 'dayjs';
 
 export abstract class ItemService {
-  static async list(user: User, query: ItemFilter): Promise<[ItemExtended[], number]> {
+  static async list(query: ItemFilter, user: User): Promise<[ItemExtended[], number]> {
     const { ownerId, ...selectedColumns } = itemColumns
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: ItemSort = 'id';
@@ -63,8 +63,6 @@ export abstract class ItemService {
         : desc(productsItems[sortBy as ProductItemColumn])
     }
 
-    const where = this.buildWhereClause(user, query);
-
     const [_items, totalData] = await Promise.all([
       db.with(itemQuantityQuery)
         .select({
@@ -95,12 +93,12 @@ export abstract class ItemService {
           images,
           and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
         )
-        .where(where)
+        .where(this.buildWhereClause(user, query))
         .orderBy(orderBy)
         .groupBy(items.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
-      this.count(where)
+      this.count(this.buildWhereClause(user, query))
     ])
 
     return [
@@ -113,7 +111,7 @@ export abstract class ItemService {
     ]
   }
 
-  static async get(id: number, user?: User): Promise<ItemExtended> {
+  static async get(id: number, user: User): Promise<ItemExtended> {
     const { ownerId, ...selectedColumns } = itemColumns
 
     const conditions = [
@@ -206,7 +204,7 @@ export abstract class ItemService {
       return item.id
     })
 
-    return await this.get(itemId)
+    return await this.get(itemId, user)
   }
 
   static async update(id: number, payload: ItemRequest, user: User): Promise<ItemExtended> {
@@ -239,7 +237,7 @@ export abstract class ItemService {
         )
     })
 
-    return await this.get(id)
+    return await this.get(id, user)
   }
 
   static async delete(id: number) {
@@ -283,8 +281,10 @@ export abstract class ItemService {
 
   private static async count(query?: SQL<unknown>) {
     const [item] = await db
-      .select({ count: count().mapWith(Number) })
+      .select({ count: countDistinct(items.id).mapWith(Number) })
       .from(items)
+      .innerJoin(users, eq(users.id, items.ownerId))
+      .innerJoin(branches, eq(branches.id, users.branchId))
       .where(query)
 
     return item?.count || 0
@@ -295,31 +295,14 @@ export abstract class ItemService {
       isNull(items.deletedAt),
     ]
 
-    if (user.role !== RoleEnum.SuperAdmin) {
-      conditions.push(
-        eq(branches.id, user.branchId)
-      )
-    } else if (query.branchId) {
-      conditions.push(
-        eq(branches.id, +query.branchId)
-      )
-    }
-
     if (query.categoryId) {
       conditions.push(eq(items.categoryId, +query.categoryId))
-    }
-
-    if (query.overtimeType) {
-      conditions.push(eq(productsItems.overtimeType, query.overtimeType))
     }
 
     if (query.ownerId) {
       conditions.push(eq(items.ownerId, +query.ownerId))
     }
 
-    if (query.productId) {
-      conditions.push(eq(productsItems.productId, +query.productId))
-    }
 
     if (query.minPrice) {
       conditions.push(gte(items.price, +query.minPrice))
@@ -335,7 +318,51 @@ export abstract class ItemService {
       );
     }
 
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(eq(
+        branches.id,
+        user.branchId
+      ))
+    } else if (query.branchId) {
+      conditions.push(eq(
+        branches.id,
+        +query.branchId
+      ))
+    }
+
+    if (query.overtimeType) {
+      conditions.push(eq(productsItems.overtimeType, query.overtimeType))
+    }
+
+    if (query.productId) {
+      conditions.push(eq(productsItems.productId, +query.productId))
+    }
+
     return and(...conditions)
+    // if (joined) {
+    // }
+
+    // if (query.overtimeType) {
+    //   conditions.push(inArray(
+    //     items.id,
+    //     db.select({ itemId: items.id })
+    //       .from(items)
+    //       .leftJoin(productsItems, eq(productsItems.itemId, items.id))
+    //       .where(eq(productsItems.overtimeType, query.overtimeType))
+    //   ))
+    // }
+
+    // if (query.productId) {
+    //   conditions.push(inArray(
+    //     items.id,
+    //     db.select({ itemId: items.id })
+    //       .from(items)
+    //       .leftJoin(productsItems, eq(productsItems.itemId, items.id))
+    //       .where(eq(productsItems.productId, +query.productId))
+    //   ))
+    // }
+
+    // return and(...conditions)
   }
 
   private static async checkConstraint(payload: ItemRequest, user: User) {

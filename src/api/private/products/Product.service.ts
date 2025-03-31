@@ -14,7 +14,7 @@ import { productColumns } from './Product.column';
 import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
 
 export abstract class ProductService {
-  static async list(user: User, query: ProductFilter): Promise<[Product[], number]> {
+  static async list(query: ProductFilter, user: User): Promise<[Product[], number]> {
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: ProductColumn = 'id';
 

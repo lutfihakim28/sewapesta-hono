@@ -14,7 +14,7 @@ const ProductController = honoApp()
 ProductController.openapi(ProductListRoute, async (context) => {
   const query = context.req.valid('query')
   const jwt = new JwtPayload(context.get('jwtPayload'))
-  const [products, totalData] = await ProductService.list(jwt.user, query);
+  const [products, totalData] = await ProductService.list(query, jwt.user);
 
   return context.json(new ApiResponseList({
     code: 200,
