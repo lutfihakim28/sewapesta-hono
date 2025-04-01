@@ -299,11 +299,6 @@ export abstract class ItemService {
       conditions.push(eq(items.categoryId, +query.categoryId))
     }
 
-    if (query.ownerId) {
-      conditions.push(eq(items.ownerId, +query.ownerId))
-    }
-
-
     if (query.minPrice) {
       conditions.push(gte(items.price, +query.minPrice))
     }
@@ -316,6 +311,12 @@ export abstract class ItemService {
       conditions.push(
         like(items.name, `%${query.keyword}%`),
       );
+    }
+
+    if (user.role === RoleEnum.Owner) {
+      conditions.push(eq(items.ownerId, user.id))
+    } else if (query.ownerId) {
+      conditions.push(eq(items.ownerId, +query.ownerId))
     }
 
     if (user.role !== RoleEnum.SuperAdmin) {
@@ -339,30 +340,6 @@ export abstract class ItemService {
     }
 
     return and(...conditions)
-    // if (joined) {
-    // }
-
-    // if (query.overtimeType) {
-    //   conditions.push(inArray(
-    //     items.id,
-    //     db.select({ itemId: items.id })
-    //       .from(items)
-    //       .leftJoin(productsItems, eq(productsItems.itemId, items.id))
-    //       .where(eq(productsItems.overtimeType, query.overtimeType))
-    //   ))
-    // }
-
-    // if (query.productId) {
-    //   conditions.push(inArray(
-    //     items.id,
-    //     db.select({ itemId: items.id })
-    //       .from(items)
-    //       .leftJoin(productsItems, eq(productsItems.itemId, items.id))
-    //       .where(eq(productsItems.productId, +query.productId))
-    //   ))
-    // }
-
-    // return and(...conditions)
   }
 
   private static async checkConstraint(payload: ItemRequest, user: User) {
