@@ -6,6 +6,7 @@ import { products } from './products';
 export const productsItems = sqliteTable('products_items', {
   itemId: integer('item_id').references(() => items.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
+  price: real('price').notNull().default(0),
   overtimePrice: integer('overtime_price').notNull().default(0), // Exact amount per hour. e.g. 100.000 / hour
   overtimeRatio: real('overtime_ratio').notNull().default(0), // Ratio based on total price.
   overtimeMultiplier: real('overtime_multiplier').notNull().default(0), // Multiplier from price per hour.

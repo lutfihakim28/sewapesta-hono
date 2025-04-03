@@ -19,6 +19,19 @@
 14. ~~debug with all test~~
 15. ~~make category and unit name unique~~
 16. handle SQL error
+17. Create Vendor
+18. Create vendor to items pivot table
+
+## Item Requirement
+
+1. Table `items` stores item's general information that contains name, price, `categories.id`, and `units.id`.
+2. `items` name should be unique.
+3. Record from table `items` can be accessed by all admin from all `branches`.
+4. Every `items` has many `owners` which data stored in table `items_owners` that contains `items.id`, `users.id` as owner, and quantity (storing all quantity for the `items` that possessed by the `owners`).
+5. Table `items_owners` also used for grouping the `items` by its related `branches` through `owners`.
+6. Every `items_owners` has multiple quantity mutations that recorded in table `item_mutations`
+7. If `item_mutations.affect_item_quantity = true`, then it will directly recalculate quality in `items_owners`, else it just record mutations.
+8. Calculation of quantity in `item_mutations` is represent `items_owners` available quantity.
 
 ## WHO
 

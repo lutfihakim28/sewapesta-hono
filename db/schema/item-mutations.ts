@@ -1,7 +1,7 @@
 import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 import { timestamps } from 'db/schema/timestamps.helper';
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { items } from 'db/schema/items';
+import { itemsOwners } from './items-owners';
 
 export const itemMutations = sqliteTable('item_mutations', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -12,11 +12,12 @@ export const itemMutations = sqliteTable('item_mutations', {
       ItemMutationTypeEnum.Adjustment,
     ],
   }).notNull().default(ItemMutationTypeEnum.Addition),
-  itemId: integer('item_id').references(() => items.id).notNull(),
+  itemOwnerId: integer('item_owner_id').references(() => itemsOwners.id).notNull(),
   quantity: integer('quantity').notNull(),
+  affectItemQuantity: integer('affect_item_quantity', { mode: 'boolean' }).default(false),
   description: text('description'),
   ...timestamps,
 }, (table) => [
   index('mutation_type_index').on(table.type),
-  index('mutation_item_index').on(table.itemId)
+  index('mutation_item_owner_index').on(table.itemOwnerId)
 ])

@@ -13,6 +13,8 @@ import { subdistricts } from 'db/schema/subdistricts';
 import { like } from 'drizzle-orm';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { faker } from '@faker-js/faker/locale/id_ID';
+import { seedProductItem } from './products-items.seed';
+import { seedItemOwner } from './items-owners.seed';
 
 await seedProvinces()
 await seedCities()
@@ -33,6 +35,8 @@ const _subdistricts = await db
 
 const unitsId = await seedUnits()
 const categoriesId = await seedCategories()
+const items = await seedItems({ unitsId: unitsId, categoriesId: categoriesId })
+
 
 await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
   const branchId = await seedBranches(_subdistricts.map((el) => el.code))
@@ -41,6 +45,7 @@ await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
   }
 
   const productsId = await seedProducts(branchId);
+  await seedProductItem({ items, productsId })
 
   await Promise.all([
     ...Array.from({ length: faker.number.int({ min: 1, max: 2 }) }).map(() => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Admin)),
@@ -49,17 +54,7 @@ await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
     ...Array.from({ length: faker.number.int({ min: 5, max: 10 }) }).map(() => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Employee)),
   ])
 
-  const _owners = await Promise.all(Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Owner)))
+  const ownersId = await Promise.all(Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Owner)))
 
-  await Promise.all(_owners.map(async (owner) => {
-    return Promise.all(Array
-      .from({ length: faker.number.int({ min: 1, max: 3 }) })
-      .map(() => seedItems({
-        categories: categoriesId,
-        units: unitsId,
-        products: productsId,
-        owner,
-      }))
-    )
-  }))
+  await seedItemOwner({ ownersId, itemsId: items.map((item) => item.id) })
 }))

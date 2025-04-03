@@ -3,6 +3,8 @@
     "*.route.ts": "routing",
     "*.schema.ts": "apiblueprint",
     "*.column.ts": "database",
-    "*.service.ts": "brainfuck"
+    "*.service.ts": "brainfuck",
+    "*.seed.ts": "mint",
+    "seed.dev.ts": "mint"
   }
 }
