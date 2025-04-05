@@ -12,6 +12,9 @@ import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiR
 import { messages } from '@/lib/constants/messages';
 import { validationMessages } from '@/lib/constants/validation-message';
 import { ImageSchema } from '../images/Image.schema';
+import { itemsOwners } from 'db/schema/items-owners';
+import { CategorySchema } from '../categories/Category.schema';
+import { UnitSchema } from '../units/Unit.schema';
 
 export type ItemColumn = keyof typeof items.$inferSelect
 export type ProductItemColumn = keyof typeof productsItems.$inferSelect
@@ -20,10 +23,27 @@ export const ItemSchema = createSelectSchema(items).pick({
   categoryId: true,
   id: true,
   name: true,
-  ownerId: true,
-  price: true,
   unitId: true,
 }).openapi('Item')
+
+export const ItemListSchema = ItemSchema.omit({
+  categoryId: true,
+  unitId: true,
+}).extend({
+  category: z.string(),
+  unit: z.string(),
+  totalQuantity: z.number(),
+  availableQuantity: z.number(),
+  ownedBy: z.number(),
+  images: z.array(ImageSchema)
+}).openapi('ItemList')
+
+const ItemOwner = createSelectSchema(itemsOwners).pick({
+  id: true
+}).extend({
+  profile: ProfileSchema,
+  quantity: z.number(),
+}).openapi('ItemOwner')
 
 export const ProductItemSchema = createSelectSchema(productsItems).pick({
   productId: true,
@@ -33,40 +53,33 @@ export const ProductItemSchema = createSelectSchema(productsItems).pick({
   overtimeType: true,
 }).openapi('ProductItem')
 
-const ItemExtendedSchema = ItemSchema.omit({
-  ownerId: true,
-}).extend({
+const ItemExtendedSchema = ItemSchema.extend({
   products: z.array(ProductItemSchema),
-  owner: ProfileSchema,
+  owner: z.array(ItemOwner),
   quantity: z.number(),
   images: z.array(ImageSchema)
 })
   .openapi('ItemExtended')
 
-export type ItemSort = ItemColumn | ProductItemColumn | 'quantity'
+export type ItemSort = ItemColumn | 'totalQuantity' | 'availableQuantity'
 
 export const ItemFilterSchema = z.object({
   categoryId: NumericSchema('Category ID').optional(),
   ownerId: NumericSchema('Owner ID').optional(),
   productId: NumericSchema('Product ID').optional(),
   branchId: NumericSchema('Branch ID').optional(),
-  minPrice: NumericSchema('Min Price').optional(),
-  maxPrice: NumericSchema('Max Price').optional(),
-  overtimeType: z.nativeEnum(OvertimeTypeEnum).optional(),
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
   .merge(SortSchema<ItemSort>([
-    'quantity',
-    'price',
-    'overtimeMultiplier',
-    'overtimePrice',
-    'overtimeRatio',
-    'overtimeType'
+    'id',
+    'name',
+    'totalQuantity',
+    'availableQuantity',
   ]))
   .openapi('ItemFilter')
 
-export const ItemResponseListSchema = ApiResponseListSchema(ItemExtendedSchema, messages.successList('Item'))
+export const ItemResponseListSchema = ApiResponseListSchema(ItemListSchema, messages.successList('Item'))
 export const ItemResponseDataSchema = ApiResponseDataSchema(ItemExtendedSchema, messages.successDetail('Item'))
 
 const ProductItemRequestSchema = createInsertSchema(productsItems, {
@@ -89,14 +102,31 @@ const ProductItemRequestSchema = createInsertSchema(productsItems, {
   overtimeType: z.nativeEnum(OvertimeTypeEnum, {
     invalid_type_error: validationMessages.enum('Overtime Type', OvertimeTypeEnum),
     required_error: validationMessages.required('Overtime Type'),
-  })
+  }),
+  price: z.number({
+    invalid_type_error: validationMessages.number('Price'),
+    required_error: validationMessages.required('Price'),
+  }),
 }).pick({
   productId: true,
   overtimeMultiplier: true,
   overtimePrice: true,
   overtimeRatio: true,
-  overtimeType: true
-})
+  overtimeType: true,
+  price: true
+}).openapi('ProductItemRequest')
+
+const ItemOwnerRequestSchema = createInsertSchema(itemsOwners, {
+  ownerId: z.number({
+    invalid_type_error: validationMessages.number('Owner\'s User ID'),
+    required_error: validationMessages.required('Owner\'s User ID'),
+  }),
+}).pick({ ownerId: true }).extend({
+  quantity: z.number({
+    invalid_type_error: validationMessages.number('Quantity'),
+    required_error: validationMessages.required('Quantity'),
+  }),
+}).openapi('ItemOwnerRequest')
 
 export const ItemRequestSchema = createInsertSchema(items, {
   categoryId: z.number({
@@ -107,24 +137,14 @@ export const ItemRequestSchema = createInsertSchema(items, {
     invalid_type_error: validationMessages.string('Name'),
     required_error: validationMessages.required('Name')
   }),
-  ownerId: z.number({
-    invalid_type_error: validationMessages.number('Owner ID'),
-    required_error: validationMessages.required('Owner ID'),
-  }),
   unitId: z.number({
     invalid_type_error: validationMessages.number('Unit ID'),
     required_error: validationMessages.required('Unit ID'),
-  }),
-  price: z.number({
-    invalid_type_error: validationMessages.number('Price'),
-    required_error: validationMessages.required('Price'),
   }),
 })
   .pick({
     categoryId: true,
     name: true,
-    ownerId: true,
-    price: true,
     unitId: true,
   })
   .extend({
@@ -132,14 +152,15 @@ export const ItemRequestSchema = createInsertSchema(items, {
       invalid_type_error: validationMessages.array('Products'),
       required_error: validationMessages.required('Products')
     }),
-    quantity: z.number({
-      invalid_type_error: validationMessages.number('Quantity'),
-      required_error: validationMessages.required('Quantity'),
-    }).optional(),
+    owners: z.array(z.union([ItemOwnerRequestSchema, z.number()]), {
+      invalid_type_error: validationMessages.array('Owners'),
+      required_error: validationMessages.required('Owners')
+    }),
     images: z.array(z.union([z.number(), z.string()]))
   })
   .openapi('ItemRequest')
 
+export type ItemList = z.infer<typeof ItemListSchema>
 export type ItemExtended = z.infer<typeof ItemExtendedSchema>
 export type ItemFilter = z.infer<typeof ItemFilterSchema>
 export type ItemRequest = z.infer<typeof ItemRequestSchema>

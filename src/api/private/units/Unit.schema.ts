@@ -7,7 +7,7 @@ import { units } from 'db/schema/units';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from '@hono/zod-openapi';
 
-const UnitSchema = createSelectSchema(units)
+export const UnitSchema = createSelectSchema(units)
   .pick({
     id: true,
     name: true,

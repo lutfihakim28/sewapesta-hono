@@ -20,11 +20,12 @@ const ItemMutationSchema = createSelectSchema(itemMutations).pick({
   quantity: true,
   type: true,
   createdAt: true,
-  itemId: true,
+  itemOwnerId: true,
+  affectItemQuantity: true,
 })
 
 const ItemMutationExtendedSchema = ItemMutationSchema
-  .omit({ itemId: true })
+  .omit({ itemOwnerId: true })
   .extend({
     item: ItemSchema,
     owner: ProfileSchema,
@@ -53,7 +54,6 @@ export const ItemMutationResponseDataSchema = ApiResponseDataSchema(ItemMutation
 
 export const ItemMutationRequestSchema = createInsertSchema(itemMutations).pick({
   description: true,
-  itemId: true,
   quantity: true,
   type: true,
 }).openapi('ItemMutationRequest')

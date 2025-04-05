@@ -13,7 +13,7 @@ import { products } from 'db/schema/products';
 import { productsItems } from 'db/schema/products-items';
 import { profiles } from 'db/schema/profiles';
 import { users } from 'db/schema/users';
-import { and, asc, countDistinct, desc, eq, gte, inArray, isNull, like, lte, not, notInArray, SQL } from 'drizzle-orm';
+import { and, asc, count, countDistinct, desc, eq, gte, inArray, isNull, like, lte, not, notInArray, sql, SQL } from 'drizzle-orm';
 import { CategoryService } from '../categories/Category.service';
 import { Image, ImageSchema } from '../images/Image.schema';
 import { ImageService } from '../images/Image.service';
@@ -23,16 +23,19 @@ import { profileColumns } from '../users/User.column';
 import { User } from '../users/User.schema';
 import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
-import { ItemColumn, ItemExtended, ItemFilter, ItemRequest, ItemSort, ProductItemColumn, ProductItemSchema } from './Item.schema';
+import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemColumn, ProductItemSchema } from './Item.schema';
 import { itemQuantityQuery } from './Item.query';
 import { itemMutations } from 'db/schema/item-mutations';
 import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
 import dayjs from 'dayjs';
+import { categories } from 'db/schema/categories';
+import { units } from 'db/schema/units';
+import { itemsOwners } from 'db/schema/items-owners';
 
 export abstract class ItemService {
-  static async list(query: ItemFilter, user: User): Promise<[ItemExtended[], number]> {
-    const { ownerId, ...selectedColumns } = itemColumns
+  static async list(query: ItemFilter, user: User): Promise<[ItemList[], number]> {
+    const { unitId, categoryId, ...selectedColumns } = itemColumns
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: ItemSort = 'id';
 
@@ -46,68 +49,64 @@ export abstract class ItemService {
 
     let orderBy: SQL<unknown>
 
-    if ([
-      'id', 'name', 'createdAt', 'updatedAt', 'deletedAt',
-      'categoryId', 'ownerId', 'price', 'unitId'
-    ].includes(sortBy as ItemColumn)) {
+    if (['id', 'name'].includes(sortBy as ItemColumn)) {
       orderBy = sort === SortEnum.Ascending
         ? asc(items[sortBy as ItemColumn])
         : desc(items[sortBy as ItemColumn])
-    } else if (sortBy === 'quantity') {
-      orderBy = sort === SortEnum.Ascending
-        ? asc(itemQuantityQuery[sortBy])
-        : desc(itemQuantityQuery[sortBy])
     } else {
-      orderBy = sort === SortEnum.Ascending
-        ? asc(productsItems[sortBy as ProductItemColumn])
-        : desc(productsItems[sortBy as ProductItemColumn])
+      // orderBy = sort === SortEnum.Ascending
+      //   ? asc(productsItems[sortBy as ProductItemColumn])
+      //   : desc(productsItems[sortBy as ProductItemColumn])
     }
 
-    const [_items, totalData] = await Promise.all([
+    const [_items] = await Promise.all([
       db.with(itemQuantityQuery)
         .select({
           ...selectedColumns,
-          owner: profileColumns,
-          products: buildJsonGroupArray([
-            productsItems.productId,
-            productsItems.overtimeMultiplier,
-            productsItems.overtimePrice,
-            productsItems.overtimeRatio,
-            productsItems.overtimeType,
-          ]),
+          // owner: profileColumns,
+          // products: buildJsonGroupArray([
+          //   productsItems.productId,
+          //   productsItems.overtimeMultiplier,
+          //   productsItems.overtimePrice,
+          //   productsItems.overtimeRatio,
+          //   productsItems.overtimeType,
+          // ]),
           images: buildJsonGroupArray([
             images.id,
             images.path,
             images.url,
           ]),
-          quantity: itemQuantityQuery.quantity,
+          // quantity: itemQuantityQuery.quantity,
+          unit: units.name,
+          category: categories.name,
+          ownedBy: count(itemsOwners.id),
+          availableQuantity: itemQuantityQuery.availableQuantity,
+          totalQuantity: sql<number>`SUM(${itemsOwners.quantity})`.mapWith(Number).as('totalQuantity'),
         })
         .from(items)
-        .leftJoin(productsItems, eq(productsItems.itemId, items.id))
-        .innerJoin(products, eq(products.id, productsItems.productId))
-        .innerJoin(users, eq(users.id, items.ownerId))
-        .innerJoin(profiles, eq(profiles.userId, users.id))
-        .innerJoin(branches, eq(branches.id, users.branchId))
+        .innerJoin(categories, eq(categories.id, items.categoryId))
+        .innerJoin(units, eq(units.id, items.unitId))
+        .leftJoin(itemsOwners, eq(itemsOwners.itemId, items.id))
         .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
         .leftJoin(
           images,
           and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
         )
-        .where(this.buildWhereClause(user, query))
-        .orderBy(orderBy)
-        .groupBy(items.id)
-        .limit(Number(query.pageSize || 5))
-        .offset(countOffset(query.page, query.pageSize)),
-      this.count(this.buildWhereClause(user, query))
+        // .where(this.buildWhereClause(user, query))
+        // .orderBy(orderBy)
+        .groupBy(items.id),
+      // .limit(Number(query.pageSize || 5))
+      // .offset(countOffset(query.page, query.pageSize)),
+      // this.count(this.buildWhereClause(user, query))
     ])
 
     return [
       _items.map((item) => ({
         ...item,
-        products: (JSON.parse(item.products) as unknown[]).map((product) => ProductItemSchema.parse(product)),
+        // products: (JSON.parse(item.products) as unknown[]).map((product) => ProductItemSchema.parse(product)),
         images: (JSON.parse(item.images) as unknown[]).filter((image) => (image as Image).id).map((image) => ImageSchema.parse(image)),
       })),
-      totalData
+      10
     ]
   }
 
@@ -280,14 +279,15 @@ export abstract class ItemService {
   }
 
   private static async count(query?: SQL<unknown>) {
-    const [item] = await db
-      .select({ count: countDistinct(items.id).mapWith(Number) })
-      .from(items)
-      .innerJoin(users, eq(users.id, items.ownerId))
-      .innerJoin(branches, eq(branches.id, users.branchId))
-      .where(query)
+    // const [item] = await db
+    //   .select({ count: countDistinct(items.id).mapWith(Number) })
+    //   .from(items)
+    //   .innerJoin(users, eq(users.id, items.ownerId))
+    //   .innerJoin(branches, eq(branches.id, users.branchId))
+    //   .where(query)
 
-    return item?.count || 0
+    // return item?.count || 0
+    return 10
   }
 
   private static buildWhereClause(user: User, query: ItemFilter) {

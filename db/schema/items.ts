@@ -6,7 +6,7 @@ import { timestamps } from "db/schema/timestamps.helper";
 export const items = sqliteTable('items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull().unique(),
-  unitId: integer('unit').references(() => units.id).notNull(),
+  unitId: integer('unit_id').references(() => units.id).notNull(),
   categoryId: integer('category_id').references(() => categories.id).notNull(),
   ...timestamps,
 }, (table) => [

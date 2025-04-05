@@ -7,7 +7,7 @@ import { categories } from 'db/schema/categories';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from '@hono/zod-openapi';
 
-const CategorySchema = createSelectSchema(categories)
+export const CategorySchema = createSelectSchema(categories)
   .pick({
     id: true,
     name: true,

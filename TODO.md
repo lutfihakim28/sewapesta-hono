@@ -21,6 +21,8 @@
 16. handle SQL error
 17. Create Vendor
 18. Create vendor to items pivot table
+19. update items crud due to flow change
+20. in get list items, need to handle its filter
 
 ## Item Requirement
 
