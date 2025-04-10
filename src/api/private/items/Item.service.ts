@@ -13,7 +13,7 @@ import { products } from 'db/schema/products';
 import { productsItems } from 'db/schema/products-items';
 import { profiles } from 'db/schema/profiles';
 import { users } from 'db/schema/users';
-import { and, asc, count, countDistinct, desc, eq, gte, inArray, isNull, like, lte, not, notInArray, sql, SQL } from 'drizzle-orm';
+import { and, asc, count, countDistinct, desc, eq, getTableColumns, gte, inArray, isNull, like, lte, not, notInArray, or, sql, SQL } from 'drizzle-orm';
 import { CategoryService } from '../categories/Category.service';
 import { Image, ImageSchema } from '../images/Image.schema';
 import { ImageService } from '../images/Image.service';
@@ -24,7 +24,7 @@ import { User } from '../users/User.schema';
 import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
 import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemColumn, ProductItemSchema } from './Item.schema';
-import { itemQuantityQuery } from './Item.query';
+import { quantityQuery } from './Item.query';
 import { itemMutations } from 'db/schema/item-mutations';
 import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
@@ -32,81 +32,165 @@ import dayjs from 'dayjs';
 import { categories } from 'db/schema/categories';
 import { units } from 'db/schema/units';
 import { itemsOwners } from 'db/schema/items-owners';
+import { logger } from '@/lib/utils/logger';
 
 export abstract class ItemService {
   static async list(query: ItemFilter, user: User): Promise<[ItemList[], number]> {
+    const latestAdjustment = db.$with('latest_adjustment').as(
+      db.select({
+        itemOwnerId: itemMutations.itemOwnerId,
+        time: sql<number>`MAX(${itemMutations.createdAt})`.mapWith(Number).as('time')
+      })
+        .from(itemMutations)
+        .where(eq(itemMutations.type, ItemMutationTypeEnum.Adjustment))
+        .groupBy(itemMutations.itemOwnerId)
+    )
+
+    const latestMutations = db.$with('latest_mutation').as(
+      db
+        .select(getTableColumns(itemMutations))
+        .from(itemMutations)
+        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, itemMutations.itemOwnerId))
+        .where(or(
+          isNull(latestAdjustment.time),
+          gte(itemMutations.createdAt, latestAdjustment.time)
+        ))
+    )
+
+    // TODO: HANDLE FILTER BY OWNER
+    const availableQuantity = db.$with('available_quantity').as(
+      db
+        .select({
+          ownerId: itemsOwners.ownerId,
+          itemId: itemsOwners.itemId,
+          value: sql<number>`SUM(
+          CASE ${latestMutations.type}
+            WHEN ${ItemMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
+            WHEN ${ItemMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
+            WHEN ${ItemMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
+            ELSE 0
+          END
+        )`.mapWith(Number).as('available_quantity')
+        })
+        .from(itemsOwners)
+        .leftJoin(latestMutations, eq(latestMutations.itemOwnerId, itemsOwners.id))
+        .groupBy(itemsOwners.itemId, itemsOwners.ownerId)
+    )
+
+    // TODO: HANDLE FILTER BY OWNER
+    const totalQuantity = db.$with('total_quantity').as(
+      db.select({
+        itemId: itemsOwners.itemId,
+        value: sql<number>`SUM(${itemsOwners.quantity})`.mapWith(Number).as('total_quantity')
+      })
+        .from(itemsOwners)
+        .groupBy(itemsOwners.itemId)
+    )
+
+    const itemQuantityQuery = db.$with('quantity_query').as(
+      db
+        .select({
+          itemId: availableQuantity.itemId,
+          availableQuantity: sql<number>`SUM(${availableQuantity.value})`.mapWith(Number).as('item_available_quantity'),
+          totalQuantity: totalQuantity.value,
+          ownedBy: countDistinct(availableQuantity.ownerId).as('owned_by')
+        })
+        .from(availableQuantity)
+        .innerJoin(totalQuantity, eq(totalQuantity.itemId, availableQuantity.itemId))
+        .groupBy(availableQuantity.itemId)
+    )
+
     const { unitId, categoryId, ...selectedColumns } = itemColumns
-    let sort: SortEnum = SortEnum.Ascending;
-    let sortBy: ItemSort = 'id';
+    let sort: SortEnum = query.sort || SortEnum.Ascending;
+    let sortBy: ItemSort = query.sortBy || 'id';
 
-    if (query.sort) {
-      sort = query.sort
-    }
+    let orderBy: SQL<unknown>;
 
-    if (query.sortBy) {
-      sortBy = query.sortBy
-    }
-
-    let orderBy: SQL<unknown>
-
-    if (['id', 'name'].includes(sortBy as ItemColumn)) {
+    if (sortBy === 'availableQuantity' || sortBy === 'totalQuantity' || sortBy === 'ownedBy') {
+      orderBy = sort === SortEnum.Ascending
+        ? asc(itemQuantityQuery[sortBy])
+        : desc(itemQuantityQuery[sortBy])
+    } else {
       orderBy = sort === SortEnum.Ascending
         ? asc(items[sortBy as ItemColumn])
         : desc(items[sortBy as ItemColumn])
-    } else {
-      // orderBy = sort === SortEnum.Ascending
-      //   ? asc(productsItems[sortBy as ProductItemColumn])
-      //   : desc(productsItems[sortBy as ProductItemColumn])
     }
 
-    const [_items] = await Promise.all([
-      db.with(itemQuantityQuery)
+    const conditions = [
+      isNull(items.deletedAt)
+    ]
+
+    if (query.categoryId) {
+      conditions.push(eq(items.categoryId, +query.categoryId))
+    }
+
+    if (query.keyword) {
+      conditions.push(
+        like(items.name, `%${query.keyword}%`),
+      );
+    }
+
+    if (query.productId) {
+      const _conditions = [
+        eq(products.id, +query.productId),
+        isNull(products.deletedAt)
+      ]
+
+      if (user.role !== RoleEnum.SuperAdmin) {
+        _conditions.push(eq(
+          products.branchId,
+          user.branchId
+        ))
+      } else if (query.branchId) {
+        _conditions.push(eq(
+          products.branchId,
+          +query.branchId
+        ))
+      }
+
+      conditions.push(inArray(
+        items.id,
+        db.select({
+          itemId: productsItems.itemId
+        })
+          .from(productsItems)
+          .innerJoin(products, eq(products.id, productsItems.productId))
+          .where(and(..._conditions))
+      ))
+    }
+
+    const [_items, [itemCount]] = await Promise.all([
+      db.with(latestAdjustment, latestMutations, availableQuantity, totalQuantity, itemQuantityQuery)
         .select({
           ...selectedColumns,
-          // owner: profileColumns,
-          // products: buildJsonGroupArray([
-          //   productsItems.productId,
-          //   productsItems.overtimeMultiplier,
-          //   productsItems.overtimePrice,
-          //   productsItems.overtimeRatio,
-          //   productsItems.overtimeType,
-          // ]),
-          images: buildJsonGroupArray([
-            images.id,
-            images.path,
-            images.url,
-          ]),
-          // quantity: itemQuantityQuery.quantity,
           unit: units.name,
           category: categories.name,
-          ownedBy: count(itemsOwners.id),
-          availableQuantity: itemQuantityQuery.availableQuantity,
-          totalQuantity: sql<number>`SUM(${itemsOwners.quantity})`.mapWith(Number).as('totalQuantity'),
+          ownedBy: sql<number>`COALESCE(${itemQuantityQuery.ownedBy}, 0)`,
+          availableQuantity: sql<number>`COALESCE(${itemQuantityQuery.availableQuantity}, 0)`,
+          totalQuantity: sql<number>`COALESCE(${itemQuantityQuery.totalQuantity}, 0)`,
         })
         .from(items)
         .innerJoin(categories, eq(categories.id, items.categoryId))
         .innerJoin(units, eq(units.id, items.unitId))
-        .leftJoin(itemsOwners, eq(itemsOwners.itemId, items.id))
         .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
-        .leftJoin(
-          images,
-          and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
-        )
-        // .where(this.buildWhereClause(user, query))
-        // .orderBy(orderBy)
-        .groupBy(items.id),
-      // .limit(Number(query.pageSize || 5))
-      // .offset(countOffset(query.page, query.pageSize)),
-      // this.count(this.buildWhereClause(user, query))
+        .where(and(...conditions))
+        .orderBy(orderBy)
+        .limit(Number(query.pageSize || 5))
+        .offset(countOffset(query.page, query.pageSize)),
+      db.with(latestAdjustment, latestMutations, availableQuantity, totalQuantity, itemQuantityQuery)
+        .select({ value: count(items.id) })
+        .from(items)
+        .innerJoin(categories, eq(categories.id, items.categoryId))
+        .innerJoin(units, eq(units.id, items.unitId))
+        .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
+        .where(and(...conditions))
     ])
 
+    logger.debug(_items, 'ItemResult')
+
     return [
-      _items.map((item) => ({
-        ...item,
-        // products: (JSON.parse(item.products) as unknown[]).map((product) => ProductItemSchema.parse(product)),
-        images: (JSON.parse(item.images) as unknown[]).filter((image) => (image as Image).id).map((image) => ImageSchema.parse(image)),
-      })),
-      10
+      _items,
+      itemCount.value
     ]
   }
 
@@ -123,7 +207,7 @@ export abstract class ItemService {
     }
 
     const [item] = await db
-      .with(itemQuantityQuery)
+      .with(quantityQuery)
       .select({
         ...selectedColumns,
         owner: profileColumns,
@@ -139,7 +223,7 @@ export abstract class ItemService {
           images.path,
           images.url,
         ]),
-        quantity: itemQuantityQuery.quantity,
+        quantity: quantityQuery.quantity,
       })
       .from(items)
       .leftJoin(productsItems, eq(productsItems.itemId, items.id))
@@ -147,7 +231,7 @@ export abstract class ItemService {
       .innerJoin(users, eq(users.id, items.ownerId))
       .innerJoin(profiles, eq(profiles.userId, users.id))
       .innerJoin(branches, eq(branches.id, users.branchId))
-      .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
+      .leftJoin(quantityQuery, eq(quantityQuery.itemId, items.id))
       .leftJoin(
         images,
         and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
@@ -276,70 +360,6 @@ export abstract class ItemService {
     if (!item) {
       throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
     }
-  }
-
-  private static async count(query?: SQL<unknown>) {
-    // const [item] = await db
-    //   .select({ count: countDistinct(items.id).mapWith(Number) })
-    //   .from(items)
-    //   .innerJoin(users, eq(users.id, items.ownerId))
-    //   .innerJoin(branches, eq(branches.id, users.branchId))
-    //   .where(query)
-
-    // return item?.count || 0
-    return 10
-  }
-
-  private static buildWhereClause(user: User, query: ItemFilter) {
-    const conditions: ReturnType<typeof and>[] = [
-      isNull(items.deletedAt),
-    ]
-
-    if (query.categoryId) {
-      conditions.push(eq(items.categoryId, +query.categoryId))
-    }
-
-    if (query.minPrice) {
-      conditions.push(gte(items.price, +query.minPrice))
-    }
-
-    if (query.maxPrice) {
-      conditions.push(lte(items.price, +query.maxPrice))
-    }
-
-    if (query.keyword) {
-      conditions.push(
-        like(items.name, `%${query.keyword}%`),
-      );
-    }
-
-    if (user.role === RoleEnum.Owner) {
-      conditions.push(eq(items.ownerId, user.id))
-    } else if (query.ownerId) {
-      conditions.push(eq(items.ownerId, +query.ownerId))
-    }
-
-    if (user.role !== RoleEnum.SuperAdmin) {
-      conditions.push(eq(
-        branches.id,
-        user.branchId
-      ))
-    } else if (query.branchId) {
-      conditions.push(eq(
-        branches.id,
-        +query.branchId
-      ))
-    }
-
-    if (query.overtimeType) {
-      conditions.push(eq(productsItems.overtimeType, query.overtimeType))
-    }
-
-    if (query.productId) {
-      conditions.push(eq(productsItems.productId, +query.productId))
-    }
-
-    return and(...conditions)
   }
 
   private static async checkConstraint(payload: ItemRequest, user: User) {

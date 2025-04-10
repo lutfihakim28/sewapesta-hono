@@ -35,7 +35,6 @@ export const ItemListSchema = ItemSchema.omit({
   totalQuantity: z.number(),
   availableQuantity: z.number(),
   ownedBy: z.number(),
-  images: z.array(ImageSchema)
 }).openapi('ItemList')
 
 const ItemOwner = createSelectSchema(itemsOwners).pick({
@@ -61,7 +60,7 @@ const ItemExtendedSchema = ItemSchema.extend({
 })
   .openapi('ItemExtended')
 
-export type ItemSort = ItemColumn | 'totalQuantity' | 'availableQuantity'
+export type ItemSort = ItemColumn | 'totalQuantity' | 'availableQuantity' | 'ownedBy'
 
 export const ItemFilterSchema = z.object({
   categoryId: NumericSchema('Category ID').optional(),
@@ -74,8 +73,9 @@ export const ItemFilterSchema = z.object({
   .merge(SortSchema<ItemSort>([
     'id',
     'name',
-    'totalQuantity',
     'availableQuantity',
+    'totalQuantity',
+    'ownedBy'
   ]))
   .openapi('ItemFilter')
 

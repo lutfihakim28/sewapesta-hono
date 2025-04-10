@@ -2,6 +2,7 @@ import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
 import { timestamps } from 'db/schema/timestamps.helper';
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { itemsOwners } from './items-owners';
+import dayjs from 'dayjs';
 
 export const itemMutations = sqliteTable('item_mutations', {
   id: integer('id').primaryKey({ autoIncrement: true }),

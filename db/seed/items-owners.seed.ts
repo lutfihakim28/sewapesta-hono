@@ -27,11 +27,13 @@ export async function seedItemOwner({ itemsId, ownersId }: ItemOwnerSeedProp) {
           .values({ itemId, ownerId, quantity })
           .returning({ id: itemsOwners.id })
 
+        const startedDate = dayjs(faker.date.past());
+
         await transaction.insert(itemMutations).values([
           {
             quantity,
             type: ItemMutationTypeEnum.Adjustment,
-            createdAt: dayjs(faker.date.past()).unix(),
+            createdAt: startedDate.unix(),
             description: 'SEEDER',
             itemOwnerId: itemOwner.id,
             affectItemQuantity: true,
@@ -42,18 +44,18 @@ export async function seedItemOwner({ itemsId, ownersId }: ItemOwnerSeedProp) {
               max: 30,
             }),
             type: ItemMutationTypeEnum.Addition,
-            createdAt: dayjs(faker.date.past()).unix(),
+            createdAt: startedDate.add(1, 'day').unix(),
             description: 'SEEDER',
             itemOwnerId: itemOwner.id,
             affectItemQuantity: false,
           },
           {
             quantity: faker.number.int({
-              min: 10,
+              min: 30,
               max: 70,
             }),
             type: ItemMutationTypeEnum.Reduction,
-            createdAt: dayjs(faker.date.past()).unix(),
+            createdAt: startedDate.add(1, 'day').unix(),
             description: 'SEEDER',
             itemOwnerId: itemOwner.id,
             affectItemQuantity: false,

@@ -5,16 +5,16 @@ import { provinces } from 'db/schema/provinces';
 import { subdistricts } from 'db/schema/subdistricts';
 import { eq, sql } from 'drizzle-orm';
 
-export const locationQuery = db.$with('locationQuery').as(db
+export const locationQuery = db.$with('location_query').as(db
   .select({
     subdistrict: sql<string>`${subdistricts.name}`.as('subdistrict'),
     district: sql<string>`${districts.name}`.as('district'),
     city: sql<string>`${cities.name}`.as('city'),
     province: sql<string>`${provinces.name}`.as('province'),
-    subdistrictCode: sql<string>`${subdistricts.code}`.as('subdistrictCode'),
-    districtCode: sql<string>`${districts.code}`.as('districtCode'),
-    cityCode: sql<string>`${cities.code}`.as('cityCode'),
-    provinceCode: sql<string>`${provinces.code}`.as('provinceCode'),
+    subdistrictCode: sql<string>`${subdistricts.code}`.as('subdistrict_code'),
+    districtCode: sql<string>`${districts.code}`.as('district_code'),
+    cityCode: sql<string>`${cities.code}`.as('city_code'),
+    provinceCode: sql<string>`${provinces.code}`.as('province_code'),
   })
   .from(subdistricts)
   .leftJoin(districts, eq(districts.code, subdistricts.districtCode))
