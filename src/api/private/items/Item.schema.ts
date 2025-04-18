@@ -13,8 +13,7 @@ import { messages } from '@/lib/constants/messages';
 import { validationMessages } from '@/lib/constants/validation-message';
 import { ImageSchema } from '../images/Image.schema';
 import { itemsOwners } from 'db/schema/items-owners';
-import { CategorySchema } from '../categories/Category.schema';
-import { UnitSchema } from '../units/Unit.schema';
+import { BooleanQuerySchema } from '@/lib/schemas/BooleanQuery.schema';
 
 export type ItemColumn = keyof typeof items.$inferSelect
 export type ProductItemColumn = keyof typeof productsItems.$inferSelect
@@ -65,8 +64,8 @@ export type ItemSort = ItemColumn | 'totalQuantity' | 'availableQuantity' | 'own
 export const ItemFilterSchema = z.object({
   categoryId: NumericSchema('Category ID').optional(),
   ownerId: NumericSchema('Owner ID').optional(),
-  productId: NumericSchema('Product ID').optional(),
   branchId: NumericSchema('Branch ID').optional(),
+  hideUnavailable: BooleanQuerySchema('hideUnavailable'),
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)

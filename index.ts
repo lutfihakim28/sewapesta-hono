@@ -81,10 +81,7 @@ app.delete('/api/private/branches', superadminMiddleware)
 app.use('/api/private/branches/*', adminMiddleware)
 
 app.use('/api/private/products/*', adminMiddleware)
-
-app.post('/api/private/items', adminMiddleware)
-app.put('/api/private/items/*', adminMiddleware)
-app.delete('/api/private/items/*', adminMiddleware)
+app.use('/api/private/items/*', adminMiddleware)
 
 app.post('/api/private/categories', superadminMiddleware)
 app.put('/api/private/categories/*', superadminMiddleware)

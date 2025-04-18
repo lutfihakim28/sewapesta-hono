@@ -11,7 +11,7 @@ export const locationQuery = db.$with('location_query').as(db
     district: sql<string>`${districts.name}`.as('district'),
     city: sql<string>`${cities.name}`.as('city'),
     province: sql<string>`${provinces.name}`.as('province'),
-    subdistrictCode: sql<string>`${subdistricts.code}`.as('subdistrict_code'),
+    subdistrictCode: sql<string>`${subdistricts.code}`.as('location_subdistrict_code'),
     districtCode: sql<string>`${districts.code}`.as('district_code'),
     cityCode: sql<string>`${cities.code}`.as('city_code'),
     provinceCode: sql<string>`${provinces.code}`.as('province_code'),

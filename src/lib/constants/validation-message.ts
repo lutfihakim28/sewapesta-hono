@@ -3,6 +3,7 @@ import { EnumLike } from 'zod';
 export const validationMessages = {
   required: (field: string) => `${field} is required.`,
   string: (field: string) => `${field} should be string.`,
+  boolean: (field: string) => `${field} should be boolean value.`,
   number: (field: string) => `${field} should be valid number.`,
   numeric: (field: string) => `${field} should be numeric string.`,
   positiveNumber: (field: string) => `${field} should be valid positive number.`,

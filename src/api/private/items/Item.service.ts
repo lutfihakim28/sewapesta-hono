@@ -13,7 +13,7 @@ import { products } from 'db/schema/products';
 import { productsItems } from 'db/schema/products-items';
 import { profiles } from 'db/schema/profiles';
 import { users } from 'db/schema/users';
-import { and, asc, count, countDistinct, desc, eq, getTableColumns, gte, inArray, isNull, like, lte, not, notInArray, or, sql, SQL } from 'drizzle-orm';
+import { and, asc, count, countDistinct, desc, eq, getTableColumns, gte, inArray, isNull, like, not, notInArray, or, sql, SQL } from 'drizzle-orm';
 import { CategoryService } from '../categories/Category.service';
 import { Image, ImageSchema } from '../images/Image.schema';
 import { ImageService } from '../images/Image.service';
@@ -23,7 +23,7 @@ import { profileColumns } from '../users/User.column';
 import { User } from '../users/User.schema';
 import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
-import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemColumn, ProductItemSchema } from './Item.schema';
+import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemSchema } from './Item.schema';
 import { quantityQuery } from './Item.query';
 import { itemMutations } from 'db/schema/item-mutations';
 import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
@@ -57,7 +57,29 @@ export abstract class ItemService {
         ))
     )
 
-    // TODO: HANDLE FILTER BY OWNER
+    const quantityConditions: SQL<unknown>[] = [];
+
+    if (user.role === RoleEnum.Admin) {
+      quantityConditions.push(inArray(
+        itemsOwners.ownerId,
+        db.select({
+          ownerId: users.id
+        }).from(users)
+          .where(eq(users.branchId, user.branchId))
+      ))
+    } else if (user.role === RoleEnum.SuperAdmin && query.branchId) {
+      quantityConditions.push(inArray(
+        itemsOwners.ownerId,
+        db.select({ ownerId: users.id })
+          .from(users)
+          .where(eq(users.branchId, +query.branchId))
+      ))
+    }
+
+    if (query.ownerId) {
+      quantityConditions.push(eq(itemsOwners.ownerId, +query.ownerId))
+    }
+
     const availableQuantity = db.$with('available_quantity').as(
       db
         .select({
@@ -74,16 +96,17 @@ export abstract class ItemService {
         })
         .from(itemsOwners)
         .leftJoin(latestMutations, eq(latestMutations.itemOwnerId, itemsOwners.id))
+        .where(and(...quantityConditions))
         .groupBy(itemsOwners.itemId, itemsOwners.ownerId)
     )
 
-    // TODO: HANDLE FILTER BY OWNER
     const totalQuantity = db.$with('total_quantity').as(
       db.select({
         itemId: itemsOwners.itemId,
         value: sql<number>`SUM(${itemsOwners.quantity})`.mapWith(Number).as('total_quantity')
       })
         .from(itemsOwners)
+        .where(and(...quantityConditions))
         .groupBy(itemsOwners.itemId)
     )
 
@@ -130,33 +153,8 @@ export abstract class ItemService {
       );
     }
 
-    if (query.productId) {
-      const _conditions = [
-        eq(products.id, +query.productId),
-        isNull(products.deletedAt)
-      ]
-
-      if (user.role !== RoleEnum.SuperAdmin) {
-        _conditions.push(eq(
-          products.branchId,
-          user.branchId
-        ))
-      } else if (query.branchId) {
-        _conditions.push(eq(
-          products.branchId,
-          +query.branchId
-        ))
-      }
-
-      conditions.push(inArray(
-        items.id,
-        db.select({
-          itemId: productsItems.itemId
-        })
-          .from(productsItems)
-          .innerJoin(products, eq(products.id, productsItems.productId))
-          .where(and(..._conditions))
-      ))
+    if (query.hideUnavailable) {
+      conditions.push(not(isNull(itemQuantityQuery.ownedBy)))
     }
 
     const [_items, [itemCount]] = await Promise.all([
