@@ -16,7 +16,7 @@ export const productsItems = sqliteTable('products_items', {
       OvertimeTypeEnum.Price,
       OvertimeTypeEnum.Ratio,
     ]
-  }).notNull().default(OvertimeTypeEnum.Price)
+  }).notNull().default(OvertimeTypeEnum.Price),
 }, (table) => ([
   primaryKey({ columns: [table.itemId, table.productId] })
 ]))

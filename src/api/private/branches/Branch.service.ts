@@ -1,5 +1,5 @@
 import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
-import { BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
+import { Branch, BranchColumn, BranchExtended, BranchFilter, BranchRequest } from './Branch.schema';
 import { branches } from 'db/schema/branches';
 import { db } from 'db';
 import { countOffset } from '@/lib/utils/count-offset';
@@ -158,7 +158,7 @@ export abstract class BranchService {
     }, 'BranchService.delete ')
   }
 
-  static async check(id: number, user: User) {
+  static async check(id: number, user: User): Promise<Branch> {
     if (user.role !== RoleEnum.SuperAdmin && user.branchId !== id) {
       throw new BadRequestException('Requested Branch ID not match with yours.')
     }
@@ -174,6 +174,8 @@ export abstract class BranchService {
     if (!branch) {
       throw new BadRequestException(messages.errorConstraint('Branch'))
     }
+
+    return branch
   }
 
   private static async count(query?: SQL<unknown>) {

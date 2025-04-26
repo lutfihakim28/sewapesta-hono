@@ -12,6 +12,8 @@ import { BranchService } from '../branches/Branch.service';
 import { User } from '../users/User.schema';
 import { productColumns } from './Product.column';
 import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
+import { branches } from 'db/schema/branches';
+import { productsItems } from 'db/schema/products-items';
 
 export abstract class ProductService {
   static async list(query: ProductFilter, user: User): Promise<[Product[], number]> {
@@ -30,17 +32,44 @@ export abstract class ProductService {
       ? asc(products[sortBy])
       : desc(products[sortBy])
 
-    const where = this.buildWhereClause(query, user);
+    const conditions: ReturnType<typeof and>[] = [
+      isNull(products.deletedAt),
+    ]
 
-    return await Promise.all([
-      db.select(productColumns)
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(
+        eq(products.branchId, user.branchId)
+      )
+    } else if (query.branchId) {
+      conditions.push(
+        eq(products.branchId, +query.branchId)
+      )
+    }
+
+    if (query.keyword) {
+      conditions.push(
+        like(products.name, `%${query.keyword}%`),
+      )
+    }
+
+    const [_products, [meta]] = await Promise.all([
+      db.select({
+        ...productColumns,
+        branchName: branches.name,
+      })
         .from(products)
-        .where(where)
+        .innerJoin(branches, eq(branches.id, products.branchId))
+        .where(and(...conditions))
         .orderBy(orderBy)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
-      this.count(where)
+      db
+        .select({ count: count().mapWith(Number) })
+        .from(products)
+        .where(and(...conditions))
     ])
+
+    return [_products, meta.count]
   }
 
   static async get(id: number, user: User): Promise<Product> {
@@ -53,8 +82,12 @@ export abstract class ProductService {
       conditions.push(eq(products.branchId, user.branchId))
     }
     const [product] = await db
-      .select(productColumns)
+      .select({
+        ...productColumns,
+        branchName: branches.name,
+      })
       .from(products)
+      .innerJoin(branches, eq(branches.id, products.branchId))
       .where(and(...conditions))
       .limit(1)
 
@@ -78,7 +111,7 @@ export abstract class ProductService {
   }
 
   static async update(id: number, payload: ProductRequest, user: User): Promise<Product> {
-    await BranchService.check(payload.branchId, user)
+    const branch = await BranchService.check(payload.branchId, user)
     const conditions = [
       eq(products.id, id),
       isNull(products.deletedAt),
@@ -98,7 +131,10 @@ export abstract class ProductService {
       throw new NotFoundException(messages.errorNotFound(`Product with ID ${id}`));
     }
 
-    return product
+    return {
+      ...product,
+      branchName: branch.name
+    }
   }
 
   static async delete(id: number, user: User): Promise<void> {
@@ -112,6 +148,10 @@ export abstract class ProductService {
       .where(and(
         eq(products.id, product.id)
       ))
+
+    await db
+      .delete(productsItems)
+      .where(eq(productsItems.productId, id))
   }
 
   static async check(id: number, user: User) {
@@ -135,38 +175,7 @@ export abstract class ProductService {
     if (!product) {
       throw new BadRequestException(messages.errorConstraint('Product'))
     }
-  }
 
-  private static async count(query?: SQL<unknown>): Promise<number> {
-    const [item] = await db
-      .select({ count: count().mapWith(Number) })
-      .from(products)
-      .where(query)
-
-    return item.count
-  }
-
-  private static buildWhereClause(query: ProductFilter, user: User) {
-    const conditions: ReturnType<typeof and>[] = [
-      isNull(products.deletedAt),
-    ]
-
-    if (user.role !== RoleEnum.SuperAdmin) {
-      conditions.push(
-        eq(products.branchId, user.branchId)
-      )
-    } else if (query.branchId) {
-      conditions.push(
-        eq(products.branchId, +query.branchId)
-      )
-    }
-
-    if (query.keyword) {
-      conditions.push(
-        like(products.name, `%${query.keyword}%`),
-      )
-    }
-
-    return and(...conditions)
+    return product
   }
 }

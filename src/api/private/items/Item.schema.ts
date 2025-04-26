@@ -53,8 +53,10 @@ export const ProductItemSchema = createSelectSchema(productsItems).pick({
 
 const ItemExtendedSchema = ItemSchema.extend({
   products: z.array(ProductItemSchema),
-  owner: z.array(ItemOwner),
-  quantity: z.number(),
+  owners: z.array(ItemOwner),
+  totalQuantity: z.number(),
+  availableQuantity: z.number(),
+  ownedBy: z.number(),
   images: z.array(ImageSchema)
 })
   .openapi('ItemExtended')

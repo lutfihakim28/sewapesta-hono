@@ -20,7 +20,7 @@ import { ImageService } from '../images/Image.service';
 import { ProductService } from '../products/Product.service';
 import { UnitService } from '../units/Unit.service';
 import { profileColumns } from '../users/User.column';
-import { User } from '../users/User.schema';
+import { ProfileSchema, User } from '../users/User.schema';
 import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
 import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemSchema } from './Item.schema';
@@ -193,7 +193,67 @@ export abstract class ItemService {
   }
 
   static async get(id: number, user: User): Promise<ItemExtended> {
-    const { ownerId, ...selectedColumns } = itemColumns
+    const latestAdjustment = db.$with('latest_adjustment').as(
+      db.select({
+        itemOwnerId: itemMutations.itemOwnerId,
+        time: sql<number>`MAX(${itemMutations.createdAt})`.mapWith(Number).as('time')
+      })
+        .from(itemMutations)
+        .where(eq(itemMutations.type, ItemMutationTypeEnum.Adjustment))
+        .groupBy(itemMutations.itemOwnerId)
+    )
+
+    const latestMutations = db.$with('latest_mutation').as(
+      db
+        .select(getTableColumns(itemMutations))
+        .from(itemMutations)
+        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, itemMutations.itemOwnerId))
+        .where(or(
+          isNull(latestAdjustment.time),
+          gte(itemMutations.createdAt, latestAdjustment.time)
+        ))
+    )
+
+    const availableQuantity = db.$with('available_quantity').as(
+      db
+        .select({
+          ownerId: itemsOwners.ownerId,
+          itemId: itemsOwners.itemId,
+          value: sql<number>`SUM(
+          CASE ${latestMutations.type}
+            WHEN ${ItemMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
+            WHEN ${ItemMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
+            WHEN ${ItemMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
+            ELSE 0
+          END
+        )`.mapWith(Number).as('available_quantity')
+        })
+        .from(itemsOwners)
+        .leftJoin(latestMutations, eq(latestMutations.itemOwnerId, itemsOwners.id))
+        .groupBy(itemsOwners.itemId, itemsOwners.ownerId)
+    )
+
+    const totalQuantity = db.$with('total_quantity').as(
+      db.select({
+        itemId: itemsOwners.itemId,
+        value: sql<number>`SUM(${itemsOwners.quantity})`.mapWith(Number).as('total_quantity')
+      })
+        .from(itemsOwners)
+        .groupBy(itemsOwners.itemId)
+    )
+
+    const itemQuantityQuery = db.$with('quantity_query').as(
+      db
+        .select({
+          itemId: availableQuantity.itemId,
+          availableQuantity: sql<number>`SUM(${availableQuantity.value})`.mapWith(Number).as('item_available_quantity'),
+          totalQuantity: totalQuantity.value,
+          ownedBy: countDistinct(availableQuantity.ownerId).as('owned_by')
+        })
+        .from(availableQuantity)
+        .innerJoin(totalQuantity, eq(totalQuantity.itemId, availableQuantity.itemId))
+        .groupBy(availableQuantity.itemId)
+    )
 
     const conditions = [
       eq(items.id, id),
@@ -205,10 +265,15 @@ export abstract class ItemService {
     }
 
     const [item] = await db
-      .with(quantityQuery)
+      .with(latestAdjustment, latestMutations, availableQuantity, totalQuantity, itemQuantityQuery)
       .select({
-        ...selectedColumns,
-        owner: profileColumns,
+        ...itemColumns,
+        owners: buildJsonGroupArray([
+          profileColumns.address,
+          profileColumns.id,
+          profileColumns.name,
+          profileColumns.phone,
+        ]),
         products: buildJsonGroupArray([
           productsItems.productId,
           productsItems.overtimeMultiplier,
@@ -221,15 +286,17 @@ export abstract class ItemService {
           images.path,
           images.url,
         ]),
-        quantity: quantityQuery.quantity,
+        ownedBy: sql<number>`COALESCE(${itemQuantityQuery.ownedBy}, 0)`,
+        availableQuantity: sql<number>`COALESCE(${itemQuantityQuery.availableQuantity}, 0)`,
+        totalQuantity: sql<number>`COALESCE(${itemQuantityQuery.totalQuantity}, 0)`,
       })
       .from(items)
       .leftJoin(productsItems, eq(productsItems.itemId, items.id))
       .innerJoin(products, eq(products.id, productsItems.productId))
-      .innerJoin(users, eq(users.id, items.ownerId))
-      .innerJoin(profiles, eq(profiles.userId, users.id))
       .innerJoin(branches, eq(branches.id, users.branchId))
-      .leftJoin(quantityQuery, eq(quantityQuery.itemId, items.id))
+      .innerJoin(categories, eq(categories.id, items.categoryId))
+      .innerJoin(units, eq(units.id, items.unitId))
+      .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
       .leftJoin(
         images,
         and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
@@ -244,6 +311,7 @@ export abstract class ItemService {
 
     return {
       ...item,
+      owners: (JSON.parse(item.owners) as unknown[]).map((owner) => ProfileSchema.parse(owner)),
       products: (JSON.parse(item.products) as unknown[]).map((product) => ProductItemSchema.parse(product)),
       images: (JSON.parse(item.images) as unknown[]).filter((image) => (image as Image).id).map((image) => ImageSchema.parse(image)),
     }
@@ -336,28 +404,30 @@ export abstract class ItemService {
     if (!item) {
       throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
     }
+
+    await db
+      .delete(productsItems)
+      .where(and(
+        eq(productsItems.productId, id)
+      ))
   }
 
-  static async check(id: number, user: User) {
+  static async check(id: number) {
     const conditions = [
       isNull(items.deletedAt),
       eq(items.id, id),
-      not(eq(users.role, RoleEnum.SuperAdmin))
     ]
-
-    if (user.role !== RoleEnum.SuperAdmin) {
-      conditions.push(eq(users.branchId, user.branchId))
-    }
 
     const [item] = await db.select()
       .from(items)
-      .innerJoin(users, eq(users.id, items.ownerId))
       .where(and(...conditions))
       .limit(1)
 
     if (!item) {
       throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
     }
+
+    return item
   }
 
   private static async checkConstraint(payload: ItemRequest, user: User) {

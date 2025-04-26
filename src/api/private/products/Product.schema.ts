@@ -11,12 +11,15 @@ import { NumericSchema } from '@/lib/schemas/Numeric.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
-const ProductSchema = createSelectSchema(products)
+export const ProductSchema = createSelectSchema(products)
   .pick({
     id: true,
     name: true,
     branchId: true,
     rentalTimeIncrement: true,
+  })
+  .extend({
+    branchName: z.string(),
   })
   .openapi('Product')
 
