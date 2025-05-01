@@ -28,6 +28,7 @@ import ItemController from '@/api/private/items/Item.controller'
 import { ownerMiddleware } from '@/lib/middlewares/owner.middleware';
 import { customerMiddleware } from '@/lib/middlewares/customer.middleware';
 import ProductItemController from '@/api/private/products-items/ProductItem.controller';
+import ItemOwnerController from '@/api/private/items-owners/ItemOwner.controller';
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -84,6 +85,7 @@ app.use('/api/private/branches/*', adminMiddleware)
 app.use('/api/private/products/*', adminMiddleware)
 app.use('/api/private/products-items/*', adminMiddleware)
 app.use('/api/private/items/*', adminMiddleware)
+app.use('/api/private/items-owners/*', adminMiddleware)
 
 app.post('/api/private/categories', superadminMiddleware)
 app.put('/api/private/categories/*', superadminMiddleware)
@@ -103,6 +105,7 @@ app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
 app.route('/api/private/products-items', ProductItemController)
 app.route('/api/private/items', ItemController)
+app.route('/api/private/items-owners', ItemOwnerController)
 app.route('/api/private/item-mutations', ItemMutationController)
 app.route('/api/private/images', ImageController)
 

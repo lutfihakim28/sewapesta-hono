@@ -1,6 +1,6 @@
 import { SortEnum } from '@/lib/enums/SortEnum';
-import { and, asc, count, desc, eq, isNull } from 'drizzle-orm';
-import { ProductItem, ProductItemFilter, ProductItemRequest } from './ProductItem.schema';
+import { and, asc, count, desc, eq, isNotNull, isNull } from 'drizzle-orm';
+import { ProductItem, ProductItemExtended, ProductItemFilter, ProductItemRequest } from './ProductItem.schema';
 import { ProductItemColumn } from '../items/Item.schema';
 import { productsItems } from 'db/schema/products-items';
 import { db } from 'db';
@@ -16,12 +16,10 @@ import { ItemService } from '../items/Item.service';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { messages } from '@/lib/constants/messages';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
-import dayjs from 'dayjs';
-import { logger } from '@/lib/utils/logger';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 
 export abstract class ProductItemService {
-  static async list(query: ProductItemFilter): Promise<[ProductItem[], number]> {
+  static async list(query: ProductItemFilter): Promise<[ProductItemExtended[], number]> {
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: ProductItemColumn = 'productId';
 
@@ -37,7 +35,9 @@ export abstract class ProductItemService {
       ? asc(productsItems[sortBy])
       : desc(productsItems[sortBy])
 
-    const conditions: ReturnType<typeof and>[] = []
+    const conditions: ReturnType<typeof and>[] = [
+      isNull(productsItems.deletedAt)
+    ]
 
     if (query.itemId) {
       conditions.push(eq(productsItems.itemId, +query.itemId))
@@ -68,19 +68,27 @@ export abstract class ProductItemService {
     return [_productsItems, _count]
   }
 
-  static async create(payload: ProductItemRequest, user: User): Promise<ProductItem> {
+  static async create(payload: ProductItemRequest, user: User): Promise<ProductItemExtended> {
     const product = await ProductService.check(payload.productId, user);
     if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
       throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
     }
     const item = await ItemService.check(payload.itemId);
 
-    const [newProductItem] = await db.insert(productsItems)
-      .values(payload)
-      .onConflictDoNothing({
-        target: [productsItems.itemId, productsItems.productId]
-      })
-      .returning()
+    const newProductItem = await db.transaction(async (transaction) => {
+      await transaction.delete(productsItems).where(and(
+        eq(productsItems.productId, product.id),
+        eq(productsItems.itemId, item.id),
+        isNotNull(productsItems.deletedAt),
+      ))
+      const [productItem] = await transaction.insert(productsItems)
+        .values(payload)
+        .onConflictDoNothing({
+          target: [productsItems.itemId, productsItems.productId]
+        })
+        .returning(productItemColumns)
+      return productItem
+    })
 
     if (!newProductItem) {
       throw new BadRequestException(`Product ID ${product.id} and Item ID ${item.id} already paired. Please use update instead if you want to change their pairs properties.`)
@@ -93,7 +101,7 @@ export abstract class ProductItemService {
     }
   }
 
-  static async update(payload: ProductItemRequest, user: User): Promise<ProductItem> {
+  static async update(payload: ProductItemRequest, user: User): Promise<ProductItemExtended> {
     const product = await ProductService.check(payload.productId, user);
     if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
       throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
@@ -105,6 +113,7 @@ export abstract class ProductItemService {
       .where(and(
         eq(productsItems.productId, payload.productId),
         eq(productsItems.itemId, payload.itemId),
+        isNull(productsItems.deletedAt)
       ))
       .returning()
 

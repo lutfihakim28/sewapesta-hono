@@ -150,7 +150,10 @@ export abstract class ProductService {
       ))
 
     await db
-      .delete(productsItems)
+      .update(productsItems)
+      .set({
+        deletedAt: dayjs().unix()
+      })
       .where(eq(productsItems.productId, id))
   }
 

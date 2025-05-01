@@ -19,10 +19,17 @@ const ProductItemSchema = createSelectSchema(productsItems).pick({
   overtimeRatio: true,
   overtimeType: true,
   price: true,
+  itemId: true,
+  productId: true
+}).openapi('ProductItem')
+
+const ProductItemExtendedSchema = ProductItemSchema.omit({
+  itemId: true,
+  productId: true,
 }).extend({
   item: ItemSchema,
   product: ProductSchema.omit({ branchName: true })
-}).openapi('ProductItem')
+}).openapi('ProductItemExtended')
 
 const Filter = PaginationSchema
   .merge(SortSchema<ProductItemColumn>([
@@ -39,7 +46,7 @@ export const ProductItemFilterSchema = z.object({
   itemId: NumericSchema('Item ID').optional(),
 }).merge(Filter).openapi('ProductItemFilter')
 
-const ProductItemListSchema = z.array(ProductItemSchema);
+const ProductItemListSchema = z.array(ProductItemExtendedSchema);
 
 export const ProductItemResponseListSchema = ApiResponseListSchema(ProductItemListSchema, messages.successList('products items'))
 
@@ -78,5 +85,6 @@ export const ProductItemRequestSchema = createInsertSchema(productsItems, {
 export const ProductItemResponseDataSchema = ApiResponseDataSchema(ProductItemSchema, messages.successDetail('product item'))
 
 export type ProductItem = z.infer<typeof ProductItemSchema>
+export type ProductItemExtended = z.infer<typeof ProductItemExtendedSchema>
 export type ProductItemFilter = z.infer<typeof ProductItemFilterSchema>
 export type ProductItemRequest = z.infer<typeof ProductItemRequestSchema>

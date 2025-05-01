@@ -2,6 +2,7 @@ import { integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite
 import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum';
 import { items } from './items';
 import { products } from './products';
+import { timestamps } from './timestamps.helper';
 
 export const productsItems = sqliteTable('products_items', {
   itemId: integer('item_id').references(() => items.id).notNull(),
@@ -17,6 +18,7 @@ export const productsItems = sqliteTable('products_items', {
       OvertimeTypeEnum.Ratio,
     ]
   }).notNull().default(OvertimeTypeEnum.Price),
+  ...timestamps,
 }, (table) => ([
   primaryKey({ columns: [table.itemId, table.productId] })
 ]))

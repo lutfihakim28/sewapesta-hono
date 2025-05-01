@@ -14,7 +14,7 @@ export const ProductItemListRoute = createRoute({
     query: ProductItemFilterSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ProductItemResponseListSchema, description: 'Retrieve list branches' },
+    successResponse: { schema: ProductItemResponseListSchema, description: 'Retrieve list product items' },
     codes: [401, 403, 422],
   }),
 })

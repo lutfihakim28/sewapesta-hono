@@ -8,6 +8,7 @@ import { messages } from '@/lib/constants/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { userColumns } from './User.column';
 
 export abstract class UserService {
   static async create(request: UserCreate): Promise<User> {
@@ -72,7 +73,7 @@ export abstract class UserService {
     return user
   }
 
-  static async check(id: number, loggedUser: User) {
+  static async check(id: number, loggedUser: User): Promise<User> {
     const conditions: ReturnType<typeof and>[] = [
       eq(users.id, id),
       isNull(users.deletedAt)
@@ -83,7 +84,7 @@ export abstract class UserService {
     }
 
     const [user] = await db
-      .select({ id: users.id })
+      .select(userColumns)
       .from(users)
       .where(and(
         ...conditions
@@ -93,5 +94,7 @@ export abstract class UserService {
     if (!user) {
       throw new NotFoundException(messages.errorConstraint('User'))
     }
+
+    return user
   }
 }

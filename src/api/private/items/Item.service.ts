@@ -406,7 +406,10 @@ export abstract class ItemService {
     }
 
     await db
-      .delete(productsItems)
+      .update(productsItems)
+      .set({
+        deletedAt: dayjs().unix()
+      })
       .where(and(
         eq(productsItems.productId, id)
       ))
@@ -418,7 +421,7 @@ export abstract class ItemService {
       eq(items.id, id),
     ]
 
-    const [item] = await db.select()
+    const [item] = await db.select(itemColumns)
       .from(items)
       .where(and(...conditions))
       .limit(1)
