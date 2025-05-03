@@ -34,7 +34,6 @@ export const UserSchema = createSelectSchema(users)
     id: true,
     role: true,
     username: true,
-    branchId: true,
   })
   .openapi('User')
 
@@ -44,7 +43,6 @@ const UserExtendedSchema = UserSchema
 
 export const UserCreateSchema = createInsertSchema(users)
   .pick({
-    branchId: true,
     password: true,
     role: true,
     username: true

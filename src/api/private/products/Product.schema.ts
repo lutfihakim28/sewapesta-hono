@@ -15,11 +15,7 @@ export const ProductSchema = createSelectSchema(products)
   .pick({
     id: true,
     name: true,
-    branchId: true,
     rentalTimeIncrement: true,
-  })
-  .extend({
-    branchName: z.string(),
   })
   .openapi('Product')
 
@@ -44,16 +40,11 @@ export const ProductRequestSchema = createInsertSchema(products, {
     required_error: validationMessages.required('Name'),
     invalid_type_error: validationMessages.string('Name'),
   }),
-  branchId: z.number({
-    invalid_type_error: validationMessages.number('Branch ID'),
-    required_error: validationMessages.required('Branch ID'),
-  }),
   rentalTimeIncrement: z.number({
     invalid_type_error: validationMessages.number('Rental increment'),
     required_error: validationMessages.required('Rental increment'),
   }),
 }).pick({
-  branchId: true,
   rentalTimeIncrement: true,
   name: true,
 }).openapi('ProductRequest')

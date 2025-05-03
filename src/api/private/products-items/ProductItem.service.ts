@@ -70,9 +70,6 @@ export abstract class ProductItemService {
 
   static async create(payload: ProductItemRequest, user: User): Promise<ProductItemExtended> {
     const product = await ProductService.check(payload.productId, user);
-    if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
-      throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
-    }
     const item = await ItemService.check(payload.itemId);
 
     const newProductItem = await db.transaction(async (transaction) => {
@@ -103,9 +100,6 @@ export abstract class ProductItemService {
 
   static async update(payload: ProductItemRequest, user: User): Promise<ProductItemExtended> {
     const product = await ProductService.check(payload.productId, user);
-    if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
-      throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
-    }
     const item = await ItemService.check(payload.itemId);
     const [productItem] = await db
       .update(productsItems)
@@ -130,9 +124,6 @@ export abstract class ProductItemService {
 
   static async delete(itemId: number, productId: number, user: User): Promise<void> {
     const product = await ProductService.check(productId, user)
-    if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
-      throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
-    }
 
     await db
       .delete(productsItems)

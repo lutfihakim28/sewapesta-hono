@@ -8,11 +8,9 @@ import dayjs from 'dayjs';
 import { db } from 'db';
 import { products } from 'db/schema/products';
 import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
-import { BranchService } from '../branches/Branch.service';
 import { User } from '../users/User.schema';
 import { productColumns } from './Product.column';
 import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
-import { branches } from 'db/schema/branches';
 import { productsItems } from 'db/schema/products-items';
 
 export abstract class ProductService {
@@ -36,16 +34,6 @@ export abstract class ProductService {
       isNull(products.deletedAt),
     ]
 
-    if (user.role !== RoleEnum.SuperAdmin) {
-      conditions.push(
-        eq(products.branchId, user.branchId)
-      )
-    } else if (query.branchId) {
-      conditions.push(
-        eq(products.branchId, +query.branchId)
-      )
-    }
-
     if (query.keyword) {
       conditions.push(
         like(products.name, `%${query.keyword}%`),
@@ -53,12 +41,8 @@ export abstract class ProductService {
     }
 
     const [_products, [meta]] = await Promise.all([
-      db.select({
-        ...productColumns,
-        branchName: branches.name,
-      })
+      db.select(productColumns)
         .from(products)
-        .innerJoin(branches, eq(branches.id, products.branchId))
         .where(and(...conditions))
         .orderBy(orderBy)
         .limit(Number(query.pageSize || 5))
@@ -77,17 +61,9 @@ export abstract class ProductService {
       eq(products.id, id),
       isNull(products.deletedAt),
     ]
-
-    if (user.role === RoleEnum.Admin) {
-      conditions.push(eq(products.branchId, user.branchId))
-    }
     const [product] = await db
-      .select({
-        ...productColumns,
-        branchName: branches.name,
-      })
+      .select(productColumns)
       .from(products)
-      .innerJoin(branches, eq(branches.id, products.branchId))
       .where(and(...conditions))
       .limit(1)
 
@@ -99,7 +75,6 @@ export abstract class ProductService {
   }
 
   static async create(payload: ProductRequest, user: User): Promise<Product> {
-    await BranchService.check(payload.branchId, user)
     const [newProduct] = await db
       .insert(products)
       .values(payload)
@@ -111,15 +86,10 @@ export abstract class ProductService {
   }
 
   static async update(id: number, payload: ProductRequest, user: User): Promise<Product> {
-    const branch = await BranchService.check(payload.branchId, user)
     const conditions = [
       eq(products.id, id),
       isNull(products.deletedAt),
     ]
-
-    if (user.role === RoleEnum.Admin) {
-      conditions.push(eq(products.branchId, user.branchId))
-    }
 
     const [product] = await db
       .update(products)
@@ -131,17 +101,11 @@ export abstract class ProductService {
       throw new NotFoundException(messages.errorNotFound(`Product with ID ${id}`));
     }
 
-    return {
-      ...product,
-      branchName: branch.name
-    }
+    return product
   }
 
   static async delete(id: number, user: User): Promise<void> {
     const product = await this.get(id, user)
-    if (user.role !== RoleEnum.SuperAdmin && user.branchId !== product.branchId) {
-      throw new NotFoundException('Requested Product ID is not found in your branch\'s products.')
-    }
     await db
       .update(products)
       .set({ deletedAt: dayjs().unix() })
@@ -162,10 +126,6 @@ export abstract class ProductService {
       eq(products.id, id),
       isNull(products.deletedAt)
     ]
-
-    if (user.role !== RoleEnum.SuperAdmin) {
-      conditions.push(eq(products.branchId, user.branchId))
-    }
 
     const [product] = await db
       .select(productColumns)

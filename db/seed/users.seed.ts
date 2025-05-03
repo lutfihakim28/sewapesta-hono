@@ -4,11 +4,11 @@ import { faker } from '@faker-js/faker/locale/id_ID';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { users } from 'db/schema/users';
 
-export async function seedUsers(branchId: number, subdistrictsCode: string[], role: RoleEnum = RoleEnum.SuperAdmin, id: number = 0) {
+export async function seedUsers(subdistrictsCode: string[], role: RoleEnum = RoleEnum.SuperAdmin, id: number = 0) {
   const user = generateUserName()
   const name = role === RoleEnum.SuperAdmin ? 'superadmin' : user.fullName
-  const username = role === RoleEnum.SuperAdmin ? 'superadmin' : `${role.toLowerCase()}_${branchId}_${id}`
-  console.log(`Seeding ${username} for branch ${branchId}...`)
+  const username = role === RoleEnum.SuperAdmin ? 'superadmin' : `${role.toLowerCase()}_${id}`
+  console.log(`Seeding ${username}...`)
   return await db.transaction(async (transaction) => {
     const [user] = await transaction
       .insert(users)
@@ -16,7 +16,6 @@ export async function seedUsers(branchId: number, subdistrictsCode: string[], ro
         password: await Bun.password.hash('password'),
         username,
         role,
-        branchId,
       })
       .returning({
         id: users.id

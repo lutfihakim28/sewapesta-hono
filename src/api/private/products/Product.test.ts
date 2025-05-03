@@ -12,7 +12,6 @@ import dayjs from 'dayjs'
 const path = '/api/private/products'
 const payload: ProductRequest = {
   name: 'Produk',
-  branchId: 1,
   rentalTimeIncrement: 8,
 }
 let testedProduct: Product
@@ -25,7 +24,6 @@ describe('Product', () => {
         .select()
         .from(products)
         .where(and(
-          eq(products.branchId, globalThis.testAuthData.Admin.user.branchId),
           isNull(products.deletedAt)
         ))
         .limit(1),
@@ -33,7 +31,6 @@ describe('Product', () => {
         .select()
         .from(products)
         .where(and(
-          not(eq(products.branchId, globalThis.testAuthData.Admin.user.branchId)),
           isNull(products.deletedAt)
         ))
         .limit(1)
@@ -63,7 +60,6 @@ describe('Product', () => {
 
       expect(response.code).toBe(200)
       expect(response.data).toBeArray()
-      expect(response.data.every((product) => product.branchId === globalThis.testAuthData.Admin.user.branchId)).toBeTruthy()
     })
 
     test('As SuperAdmin', async () => {
@@ -75,7 +71,6 @@ describe('Product', () => {
 
       expect(response.code).toBe(200)
       expect(response.data).toBeArray()
-      expect(response.data.every((product) => product.branchId === globalThis.testAuthData.SuperAdmin.user.branchId)).toBeFalsy()
     })
 
     describe('Filter', async () => {
@@ -93,25 +88,17 @@ describe('Product', () => {
 
         expect(response.code).toBe(200)
         expect(response.data).toBeArray()
-        expect(response.data.every((branch) => branch.name.toLowerCase().includes(keyword)))
       })
 
       test('By Branch as Admin', async () => {
-        const adminBranchId = globalThis.testAuthData.Admin.user.branchId
-        let branchId = '1';
-        if (adminBranchId === 1) branchId = '2'
-        if (adminBranchId === 2) branchId = '3'
 
-        const searchParam = new URLSearchParams({ branchId })
-
-        const _response = await app.request(`${path}?${searchParam.toString()}`, {
+        const _response = await app.request(`${path}`, {
           headers: generateTestHeader(globalThis.testAuthData.Admin.token)
         })
 
         const response: ApiResponseList<Product[]> = await _response.json()
         expect(response.code).toBe(200)
         expect(response.data).toBeArray()
-        expect(response.data.every((product) => product.branchId === adminBranchId)).toBeTruthy()
       })
 
       test('By Branch as SuperAdmin', async () => {
@@ -124,7 +111,6 @@ describe('Product', () => {
         const response: ApiResponseList<Product[]> = await _response.json()
         expect(response.code).toBe(200)
         expect(response.data).toBeArray()
-        expect(response.data.every((product) => product.branchId === 2)).toBeTruthy()
       })
 
       test('Sort', async () => {
@@ -158,15 +144,9 @@ describe('Product', () => {
     })
 
     test('As Admin Other Branch', async () => {
-      const adminBranchId = globalThis.testAuthData.Admin.user.branchId
-      let branchId = 1;
-      if (adminBranchId === 1) branchId = 2
-      if (adminBranchId === 2) branchId = 3
-
       const [product] = await db
         .select({ id: products.id })
         .from(products)
-        .where(eq(products.branchId, branchId))
         .limit(1)
 
       const _response = await app.request(`${path}/${product!.id}`, {
@@ -182,7 +162,6 @@ describe('Product', () => {
       const [product] = await db
         .select({ id: products.id })
         .from(products)
-        .where(eq(products.branchId, globalThis.testAuthData.Admin.user.branchId))
         .limit(1)
 
       const _response = await app.request(`${path}/${product!.id}`, {
@@ -193,7 +172,6 @@ describe('Product', () => {
 
       expect(response.code).toBe(200)
       expect(response.data.id).toBe(product!.id)
-      expect(response.data.branchId).toBe(globalThis.testAuthData.Admin.user.branchId)
     })
   })
 
@@ -211,16 +189,11 @@ describe('Product', () => {
     })
 
     test('Wrong Branch', async () => {
-      const adminBranchId = globalThis.testAuthData.Admin.user.branchId
-      let branchId = 1;
-      if (adminBranchId === 1) branchId = 2
-      if (adminBranchId === 2) branchId = 3
 
       const _response = await app.request(path, {
         method: 'POST',
         body: JSON.stringify({
           ...payload,
-          branchId,
         }),
         headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
@@ -251,7 +224,6 @@ describe('Product', () => {
         method: 'POST',
         body: JSON.stringify({
           ...payload,
-          branchId: globalThis.testAuthData.Admin.user.branchId,
         }),
         headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
@@ -345,7 +317,6 @@ describe('Product', () => {
         method: 'PUT',
         body: JSON.stringify({
           ...payload,
-          branchId: testedProduct.branchId
         }),
         headers: generateTestHeader(globalThis.testAuthData.Admin.token)
       })
@@ -359,7 +330,6 @@ describe('Product', () => {
       await db
         .update(products)
         .set({
-          branchId: testedProduct.branchId,
           name: testedProduct.name,
           rentalTimeIncrement: testedProduct.rentalTimeIncrement,
         })

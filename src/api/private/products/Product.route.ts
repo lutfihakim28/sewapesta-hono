@@ -27,7 +27,7 @@ export const ProductDetailRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ProductResponseDataSchema, description: 'Retrieve detail branch' },
+    successResponse: { schema: ProductResponseDataSchema, description: 'Retrieve detail products' },
     codes: [401, 403, 404],
   }),
 })

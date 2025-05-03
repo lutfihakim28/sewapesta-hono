@@ -1,7 +1,7 @@
 import { db } from 'db/index';
 import { products } from 'db/schema/products';
 
-export async function seedProducts(branchId: number) {
+export async function seedProducts() {
   console.log('Seeding products...');
   const _products = await db
     .insert(products)
@@ -9,12 +9,10 @@ export async function seedProducts(branchId: number) {
       {
         name: 'Wedding',
         rentalTimeIncrement: 24,
-        branchId,
       },
       {
         name: 'Event',
         rentalTimeIncrement: 8,
-        branchId,
       },
     ])
     .returning({

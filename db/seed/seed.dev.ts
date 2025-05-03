@@ -1,5 +1,4 @@
 import { db } from 'db';
-import { seedBranches } from 'db/seed/branches.seed';
 import { seedCategories } from 'db/seed/categories.seed';
 import { seedCities } from 'db/seed/cities.seed';
 import { seedDistricts } from 'db/seed/districts.seed';
@@ -39,22 +38,21 @@ const items = await seedItems({ unitsId: unitsId, categoriesId: categoriesId })
 
 
 await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {
-  const branchId = await seedBranches(_subdistricts.map((el) => el.code))
   if (index === 0) {
-    await seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.SuperAdmin)
+    await seedUsers(_subdistricts.map((el) => el.code), RoleEnum.SuperAdmin)
   }
 
-  const productsId = await seedProducts(branchId);
+  const productsId = await seedProducts();
   await seedProductItem({ items, productsId })
 
   await Promise.all([
-    ...Array.from({ length: faker.number.int({ min: 1, max: 2 }) }).map((_, index) => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Admin, index)),
-    ...Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map((_, index) => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Agent, index)),
-    ...Array.from({ length: faker.number.int({ min: 5, max: 10 }) }).map((_, index) => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Customer, index)),
-    ...Array.from({ length: faker.number.int({ min: 5, max: 10 }) }).map((_, index) => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Employee, index)),
+    ...Array.from({ length: faker.number.int({ min: 1, max: 2 }) }).map((_, index) => seedUsers(_subdistricts.map((el) => el.code), RoleEnum.Admin, index)),
+    ...Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map((_, index) => seedUsers(_subdistricts.map((el) => el.code), RoleEnum.Agent, index)),
+    ...Array.from({ length: faker.number.int({ min: 5, max: 10 }) }).map((_, index) => seedUsers(_subdistricts.map((el) => el.code), RoleEnum.Customer, index)),
+    ...Array.from({ length: faker.number.int({ min: 5, max: 10 }) }).map((_, index) => seedUsers(_subdistricts.map((el) => el.code), RoleEnum.Employee, index)),
   ])
 
-  const ownersId = await Promise.all(Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map((_, index) => seedUsers(branchId, _subdistricts.map((el) => el.code), RoleEnum.Owner, index)))
+  const ownersId = await Promise.all(Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map((_, index) => seedUsers(_subdistricts.map((el) => el.code), RoleEnum.Owner, index)))
 
   await seedItemOwner({ ownersId, itemsId: items.map((item) => item.id) })
 }))

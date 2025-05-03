@@ -7,7 +7,6 @@ import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { messages } from '@/lib/constants/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { userColumns } from './User.column';
 
 export abstract class UserService {
@@ -33,7 +32,6 @@ export abstract class UserService {
     })
 
     return {
-      branchId: request.branchId,
       id: user.id,
       role: request.role,
       username: request.username,
@@ -66,7 +64,6 @@ export abstract class UserService {
       .from(users)
       .where(and(
         eq(users.id, userId),
-        eq(users.branchId, branchId)
       ))
       .limit(1)
 
@@ -78,10 +75,6 @@ export abstract class UserService {
       eq(users.id, id),
       isNull(users.deletedAt)
     ]
-
-    if (loggedUser.role !== RoleEnum.SuperAdmin) {
-      conditions.push(eq(users.branchId, loggedUser.branchId))
-    }
 
     const [user] = await db
       .select(userColumns)
