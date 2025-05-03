@@ -25,8 +25,8 @@ import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
 import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemSchema } from './Item.schema';
 import { quantityQuery } from './Item.query';
-import { itemMutations } from 'db/schema/item-mutations';
-import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
+import { stockMutations } from 'db/schema/stock-mutations';
+import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
 import dayjs from 'dayjs';
 import { categories } from 'db/schema/categories';
@@ -38,22 +38,22 @@ export abstract class ItemService {
   static async list(query: ItemFilter, user: User): Promise<[ItemList[], number]> {
     const latestAdjustment = db.$with('latest_adjustment').as(
       db.select({
-        itemOwnerId: itemMutations.itemOwnerId,
-        time: sql<number>`MAX(${itemMutations.createdAt})`.mapWith(Number).as('time')
+        itemOwnerId: stockMutations.itemOwnerId,
+        time: sql<number>`MAX(${stockMutations.createdAt})`.mapWith(Number).as('time')
       })
-        .from(itemMutations)
-        .where(eq(itemMutations.type, ItemMutationTypeEnum.Adjustment))
-        .groupBy(itemMutations.itemOwnerId)
+        .from(stockMutations)
+        .where(eq(stockMutations.type, StockMutationTypeEnum.Adjustment))
+        .groupBy(stockMutations.itemOwnerId)
     )
 
     const latestMutations = db.$with('latest_mutation').as(
       db
-        .select(getTableColumns(itemMutations))
-        .from(itemMutations)
-        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, itemMutations.itemOwnerId))
+        .select(getTableColumns(stockMutations))
+        .from(stockMutations)
+        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, stockMutations.itemOwnerId))
         .where(or(
           isNull(latestAdjustment.time),
-          gte(itemMutations.createdAt, latestAdjustment.time)
+          gte(stockMutations.createdAt, latestAdjustment.time)
         ))
     )
 
@@ -87,9 +87,9 @@ export abstract class ItemService {
           itemId: itemsOwners.itemId,
           value: sql<number>`SUM(
           CASE ${latestMutations.type}
-            WHEN ${ItemMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
-            WHEN ${ItemMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
-            WHEN ${ItemMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
             ELSE 0
           END
         )`.mapWith(Number).as('available_quantity')
@@ -195,22 +195,22 @@ export abstract class ItemService {
   static async get(id: number, user: User): Promise<ItemExtended> {
     const latestAdjustment = db.$with('latest_adjustment').as(
       db.select({
-        itemOwnerId: itemMutations.itemOwnerId,
-        time: sql<number>`MAX(${itemMutations.createdAt})`.mapWith(Number).as('time')
+        itemOwnerId: stockMutations.itemOwnerId,
+        time: sql<number>`MAX(${stockMutations.createdAt})`.mapWith(Number).as('time')
       })
-        .from(itemMutations)
-        .where(eq(itemMutations.type, ItemMutationTypeEnum.Adjustment))
-        .groupBy(itemMutations.itemOwnerId)
+        .from(stockMutations)
+        .where(eq(stockMutations.type, StockMutationTypeEnum.Adjustment))
+        .groupBy(stockMutations.itemOwnerId)
     )
 
     const latestMutations = db.$with('latest_mutation').as(
       db
-        .select(getTableColumns(itemMutations))
-        .from(itemMutations)
-        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, itemMutations.itemOwnerId))
+        .select(getTableColumns(stockMutations))
+        .from(stockMutations)
+        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, stockMutations.itemOwnerId))
         .where(or(
           isNull(latestAdjustment.time),
-          gte(itemMutations.createdAt, latestAdjustment.time)
+          gte(stockMutations.createdAt, latestAdjustment.time)
         ))
     )
 
@@ -221,9 +221,9 @@ export abstract class ItemService {
           itemId: itemsOwners.itemId,
           value: sql<number>`SUM(
           CASE ${latestMutations.type}
-            WHEN ${ItemMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
-            WHEN ${ItemMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
-            WHEN ${ItemMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
             ELSE 0
           END
         )`.mapWith(Number).as('available_quantity')
@@ -342,12 +342,12 @@ export abstract class ItemService {
           }))
         )
 
-      await transaction.insert(itemMutations)
+      await transaction.insert(stockMutations)
         .values({
           itemId: item.id,
           quantity: payload.quantity || 0,
           description: ItemMutationDescriptionEnum.ItemCreation,
-          type: ItemMutationTypeEnum.Adjustment
+          type: StockMutationTypeEnum.Adjustment
         })
 
       return item.id

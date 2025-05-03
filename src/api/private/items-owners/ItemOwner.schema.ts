@@ -15,7 +15,6 @@ export type ItemOwnerColumn = keyof typeof itemsOwners.$inferSelect
 
 const ItemOwnerSchema = createSelectSchema(itemsOwners).pick({
   id: true,
-  quantity: true,
   itemId: true,
   ownerId: true,
 }).openapi('ItemOwner')
@@ -34,7 +33,6 @@ const Filter = PaginationSchema
     'id',
     'itemId',
     'ownerId',
-    'quantity',
   ]))
 
 export const ItemOwnerFilterSchema = z.object({
@@ -56,14 +54,9 @@ export const ItemOwnerRequestSchema = createInsertSchema(itemsOwners, {
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID'),
   }),
-  quantity: z.number({
-    invalid_type_error: validationMessages.number('Quantity'),
-    required_error: validationMessages.required('Quantity'),
-  }),
 }).pick({
   itemId: true,
   ownerId: true,
-  quantity: true,
 })
 
 export const ItemOwnerUpdateRequestSchema = ItemOwnerRequestSchema.omit({

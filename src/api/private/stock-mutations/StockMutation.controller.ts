@@ -1,22 +1,22 @@
 import {
-  ItemMutationCreateRoute, ItemMutationDeleteRoute,
-  ItemMutationDetailRoute,
-  ItemMutationListRoute, ItemMutationUpdateRoute,
-} from '@/api/private/item-mutations/ItemMutation.route';
-import { ItemMutationService } from '@/api/private/item-mutations/ItemMutation.service';
+  StockMutationCreateRoute, StockMutationDeleteRoute,
+  StockMutationDetailRoute,
+  StockMutationListRoute, StockMutationUpdateRoute,
+} from '@/api/private/stock-mutations/StockMutation.route';
+import { StockMutationService } from '@/api/private/stock-mutations/StockMutation.service';
 import { messages } from '@/lib/constants/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { Meta } from '@/lib/dtos/Meta.dto';
 import { honoApp } from '@/lib/utils/hono';
 
-const ItemMutationController = honoApp()
+const StockMutationController = honoApp()
 
-ItemMutationController.openapi(ItemMutationListRoute, async (context) => {
+StockMutationController.openapi(StockMutationListRoute, async (context) => {
   const query = context.req.valid('query')
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const [mutations, totalData] = await ItemMutationService.list(query, jwtPayload.user)
+  const [mutations, totalData] = await StockMutationService.list(query, jwtPayload.user)
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -30,11 +30,11 @@ ItemMutationController.openapi(ItemMutationListRoute, async (context) => {
   }), 200)
 })
 
-ItemMutationController.openapi(ItemMutationDetailRoute, async (context) => {
+StockMutationController.openapi(StockMutationDetailRoute, async (context) => {
   const param = context.req.valid('param')
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemMutationService.get(+param.id, jwtPayload.user)
+  const item = await StockMutationService.get(+param.id, jwtPayload.user)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -43,11 +43,11 @@ ItemMutationController.openapi(ItemMutationDetailRoute, async (context) => {
   }), 200)
 })
 
-ItemMutationController.openapi(ItemMutationCreateRoute, async (context) => {
+StockMutationController.openapi(StockMutationCreateRoute, async (context) => {
   const payload = context.req.valid('json')
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemMutationService.create(payload, jwtPayload.user)
+  const item = await StockMutationService.create(payload, jwtPayload.user)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -56,12 +56,12 @@ ItemMutationController.openapi(ItemMutationCreateRoute, async (context) => {
   }), 200)
 })
 
-ItemMutationController.openapi(ItemMutationUpdateRoute, async (context) => {
+StockMutationController.openapi(StockMutationUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemMutationService.update(+param.id, payload, jwtPayload.user)
+  const item = await StockMutationService.update(+param.id, payload, jwtPayload.user)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -70,11 +70,11 @@ ItemMutationController.openapi(ItemMutationUpdateRoute, async (context) => {
   }), 200)
 })
 
-ItemMutationController.openapi(ItemMutationDeleteRoute, async (context) => {
+StockMutationController.openapi(StockMutationDeleteRoute, async (context) => {
   const param = context.req.valid('param')
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  await ItemMutationService.delete(+param.id, jwtPayload.user)
+  await StockMutationService.delete(+param.id, jwtPayload.user)
 
   return context.json(new ApiResponse({
     code: 200,
@@ -82,4 +82,4 @@ ItemMutationController.openapi(ItemMutationDeleteRoute, async (context) => {
   }), 200)
 })
 
-export default ItemMutationController
+export default StockMutationController

@@ -1,4 +1,4 @@
-import ItemMutationController from '@/api/private/item-mutations/ItemMutation.controller';
+import StockMutationController from '@/api/private/stock-mutations/StockMutation.controller';
 import { cors } from 'hono/cors'
 import { honoApp } from '@/lib/utils/hono'
 import { HTTPException } from 'hono/http-exception'
@@ -106,7 +106,7 @@ app.route('/api/private/products', ProductController)
 app.route('/api/private/products-items', ProductItemController)
 app.route('/api/private/items', ItemController)
 app.route('/api/private/items-owners', ItemOwnerController)
-app.route('/api/private/item-mutations', ItemMutationController)
+app.route('/api/private/stock-mutations', StockMutationController)
 app.route('/api/private/images', ImageController)
 
 // PUBLIC PATH

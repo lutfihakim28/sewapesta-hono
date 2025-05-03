@@ -178,4 +178,34 @@ export abstract class ItemOwnerService {
         eq(itemsOwners.id, id)
       ))
   }
+
+  static async check(id: number, user: User) {
+    const conditions = [
+      isNull(itemsOwners.deletedAt),
+      eq(itemsOwners.id, id),
+    ]
+
+    if (user.role !== RoleEnum.SuperAdmin) {
+      conditions.push(inArray(
+        itemsOwners.ownerId,
+        db.select({ id: users.id })
+          .from(users)
+          .where(and(
+            isNull(users.deletedAt),
+            eq(users.branchId, user.branchId)
+          ))
+      ))
+    }
+
+    const [itemOwner] = await db.select(itemColumns)
+      .from(itemsOwners)
+      .where(and(...conditions))
+      .limit(1)
+
+    if (!itemOwner) {
+      throw new NotFoundException(messages.errorNotFound(`Item owner with ID ${id}`))
+    }
+
+    return itemOwner
+  }
 }

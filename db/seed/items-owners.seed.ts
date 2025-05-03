@@ -1,9 +1,10 @@
-import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
+import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 import { faker } from '@faker-js/faker';
 import dayjs from 'dayjs';
 import { db } from 'db';
-import { itemMutations } from 'db/schema/item-mutations';
+import { stockMutations } from 'db/schema/stock-mutations';
 import { itemsOwners } from 'db/schema/items-owners';
+import { StockMutationDefaultDescriptionEnum } from '@/lib/enums/StockMutationDefaultDescriptionEnum';
 
 type ItemOwnerSeedProp = {
   ownersId: number[];
@@ -24,17 +25,17 @@ export async function seedItemOwner({ itemsId, ownersId }: ItemOwnerSeedProp) {
         })
         const [itemOwner] = await transaction
           .insert(itemsOwners)
-          .values({ itemId, ownerId, quantity })
+          .values({ itemId, ownerId })
           .returning({ id: itemsOwners.id })
 
         const startedDate = dayjs(faker.date.past());
 
-        await transaction.insert(itemMutations).values([
+        await transaction.insert(stockMutations).values([
           {
             quantity,
-            type: ItemMutationTypeEnum.Adjustment,
+            type: StockMutationTypeEnum.Adjustment,
             createdAt: startedDate.unix(),
-            description: 'SEEDER',
+            description: StockMutationDefaultDescriptionEnum.Seeder,
             itemOwnerId: itemOwner.id,
             affectItemQuantity: true,
           },
@@ -43,9 +44,9 @@ export async function seedItemOwner({ itemsId, ownersId }: ItemOwnerSeedProp) {
               min: 20,
               max: 30,
             }),
-            type: ItemMutationTypeEnum.Addition,
+            type: StockMutationTypeEnum.Addition,
             createdAt: startedDate.add(1, 'day').unix(),
-            description: 'SEEDER',
+            description: StockMutationDefaultDescriptionEnum.Seeder,
             itemOwnerId: itemOwner.id,
             affectItemQuantity: false,
           },
@@ -54,9 +55,9 @@ export async function seedItemOwner({ itemsId, ownersId }: ItemOwnerSeedProp) {
               min: 30,
               max: 70,
             }),
-            type: ItemMutationTypeEnum.Reduction,
+            type: StockMutationTypeEnum.Reduction,
             createdAt: startedDate.add(1, 'day').unix(),
-            description: 'SEEDER',
+            description: StockMutationDefaultDescriptionEnum.Seeder,
             itemOwnerId: itemOwner.id,
             affectItemQuantity: false,
           },

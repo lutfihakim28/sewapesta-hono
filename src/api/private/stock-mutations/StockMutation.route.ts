@@ -1,7 +1,7 @@
 import {
-  ItemMutationFilterSchema, ItemMutationRequestSchema, ItemMutationResponseDataSchema,
-  ItemMutationResponseListSchema,
-} from '@/api/private/item-mutations/ItemMutation.schema';
+  StockMutationFilterSchema, StockMutationRequestSchema, StockMutationResponseDataSchema,
+  StockMutationResponseListSchema,
+} from '@/api/private/stock-mutations/StockMutation.schema';
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto';
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema';
 import { SuccessSchema } from '@/lib/schemas/Success.schema';
@@ -9,20 +9,20 @@ import { createRoute } from '@hono/zod-openapi';
 
 const tag = 'Item Mutation'
 
-export const ItemMutationListRoute = createRoute({
+export const StockMutationListRoute = createRoute({
   method: 'get',
   path: '/',
   tags: [tag],
   request: {
-    query: ItemMutationFilterSchema,
+    query: StockMutationFilterSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ItemMutationResponseListSchema, description: 'Retrieve list mutations' },
+    successResponse: { schema: StockMutationResponseListSchema, description: 'Retrieve list mutations' },
     codes: [401, 403, 422],
   }),
 })
 
-export const ItemMutationDetailRoute = createRoute({
+export const StockMutationDetailRoute = createRoute({
   method: 'get',
   path: '/{id}',
   tags: [tag],
@@ -30,12 +30,12 @@ export const ItemMutationDetailRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ItemMutationResponseDataSchema, description: 'Retrieve detail mutation' },
+    successResponse: { schema: StockMutationResponseDataSchema, description: 'Retrieve detail mutation' },
     codes: [401, 403, 404],
   }),
 })
 
-export const ItemMutationCreateRoute = createRoute({
+export const StockMutationCreateRoute = createRoute({
   method: 'post',
   path: '/',
   tags: [tag],
@@ -43,18 +43,18 @@ export const ItemMutationCreateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: ItemMutationRequestSchema
+          schema: StockMutationRequestSchema
         }
       }
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ItemMutationResponseDataSchema, description: 'Mutation created' },
+    successResponse: { schema: StockMutationResponseDataSchema, description: 'Mutation created' },
     codes: [401, 403, 422],
   }),
 })
 
-export const ItemMutationUpdateRoute = createRoute({
+export const StockMutationUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}',
   tags: [tag],
@@ -63,18 +63,18 @@ export const ItemMutationUpdateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: ItemMutationRequestSchema,
+          schema: StockMutationRequestSchema,
         }
       }
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ItemMutationResponseDataSchema, description: 'Mutation updated' },
+    successResponse: { schema: StockMutationResponseDataSchema, description: 'Mutation updated' },
     codes: [401, 403, 404, 422],
   }),
 })
 
-export const ItemMutationDeleteRoute = createRoute({
+export const StockMutationDeleteRoute = createRoute({
   method: 'delete',
   path: '/{id}',
   tags: [tag],

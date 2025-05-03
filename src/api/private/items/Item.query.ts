@@ -1,6 +1,6 @@
-import { ItemMutationTypeEnum } from '@/lib/enums/ItemMutationType.Enum';
+import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 import { db } from 'db';
-import { itemMutations } from 'db/schema/item-mutations';
+import { stockMutations } from 'db/schema/stock-mutations';
 import { itemsOwners } from 'db/schema/items-owners';
 import { and, count, countDistinct, eq, getTableColumns, gte, inArray, isNull, max, or, sql } from 'drizzle-orm';
 import { User } from '../users/User.schema';
@@ -10,22 +10,22 @@ import { users } from 'db/schema/users';
 export function quantityQuery(user: User, branchId?: string) {
   const latestAdjustment = db.$with('latestAdjustment').as(
     db.select({
-      itemOwnerId: itemMutations.itemOwnerId,
-      time: sql<number>`MAX(${itemMutations.createdAt})`.mapWith(Number).as('time')
+      itemOwnerId: stockMutations.itemOwnerId,
+      time: sql<number>`MAX(${stockMutations.createdAt})`.mapWith(Number).as('time')
     })
-      .from(itemMutations)
-      .where(eq(itemMutations.type, ItemMutationTypeEnum.Adjustment))
-      .groupBy(itemMutations.itemOwnerId)
+      .from(stockMutations)
+      .where(eq(stockMutations.type, StockMutationTypeEnum.Adjustment))
+      .groupBy(stockMutations.itemOwnerId)
   )
 
   const latestMutations = db.$with('latestMutations').as(
     db.with(latestAdjustment)
-      .select(getTableColumns(itemMutations))
-      .from(itemMutations)
-      .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, itemMutations.itemOwnerId))
+      .select(getTableColumns(stockMutations))
+      .from(stockMutations)
+      .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, stockMutations.itemOwnerId))
       .where(or(
         isNull(latestAdjustment.time),
-        gte(itemMutations.createdAt, latestAdjustment.time)
+        gte(stockMutations.createdAt, latestAdjustment.time)
       ))
   )
 
@@ -37,9 +37,9 @@ export function quantityQuery(user: User, branchId?: string) {
         itemId: itemsOwners.itemId,
         value: sql<number>`SUM(
           CASE ${latestMutations.type}
-            WHEN ${ItemMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
-            WHEN ${ItemMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
-            WHEN ${ItemMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
+            WHEN ${StockMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
             ELSE 0
           END
         )`.mapWith(Number).as('availableQuantity')
