@@ -6,7 +6,6 @@ import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
 import { countOffset } from '@/lib/utils/count-offset';
 import { db } from 'db';
-import { branches } from 'db/schema/branches';
 import { images } from 'db/schema/images';
 import { items } from 'db/schema/items';
 import { products } from 'db/schema/products';

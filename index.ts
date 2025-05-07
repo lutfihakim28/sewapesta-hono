@@ -15,7 +15,6 @@ import DistrictController from '@/api/public/locations/districts/District.contro
 import ProvinceController from '@/api/public/locations/provinces/Province.controller'
 import SubdistrictController from '@/api/public/locations/subdistricts/Subdistrict.controller'
 import { ApiResponse } from '@/lib/dtos/ApiResponse.dto'
-import BranchController from '@/api/private/branches/Branch.controller'
 import { authMiddleware } from '@/lib/middlewares/auth.middleware'
 import AuthController from '@/api/auth/Auth.controller'
 import CategoryController from '@/api/private/categories/Category.controller'
@@ -25,10 +24,11 @@ import { superadminMiddleware } from '@/lib/middlewares/superadmin.middleware'
 import UnitController from '@/api/private/units/Unit.controller'
 import ImageController from '@/api/private/images/Image.controller'
 import ItemController from '@/api/private/items/Item.controller'
-import { ownerMiddleware } from '@/lib/middlewares/owner.middleware';
-import { customerMiddleware } from '@/lib/middlewares/customer.middleware';
+// import { ownerMiddleware } from '@/lib/middlewares/owner.middleware';
+// import { customerMiddleware } from '@/lib/middlewares/customer.middleware';
 import ProductItemController from '@/api/private/products-items/ProductItem.controller';
 import ItemOwnerController from '@/api/private/items-owners/ItemOwner.controller';
+import UserController from '@/api/private/users/User.controller';
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -77,11 +77,6 @@ app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }), authMiddleware)
 app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
 app.use('/static/*', serveStatic({ root: './' }))
 
-// MIDDLEWARES
-app.post('/api/private/branches', superadminMiddleware)
-app.delete('/api/private/branches', superadminMiddleware)
-app.use('/api/private/branches/*', adminMiddleware)
-
 app.use('/api/private/products/*', adminMiddleware)
 app.use('/api/private/products-items/*', adminMiddleware)
 app.use('/api/private/items/*', adminMiddleware)
@@ -99,7 +94,6 @@ app.delete('/api/private/units/*', superadminMiddleware)
 app.route('/api/auth', AuthController)
 
 // PRIVATE PATH
-app.route('/api/private/branches', BranchController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
@@ -108,6 +102,7 @@ app.route('/api/private/items', ItemController)
 app.route('/api/private/items-owners', ItemOwnerController)
 app.route('/api/private/stock-mutations', StockMutationController)
 app.route('/api/private/images', ImageController)
+app.route('/api/private/users', UserController)
 
 // PUBLIC PATH
 app.route('/api/public/locations/provinces', ProvinceController)

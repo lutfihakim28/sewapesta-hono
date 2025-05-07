@@ -5,7 +5,7 @@ export function NumericSchema(field: string) {
   return z.string({
     invalid_type_error: validationMessages.string(field),
     required_error: validationMessages.required(field)
-  }).refine((val) => /^\d+(\.\d+)?$/.test(val), {
+  }).regex(/^\d+(\.\d+)?$/, {
     message: validationMessages.numeric(field),
   })
 }

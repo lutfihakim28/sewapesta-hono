@@ -3,7 +3,6 @@ import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { describe, expect, setSystemTime, test } from 'bun:test'
 import { login } from '../auth/Auth.test';
 import dayjs from 'dayjs';
-import { Branch } from './branches/Branch.schema';
 import { generateTestHeader } from '@/lib/utils/testing-utils';
 
 describe('Private API', () => {
@@ -37,17 +36,5 @@ describe('Private API', () => {
 
     expect(response.code).toBe(401)
     setSystemTime(now.toDate())
-  })
-
-  test('Valid Token', async () => {
-    const loginResponse = await login();
-    const _response = await app.request('/api/private/branches?page=1', {
-      headers: generateTestHeader(loginResponse.data.token)
-    });
-
-    const response: ApiResponseList<Branch[]> = await _response.json();
-
-    expect(response.code).toBe(200)
-    expect(response.data).toBeArray()
   })
 })

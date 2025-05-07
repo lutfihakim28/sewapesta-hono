@@ -3,4 +3,4 @@ import { users } from 'db/schema/users';
 import { getTableColumns } from 'drizzle-orm';
 
 export const { createdAt, deletedAt, password, refreshToken, updatedAt, ...userColumns } = getTableColumns(users)
-export const { createdAt: ca, deletedAt: da, updatedAt: ua, ...profileColumns } = getTableColumns(profiles);
+export const { createdAt: ca, deletedAt: da, updatedAt: ua, id, userId, ...profileColumns } = getTableColumns(profiles);

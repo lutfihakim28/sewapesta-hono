@@ -9,6 +9,6 @@ export const itemsOwners = sqliteTable('items_owners', {
   ownerId: integer('owner_id').references(() => users.id).notNull(),
   ...timestamps,
 }, (table) => [
-  index('owner_index').on(table.ownerId),
-  index('item_index').on(table.itemId)
+  index('item_owner_owner_index').on(table.ownerId),
+  index('item_owner_item_index').on(table.itemId)
 ])

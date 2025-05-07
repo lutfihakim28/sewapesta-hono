@@ -4,17 +4,12 @@ import { ProductService } from './Product.service';
 import { messages } from '@/lib/constants/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { Meta } from '@/lib/dtos/Meta.dto';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 
 const ProductController = honoApp()
 
 ProductController.openapi(ProductListRoute, async (context) => {
   const query = context.req.valid('query')
-  const jwt = new JwtPayload(context.get('jwtPayload'))
-  const [products, totalData] = await ProductService.list(query, jwt.user);
+  const [products, totalData] = await ProductService.list(query);
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -30,8 +25,7 @@ ProductController.openapi(ProductListRoute, async (context) => {
 
 ProductController.openapi(ProductDetailRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  const product = await ProductService.get(+param.id, jwtPayload.user)
+  const product = await ProductService.get(+param.id)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -42,9 +36,8 @@ ProductController.openapi(ProductDetailRoute, async (context) => {
 
 ProductController.openapi(ProductCreateRoute, async (context) => {
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const product = await ProductService.create(payload, jwtPayload.user)
+  const product = await ProductService.create(payload)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -56,9 +49,8 @@ ProductController.openapi(ProductCreateRoute, async (context) => {
 ProductController.openapi(ProductUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const product = await ProductService.update(+param.id, payload, jwtPayload.user)
+  const product = await ProductService.update(+param.id, payload)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -69,9 +61,8 @@ ProductController.openapi(ProductUpdateRoute, async (context) => {
 
 ProductController.openapi(ProductDeleteRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwt = new JwtPayload(context.get('jwtPayload'))
 
-  await ProductService.delete(+param.id, jwt.user)
+  await ProductService.delete(+param.id)
 
   return context.json(new ApiResponse({
     code: 200,

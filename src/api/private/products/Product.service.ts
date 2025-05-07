@@ -1,5 +1,4 @@
 import { messages } from '@/lib/constants/messages';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { SortEnum } from '@/lib/enums/SortEnum';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
@@ -7,14 +6,14 @@ import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { products } from 'db/schema/products';
-import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like } from 'drizzle-orm';
 import { User } from '../users/User.schema';
 import { productColumns } from './Product.column';
 import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
 import { productsItems } from 'db/schema/products-items';
 
 export abstract class ProductService {
-  static async list(query: ProductFilter, user: User): Promise<[Product[], number]> {
+  static async list(query: ProductFilter): Promise<[Product[], number]> {
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: ProductColumn = 'id';
 
@@ -56,7 +55,7 @@ export abstract class ProductService {
     return [_products, meta.count]
   }
 
-  static async get(id: number, user: User): Promise<Product> {
+  static async get(id: number): Promise<Product> {
     const conditions = [
       eq(products.id, id),
       isNull(products.deletedAt),
@@ -74,7 +73,7 @@ export abstract class ProductService {
     return product
   }
 
-  static async create(payload: ProductRequest, user: User): Promise<Product> {
+  static async create(payload: ProductRequest): Promise<Product> {
     const [newProduct] = await db
       .insert(products)
       .values(payload)
@@ -82,10 +81,10 @@ export abstract class ProductService {
         id: products.id
       })
 
-    return await this.get(newProduct.id, user)
+    return await this.get(newProduct.id)
   }
 
-  static async update(id: number, payload: ProductRequest, user: User): Promise<Product> {
+  static async update(id: number, payload: ProductRequest): Promise<Product> {
     const conditions = [
       eq(products.id, id),
       isNull(products.deletedAt),
@@ -104,8 +103,8 @@ export abstract class ProductService {
     return product
   }
 
-  static async delete(id: number, user: User): Promise<void> {
-    const product = await this.get(id, user)
+  static async delete(id: number): Promise<void> {
+    const product = await this.get(id)
     await db
       .update(products)
       .set({ deletedAt: dayjs().unix() })
@@ -121,7 +120,7 @@ export abstract class ProductService {
       .where(eq(productsItems.productId, id))
   }
 
-  static async check(id: number, user: User) {
+  static async check(id: number) {
     const conditions: ReturnType<typeof and>[] = [
       eq(products.id, id),
       isNull(products.deletedAt)
