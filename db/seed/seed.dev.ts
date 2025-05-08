@@ -8,6 +8,7 @@ import { like } from 'drizzle-orm';
 import { users } from 'db/schema/users';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { profiles } from 'db/schema/profiles';
+import { usersRoles } from 'db/schema/users-roles';
 
 await seedProvinces()
 await seedCities()
@@ -31,9 +32,13 @@ const password = await Bun.password.hash('password');
 
 const [superadmin] = await db.insert(users).values({
   password: password,
-  role: RoleEnum.SuperAdmin,
   username: 'superadmin',
 }).returning()
+
+await db.insert(usersRoles).values({
+  role: RoleEnum.SuperAdmin,
+  userId: superadmin.id
+})
 
 await db.insert(profiles).values({
   name: 'Super Admin',

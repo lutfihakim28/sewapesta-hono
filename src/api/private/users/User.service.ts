@@ -1,7 +1,7 @@
 import { db } from 'db';
 import { users } from 'db/schema/users';
 import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
-import { ProfileColumn, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserUpdate } from './User.schema';
+import { ProfileColumn, ProfileRequest, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserRoleSchema, UserRoleUpdate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { messages } from '@/lib/constants/messages';
@@ -15,6 +15,8 @@ import dayjs from 'dayjs';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { validationMessages } from '@/lib/constants/validation-message';
+import { usersRoles } from 'db/schema/users-roles';
+import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
 
 export abstract class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
@@ -35,7 +37,7 @@ export abstract class UserService {
       orderBy = sort === SortEnum.Ascending
         ? asc(profiles[sortBy])
         : desc(profiles[sortBy])
-    } else if (sortBy === 'id' || sortBy === 'username' || sortBy === 'role') {
+    } else if (sortBy === 'id' || sortBy === 'username') {
       orderBy = sort === SortEnum.Ascending
         ? asc(users[sortBy])
         : desc(users[sortBy])
@@ -47,7 +49,7 @@ export abstract class UserService {
 
     if (query.role) {
       conditions.push(
-        eq(users.role, query.role)
+        eq(usersRoles.role, query.role)
       )
     }
 
@@ -65,6 +67,7 @@ export abstract class UserService {
         .select({
           ...userColumns,
           ...profileColumns,
+          roles: buildJsonGroupArray([usersRoles.role], true),
           location: {
             subdistrictCode: locationQuery.subdistrictCode,
             subdistrict: locationQuery.subdistrict,
@@ -78,9 +81,11 @@ export abstract class UserService {
         })
         .from(users)
         .innerJoin(profiles, eq(profiles.userId, users.id))
+        .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
         .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
         .where(and(...conditions))
         .orderBy(orderBy)
+        .groupBy(users.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db
@@ -88,19 +93,31 @@ export abstract class UserService {
           count: count().mapWith(Number),
         })
         .from(users)
-        .leftJoin(profiles, eq(profiles.userId, users.id))
+        .innerJoin(profiles, eq(profiles.userId, users.id))
         .where(and(...conditions))
     ])
 
-    return [_users, meta.count]
+    return [_users.map((user) => ({
+      ...user,
+      roles: (JSON.parse(user.roles) as unknown[]).map((role) => UserRoleSchema.parse(role))
+    })), meta.count]
   }
 
-  static async get(id: number): Promise<UserExtended> {
+  static async get(id: number, additionalConditions?: SQL<unknown>[]): Promise<UserExtended> {
+    const conditions = [
+      isNull(users.deletedAt),
+      eq(users.id, id),
+    ]
+
+    if (additionalConditions) {
+      conditions.push(...additionalConditions)
+    }
     const [user] = await db
       .with(locationQuery)
       .select({
         ...userColumns,
         ...profileColumns,
+        roles: buildJsonGroupArray([usersRoles.role], true),
         location: {
           subdistrictCode: locationQuery.subdistrictCode,
           subdistrict: locationQuery.subdistrict,
@@ -114,19 +131,22 @@ export abstract class UserService {
       })
       .from(users)
       .innerJoin(profiles, eq(profiles.userId, users.id))
+      .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
       .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
       .where(and(
-        isNull(users.deletedAt),
-        eq(users.id, id)
+        ...conditions
       ))
       .limit(1);
 
-    return user;
+    return {
+      ...user,
+      roles: (JSON.parse(user.roles) as unknown[]).map((role) => UserRoleSchema.parse(role))
+    };
   }
 
   static async create(payload: UserCreate): Promise<UserExtended> {
     const user = await db.transaction(async (transaction) => {
-      const { profile, password: userPassword, ...userPayload } = payload;
+      const { profile, password: userPassword, roles, ...userPayload } = payload;
       const password = await Bun.password.hash(userPassword);
       const [user] = await transaction
         .insert(users)
@@ -137,6 +157,14 @@ export abstract class UserService {
         .returning({
           id: users.id
         })
+
+      await Promise.all(roles.map((role) => transaction
+        .insert(usersRoles)
+        .values({
+          userId: user.id,
+          role,
+        })
+      ))
 
       if (profile) {
         await transaction
@@ -153,27 +181,16 @@ export abstract class UserService {
     return user;
   }
 
-  static async update(id: number, payload: UserUpdate): Promise<UserExtended> {
+  static async updateProfile(id: number, payload: ProfileRequest): Promise<UserExtended> {
     const user = await db.transaction(async (transaction) => {
-      const { profile, ...userPayload } = payload;
-      const [user] = await transaction
-        .update(users)
-        .set(userPayload)
-        .where(and(
-          isNull(users.deletedAt),
-          eq(users.id, id)
-        ))
-        .returning({ id: users.id })
+      const [profile] = await transaction
+        .update(profiles)
+        .set(payload)
+        .where(eq(profiles.userId, id))
+        .returning({ id: profiles.id })
 
-      if (!user) {
-        throw new NotFoundException(messages.errorNotFound(`User with ID ${id}`));
-      }
-
-      if (profile) {
-        await transaction
-          .update(profiles)
-          .set(profile)
-          .where(eq(profiles.userId, id))
+      if (!profile) {
+        throw new NotFoundException(messages.errorNotFound(`User with ID ${id}`))
       }
 
       return await this.get(id)
@@ -227,7 +244,7 @@ export abstract class UserService {
 
     let isMatch = false;
 
-    if (loggedUser.role === RoleEnum.SuperAdmin) {
+    if (loggedUser.roles.includes(RoleEnum.SuperAdmin)) {
       isMatch = true
     } else if (!payload.oldPassword) {
       throw new BadRequestException(validationMessages.required('Old password'))
@@ -252,6 +269,31 @@ export abstract class UserService {
       ))
 
     return await this.get(user.id)
+  }
+
+  static async changeRole(userId: number, payload: UserRoleUpdate): Promise<void> {
+    if (!payload.assigned) {
+      if (payload.role === RoleEnum.SuperAdmin) {
+        throw new BadRequestException(`Super Admin role from user with ID ${userId} can not be removed.`)
+      }
+      await db
+        .delete(usersRoles)
+        .where(and(
+          eq(usersRoles.userId, userId),
+          eq(usersRoles.role, payload.role)
+        ))
+      return
+    }
+    if (payload.role === RoleEnum.SuperAdmin) {
+      throw new BadRequestException(`Super Admin role can not be assigned into user with ID ${userId}.`)
+    }
+    await db
+      .insert(usersRoles)
+      .values({
+        userId,
+        role: payload.role
+      })
+      .onConflictDoNothing()
   }
 
   static async checkCredentials(loginRequest: LoginRequest): Promise<number> {

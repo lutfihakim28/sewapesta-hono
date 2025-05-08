@@ -2,8 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
-import { UniqueCheckSchema } from '@/lib/schemas/UniqueCheck.schema'
-import { UserChangePasswordSchema, UserCreateSchema, UserFilterSchema, UserResponseDataSchema, UserResponseListSchema, UserUpdateSchema } from './User.schema'
+import { ProfileRequestSchema, UserChangePasswordSchema, UserCreateSchema, UserFilterSchema, UserResponseDataSchema, UserResponseListSchema, UserRoleUpdateSchema } from './User.schema'
 
 const tag = 'User'
 
@@ -54,20 +53,20 @@ export const UserCreateRoute = createRoute({
 
 export const UserUpdateRoute = createRoute({
   method: 'put',
-  path: '/{id}',
+  path: '/{id}/profiles',
   tags: [tag],
   request: {
     params: ParamIdSchema,
     body: {
       content: {
         'application/json': {
-          schema: UserUpdateSchema
+          schema: ProfileRequestSchema
         }
       },
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: UserResponseDataSchema, description: 'User updated' },
+    successResponse: { schema: UserResponseDataSchema, description: 'User\'s profile is updated' },
     codes: [401, 403, 404, 422],
   }),
 })
@@ -87,7 +86,7 @@ export const UserDeleteRoute = createRoute({
 
 export const UserChangePasswordRoute = createRoute({
   method: 'patch',
-  path: '/{id}',
+  path: '/{id}/passwords',
   tags: [tag],
   request: {
     params: ParamIdSchema,
@@ -101,6 +100,26 @@ export const UserChangePasswordRoute = createRoute({
   },
   responses: new OpenApiResponse({
     successResponse: { schema: UserResponseDataSchema, description: 'User\'s password updated' },
+    codes: [401, 403, 404, 422],
+  }),
+})
+
+export const UserRoleUpdateRoute = createRoute({
+  method: 'patch',
+  path: '/{id}/roles',
+  tags: [tag],
+  request: {
+    params: ParamIdSchema,
+    body: {
+      content: {
+        'application/json': {
+          schema: UserRoleUpdateSchema
+        }
+      },
+    }
+  },
+  responses: new OpenApiResponse({
+    successResponse: { schema: SuccessSchema, description: 'User\'s roles updated' },
     codes: [401, 403, 404, 422],
   }),
 })

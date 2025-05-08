@@ -1,5 +1,5 @@
 import { honoApp } from '@/lib/utils/hono';
-import { UserChangePasswordRoute, UserCreateRoute, UserDeleteRoute, UserDetailRoute, UserListRoute, UserUpdateRoute } from './User.route';
+import { UserChangePasswordRoute, UserCreateRoute, UserDeleteRoute, UserDetailRoute, UserListRoute, UserRoleUpdateRoute, UserUpdateRoute } from './User.route';
 import { UserService } from './User.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
 import { messages } from '@/lib/constants/messages';
@@ -7,6 +7,7 @@ import { Meta } from '@/lib/dtos/Meta.dto';
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import { ForbiddenException } from '@/lib/exceptions/ForbiddenException';
+import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 
 const UserController = honoApp();
 
@@ -51,7 +52,7 @@ UserController.openapi(UserCreateRoute, async (context) => {
 UserController.openapi(UserUpdateRoute, async (context) => {
   const param = context.req.valid('param');
   const payload = context.req.valid('json');
-  const user = await UserService.update(+param.id, payload);
+  const user = await UserService.updateProfile(+param.id, payload);
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -75,7 +76,7 @@ UserController.openapi(UserChangePasswordRoute, async (context) => {
   const payload = context.req.valid('json')
   const jwt = new JwtPayload(context.get('jwtPayload'))
 
-  if (+param.id !== jwt.user.id && jwt.user.role !== RoleEnum.SuperAdmin) {
+  if (+param.id !== jwt.user.id && !jwt.user.roles.includes(RoleEnum.SuperAdmin)) {
     throw new ForbiddenException('The password for this user can only be changed by the Super Admin or the user themselves.')
   }
 
@@ -85,6 +86,23 @@ UserController.openapi(UserChangePasswordRoute, async (context) => {
     code: 200,
     messages: [`Change password successfully`],
     data: user,
+  }), 200)
+})
+
+UserController.openapi(UserRoleUpdateRoute, async (context) => {
+  const param = context.req.valid('param')
+  const payload = context.req.valid('json')
+  const jwt = new JwtPayload(context.get('jwtPayload'));
+
+  if (+param.id === jwt.user.id && !jwt.user.roles.includes(RoleEnum.SuperAdmin)) {
+    throw new BadRequestException('Can not self assign.')
+  }
+
+  await UserService.changeRole(+param.id, payload);
+
+  return context.json(new ApiResponse({
+    code: 200,
+    messages: [`User with ID ${param.id} successfully ${payload.assigned ? 'assigned' : 'unassigned'} as ${payload.role}`],
   }), 200)
 })
 

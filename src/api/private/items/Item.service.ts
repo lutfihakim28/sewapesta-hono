@@ -298,7 +298,7 @@ export abstract class ItemService {
       .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
       .leftJoin(
         images,
-        and(eq(images.reference, ImageReferenceEnum.ITEM), eq(images.referenceId, items.id)),
+        and(eq(images.reference, ImageReferenceEnum.EquipmentItem), eq(images.referenceId, items.id)),
       )
       .where(and(...conditions))
       .groupBy(items.id)
@@ -329,7 +329,7 @@ export abstract class ItemService {
         })
 
       await ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
-        reference: ImageReferenceEnum.ITEM,
+        reference: ImageReferenceEnum.EquipmentItem,
         referenceId: item.id
       })
       await transaction.insert(productsItems)
@@ -372,7 +372,7 @@ export abstract class ItemService {
         .where(notInArray(productsItems.productId, productsData.filter((product) => typeof product === 'number')))
       await ImageService.delete(transaction, imagesData.filter((image) => typeof image === 'number'))
       await ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
-        reference: ImageReferenceEnum.ITEM,
+        reference: ImageReferenceEnum.EquipmentItem,
         referenceId: id
       })
       await transaction.insert(productsItems)

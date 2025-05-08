@@ -16,6 +16,12 @@ import { SortSchema } from '@/lib/schemas/Sort.schema'
 export type UserColumn = keyof typeof users.$inferSelect
 export type ProfileColumn = keyof typeof profiles.$inferSelect
 
+export const UserRoleSchema = z.nativeEnum(RoleEnum)
+export const UserRoleUpdateSchema = z.object({
+  role: z.nativeEnum(RoleEnum),
+  assigned: z.boolean(),
+})
+
 export const ProfileSchema = createSelectSchema(profiles)
   .pick({
     address: true,
@@ -57,17 +63,19 @@ export const ProfileRequestSchema = createInsertSchema(profiles, {
 export const UserSchema = createSelectSchema(users)
   .pick({
     id: true,
-    role: true,
     username: true,
+  })
+  .extend({
+    roles: z.array(UserRoleSchema)
   })
   .openapi('User')
 
-const UserExtendedSchema = UserSchema
+export const UserExtendedSchema = UserSchema
   .merge(ProfileExtendedSchema)
   .openapi('UserExtended')
 
 export const UserFilterSchema = z.object({
-  role: z.nativeEnum(RoleEnum).optional()
+  role: UserRoleSchema.optional()
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
@@ -75,7 +83,6 @@ export const UserFilterSchema = z.object({
     'id',
     'name',
     'username',
-    'role',
   ])).openapi('UserFilter')
 
 const UserListSchema = z.array(UserExtendedSchema)
@@ -85,14 +92,18 @@ export const UserResponseListSchema = ApiResponseListSchema(UserListSchema, mess
 export const UserCreateSchema = createInsertSchema(users)
   .pick({
     password: true,
-    role: true,
     username: true
   })
   .extend({
-    profile: ProfileRequestSchema
+    profile: ProfileRequestSchema,
+    roles: z.array(z.nativeEnum(RoleEnum, {
+      invalid_type_error: validationMessages.enum('Role', RoleEnum),
+      required_error: validationMessages.required('Role')
+    }), {
+      invalid_type_error: validationMessages.array('Roles'),
+      required_error: validationMessages.required('Roles')
+    }).nonempty('Roles can not be empty.')
   }).openapi('UserCreate')
-
-export const UserUpdateSchema = UserCreateSchema.pick({ role: true, profile: true }).openapi('UserUpdate')
 
 export const UserResponseDataSchema = ApiResponseDataSchema(UserExtendedSchema, messages.successDetail('user'))
 
@@ -108,7 +119,7 @@ export const UserChangePasswordSchema = z.object({
 export type User = z.infer<typeof UserSchema>
 export type UserExtended = z.infer<typeof UserExtendedSchema>
 export type UserCreate = z.infer<typeof UserCreateSchema>
-export type UserUpdate = z.infer<typeof UserUpdateSchema>
 export type ProfileRequest = z.infer<typeof ProfileRequestSchema>
 export type UserChangePassword = z.infer<typeof UserChangePasswordSchema>
 export type UserFilter = z.infer<typeof UserFilterSchema>
+export type UserRoleUpdate = z.infer<typeof UserRoleUpdateSchema>

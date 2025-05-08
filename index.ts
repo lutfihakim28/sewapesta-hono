@@ -82,6 +82,12 @@ app.use('/api/private/products-items/*', adminMiddleware)
 app.use('/api/private/items/*', adminMiddleware)
 app.use('/api/private/items-owners/*', adminMiddleware)
 
+app.get('/api/private/users', adminMiddleware)
+app.post('/api/private/users', adminMiddleware)
+app.put('/api/private/users/*', adminMiddleware)
+app.delete('/api/private/users/*', adminMiddleware)
+app.patch('/api/private/users/:id/roles', adminMiddleware)
+
 app.post('/api/private/categories', superadminMiddleware)
 app.put('/api/private/categories/*', superadminMiddleware)
 app.delete('/api/private/categories/*', superadminMiddleware)

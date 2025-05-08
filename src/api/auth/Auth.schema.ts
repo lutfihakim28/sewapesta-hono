@@ -1,4 +1,4 @@
-import { UserSchema } from '@/api/private/users/User.schema';
+import { UserExtendedSchema } from '@/api/private/users/User.schema';
 import { messages } from '@/lib/constants/messages';
 import { validationMessages } from '@/lib/constants/validation-message';
 import { ApiResponseDataSchema } from '@/lib/schemas/ApiResponse.schema';
@@ -30,7 +30,7 @@ export const LoginDataSchema = z.object({
     .openapi({
       example: 'eyJH*************',
     }),
-  user: UserSchema
+  user: UserExtendedSchema
 })
 export const LoginResponseSchema = ApiResponseDataSchema(LoginDataSchema, messages.successLogin).openapi('LoginResponse');
 
