@@ -24,7 +24,7 @@ import { UserService } from '../users/User.service';
 import { itemColumns } from './Item.column';
 import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemSchema } from './Item.schema';
 import { quantityQuery } from './Item.query';
-import { stockMutations } from 'db/schema/stock-mutations';
+import { stockMutations } from 'db/schema/inventory-item-mutations';
 import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
 import dayjs from 'dayjs';

@@ -1,6 +1,6 @@
 import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 import { db } from 'db';
-import { stockMutations } from 'db/schema/stock-mutations';
+import { stockMutations } from 'db/schema/inventory-item-mutations';
 import { itemsOwners } from 'db/schema/items-owners';
 import { and, count, countDistinct, eq, getTableColumns, gte, inArray, isNull, max, or, sql } from 'drizzle-orm';
 import { User } from '../users/User.schema';

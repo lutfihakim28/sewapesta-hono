@@ -1,4 +1,4 @@
 import { getTableColumns } from 'drizzle-orm';
-import { stockMutations } from 'db/schema/stock-mutations';
+import { stockMutations } from 'db/schema/inventory-item-mutations';
 
 export const { deletedAt, updatedAt, createdAt, ...stockMutationsColumns } = getTableColumns(stockMutations)

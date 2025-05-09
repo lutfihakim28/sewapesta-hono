@@ -6,7 +6,7 @@ import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
 import { db } from 'db';
-import { stockMutations } from 'db/schema/stock-mutations';
+import { stockMutations } from 'db/schema/inventory-item-mutations';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
 import { users } from 'db/schema/users';

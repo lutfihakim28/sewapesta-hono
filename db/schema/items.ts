@@ -1,4 +1,4 @@
-import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { units } from './units';
 import { categories } from 'db/schema/categories';
 import { timestamps } from "db/schema/timestamps.helper";

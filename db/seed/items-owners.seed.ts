@@ -2,7 +2,7 @@ import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 import { faker } from '@faker-js/faker';
 import dayjs from 'dayjs';
 import { db } from 'db';
-import { stockMutations } from 'db/schema/stock-mutations';
+import { stockMutations } from 'db/schema/inventory-item-mutations';
 import { itemsOwners } from 'db/schema/items-owners';
 import { StockMutationDefaultDescriptionEnum } from '@/lib/enums/StockMutationDefaultDescriptionEnum';
 

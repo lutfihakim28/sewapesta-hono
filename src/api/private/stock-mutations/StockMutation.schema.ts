@@ -1,4 +1,4 @@
-import { stockMutations } from 'db/schema/stock-mutations';
+import { stockMutations } from 'db/schema/inventory-item-mutations';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { ItemSchema } from '../items/Item.schema';
 import { ProfileSchema } from '../users/User.schema';
