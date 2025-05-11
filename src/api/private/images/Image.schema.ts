@@ -54,7 +54,7 @@ export const ImageUploadResponse = ApiResponseDataSchema(ImageUploadSchema, mess
 export type ImageSave = z.infer<typeof ImageSaveSchema>
 
 export type ImageRequest = {
-  image: Blob
+  image: File
 }
 export type ImageFilter = z.infer<typeof ImageFilterSchema>
 export type Image = z.infer<typeof ImageSchema>

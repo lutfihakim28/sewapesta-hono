@@ -18,7 +18,7 @@ import { validationMessages } from '@/lib/constants/validation-message';
 import { usersRoles } from 'db/schema/users-roles';
 import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
 
-export abstract class UserService {
+export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
     let sort: SortEnum = SortEnum.Ascending;
     let sortBy: UserColumn | ProfileColumn = 'id';
@@ -316,24 +316,21 @@ export abstract class UserService {
     return user.id
   }
 
-  // static async check(id: number): Promise<User> {
-  //   const conditions: ReturnType<typeof and>[] = [
-  //     eq(users.id, id),
-  //     isNull(users.deletedAt)
-  //   ]
+  static async check(id: number) {
 
-  //   const [user] = await db
-  //     .select(userColumns)
-  //     .from(users)
-  //     .where(and(
-  //       ...conditions
-  //     ))
-  //     .limit(1)
+    const [user] = await db
+      .select(userColumns)
+      .from(users)
+      .where(and(
+        eq(users.id, id),
+        isNull(users.deletedAt)
+      ))
+      .limit(1)
 
-  //   if (!user) {
-  //     throw new NotFoundException(messages.errorConstraint('User'))
-  //   }
+    if (!user) {
+      throw new NotFoundException(messages.errorConstraint('User'))
+    }
+  }
 
-  //   return user
-  // }
+  private constructor() { }
 }

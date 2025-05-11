@@ -15,7 +15,6 @@ export const ProductSchema = createSelectSchema(products)
   .pick({
     id: true,
     name: true,
-    rentalTimeIncrement: true,
   })
   .openapi('Product')
 
@@ -27,7 +26,6 @@ export const ProductFilterSchema = z.object({
   .merge(SortSchema<ProductColumn>([
     'id',
     'name',
-    'rentalTimeIncrement',
   ]))
   .openapi('ProductFilter')
 
@@ -40,12 +38,7 @@ export const ProductRequestSchema = createInsertSchema(products, {
     required_error: validationMessages.required('Name'),
     invalid_type_error: validationMessages.string('Name'),
   }),
-  rentalTimeIncrement: z.number({
-    invalid_type_error: validationMessages.number('Rental increment'),
-    required_error: validationMessages.required('Rental increment'),
-  }),
 }).pick({
-  rentalTimeIncrement: true,
   name: true,
 }).openapi('ProductRequest')
 

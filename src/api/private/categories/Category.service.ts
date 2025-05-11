@@ -10,7 +10,7 @@ import { categoryColumns } from './Category.column';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { UniqueCheck } from '@/lib/schemas/UniqueCheck.schema';
 
-export abstract class CategoryService {
+export class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
     const where = this.buildWhereClause(query);
     const result = await Promise.all([
@@ -116,4 +116,6 @@ export abstract class CategoryService {
 
     return and(...conditions)
   }
+
+  private constructor() { }
 }

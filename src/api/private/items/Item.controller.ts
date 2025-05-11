@@ -10,8 +10,7 @@ const ItemController = honoApp()
 
 ItemController.openapi(ItemListRoute, async (context) => {
   const query = context.req.valid('query')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
-  const [items, totalData] = await ItemService.list(query, jwtPayload.user);
+  const [items, totalData] = await ItemService.list(query);
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -27,9 +26,8 @@ ItemController.openapi(ItemListRoute, async (context) => {
 
 ItemController.openapi(ItemDetailRoute, async (context) => {
   const param = context.req.valid('param')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemService.get(+param.id, jwtPayload.user)
+  const item = await ItemService.get(+param.id)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -40,9 +38,8 @@ ItemController.openapi(ItemDetailRoute, async (context) => {
 
 ItemController.openapi(ItemCreateRoute, async (context) => {
   const payload = context.req.valid('json')
-  const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemService.create(payload, jwtPayload.user)
+  const item = await ItemService.create(payload)
 
   return context.json(new ApiResponseData({
     code: 200,
@@ -56,7 +53,7 @@ ItemController.openapi(ItemUpdateRoute, async (context) => {
   const payload = context.req.valid('json')
   const jwtPayload = new JwtPayload(context.get('jwtPayload'))
 
-  const item = await ItemService.update(+param.id, payload, jwtPayload.user)
+  const item = await ItemService.update(+param.id, payload)
 
   return context.json(new ApiResponseData({
     code: 200,

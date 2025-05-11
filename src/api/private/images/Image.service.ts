@@ -8,7 +8,7 @@ import { unlink } from 'node:fs/promises';
 import { imageColumns } from './Image.column';
 import { Image, ImageFilter, ImageRequest, ImageSave, ImageUpload } from './Image.schema';
 
-export abstract class ImageService {
+export class ImageService {
   static async getByReference(request: ImageFilter): Promise<Image[]> {
     return db
       .select(imageColumns)
@@ -98,4 +98,6 @@ export abstract class ImageService {
       await transaction.delete(images).where(eq(images.id, image.id))
     }
   }
+
+  private constructor() { }
 }

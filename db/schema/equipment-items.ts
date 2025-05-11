@@ -26,7 +26,6 @@ export const equipmentItems = sqliteTable('equipment_items', {
   lastMaintenanceDate: integer('last_maintenance_date').notNull().$defaultFn(() => dayjs().unix()),
   ...timestamps,
 }, (table) => [
-  index('equipment_item_number_index').on(table.number),
   index('equipment_item_status_index').on(table.status),
   index('equipment_item_item_index').on(table.itemId),
   index('equipment_item_owner_index').on(table.ownerId),

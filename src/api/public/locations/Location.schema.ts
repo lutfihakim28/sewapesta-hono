@@ -1,4 +1,4 @@
-import { z } from '@hono/zod-openapi';
+import { z } from 'zod'
 
 export const LocationSchema = z.object({
   subdistrict: z.string(),
@@ -10,3 +10,5 @@ export const LocationSchema = z.object({
   province: z.string(),
   provinceCode: z.string(),
 }).openapi('Location')
+
+export type Location = z.infer<typeof LocationSchema>

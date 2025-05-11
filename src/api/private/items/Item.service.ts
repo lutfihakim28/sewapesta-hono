@@ -1,447 +1,161 @@
-import { messages } from '@/lib/constants/messages';
-import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { SortEnum } from '@/lib/enums/SortEnum';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
-import { countOffset } from '@/lib/utils/count-offset';
-import { db } from 'db';
-import { images } from 'db/schema/images';
+import { Item, ItemFilter, ItemRequest } from './Item.schema';
+import { buildOrderBy } from '@/lib/utils/build-order-by';
 import { items } from 'db/schema/items';
-import { products } from 'db/schema/products';
-import { productsItems } from 'db/schema/products-items';
-import { profiles } from 'db/schema/profiles';
-import { users } from 'db/schema/users';
-import { and, asc, count, countDistinct, desc, eq, getTableColumns, gte, inArray, isNull, like, not, notInArray, or, sql, SQL } from 'drizzle-orm';
-import { CategoryService } from '../categories/Category.service';
-import { Image, ImageSchema } from '../images/Image.schema';
-import { ImageService } from '../images/Image.service';
-import { ProductService } from '../products/Product.service';
-import { UnitService } from '../units/Unit.service';
-import { profileColumns } from '../users/User.column';
-import { ProfileSchema, User } from '../users/User.schema';
-import { UserService } from '../users/User.service';
+import { and, count, eq, isNull, like } from 'drizzle-orm';
+import { db } from 'db';
 import { itemColumns } from './Item.column';
-import { ItemColumn, ItemExtended, ItemFilter, ItemList, ItemRequest, ItemSort, ProductItemSchema } from './Item.schema';
-import { quantityQuery } from './Item.query';
-import { stockMutations } from 'db/schema/inventory-item-mutations';
-import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
-import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
-import dayjs from 'dayjs';
 import { categories } from 'db/schema/categories';
 import { units } from 'db/schema/units';
-import { itemsOwners } from 'db/schema/items-owners';
-import { logger } from '@/lib/utils/logger';
+import { countOffset } from '@/lib/utils/count-offset';
+import { categoryColumns } from '../categories/Category.column';
+import { unitColumns } from '../units/Unit.column';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { messages } from '@/lib/constants/messages';
+import { CategoryService } from '../categories/Category.service';
+import { UnitService } from '../units/Unit.service';
+import dayjs from 'dayjs';
 
-export abstract class ItemService {
-  static async list(query: ItemFilter, user: User): Promise<[ItemList[], number]> {
-    const latestAdjustment = db.$with('latest_adjustment').as(
-      db.select({
-        itemOwnerId: stockMutations.itemOwnerId,
-        time: sql<number>`MAX(${stockMutations.createdAt})`.mapWith(Number).as('time')
-      })
-        .from(stockMutations)
-        .where(eq(stockMutations.type, StockMutationTypeEnum.Adjustment))
-        .groupBy(stockMutations.itemOwnerId)
-    )
+export class ItemService {
+  static async list(query: ItemFilter): Promise<[Item[], number]> {
+    const orderBy = buildOrderBy(items, query.sortBy || 'id', query.sort);
 
-    const latestMutations = db.$with('latest_mutation').as(
-      db
-        .select(getTableColumns(stockMutations))
-        .from(stockMutations)
-        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, stockMutations.itemOwnerId))
-        .where(or(
-          isNull(latestAdjustment.time),
-          gte(stockMutations.createdAt, latestAdjustment.time)
-        ))
-    )
-
-    const quantityConditions: SQL<unknown>[] = [];
-
-    if (user.role === RoleEnum.Admin) {
-      quantityConditions.push(inArray(
-        itemsOwners.ownerId,
-        db.select({
-          ownerId: users.id
-        }).from(users)
-          .where(eq(users.branchId, user.branchId))
-      ))
-    } else if (user.role === RoleEnum.SuperAdmin && query.branchId) {
-      quantityConditions.push(inArray(
-        itemsOwners.ownerId,
-        db.select({ ownerId: users.id })
-          .from(users)
-          .where(eq(users.branchId, +query.branchId))
-      ))
-    }
-
-    if (query.ownerId) {
-      quantityConditions.push(eq(itemsOwners.ownerId, +query.ownerId))
-    }
-
-    const availableQuantity = db.$with('available_quantity').as(
-      db
-        .select({
-          ownerId: itemsOwners.ownerId,
-          itemId: itemsOwners.itemId,
-          value: sql<number>`SUM(
-          CASE ${latestMutations.type}
-            WHEN ${StockMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
-            WHEN ${StockMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
-            WHEN ${StockMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
-            ELSE 0
-          END
-        )`.mapWith(Number).as('available_quantity')
-        })
-        .from(itemsOwners)
-        .leftJoin(latestMutations, eq(latestMutations.itemOwnerId, itemsOwners.id))
-        .where(and(...quantityConditions))
-        .groupBy(itemsOwners.itemId, itemsOwners.ownerId)
-    )
-
-    const totalQuantity = db.$with('total_quantity').as(
-      db.select({
-        itemId: itemsOwners.itemId,
-        value: sql<number>`SUM(${itemsOwners.quantity})`.mapWith(Number).as('total_quantity')
-      })
-        .from(itemsOwners)
-        .where(and(...quantityConditions))
-        .groupBy(itemsOwners.itemId)
-    )
-
-    const itemQuantityQuery = db.$with('quantity_query').as(
-      db
-        .select({
-          itemId: availableQuantity.itemId,
-          availableQuantity: sql<number>`SUM(${availableQuantity.value})`.mapWith(Number).as('item_available_quantity'),
-          totalQuantity: totalQuantity.value,
-          ownedBy: countDistinct(availableQuantity.ownerId).as('owned_by')
-        })
-        .from(availableQuantity)
-        .innerJoin(totalQuantity, eq(totalQuantity.itemId, availableQuantity.itemId))
-        .groupBy(availableQuantity.itemId)
-    )
-
-    const { unitId, categoryId, ...selectedColumns } = itemColumns
-    let sort: SortEnum = query.sort || SortEnum.Ascending;
-    let sortBy: ItemSort = query.sortBy || 'id';
-
-    let orderBy: SQL<unknown>;
-
-    if (sortBy === 'availableQuantity' || sortBy === 'totalQuantity' || sortBy === 'ownedBy') {
-      orderBy = sort === SortEnum.Ascending
-        ? asc(itemQuantityQuery[sortBy])
-        : desc(itemQuantityQuery[sortBy])
-    } else {
-      orderBy = sort === SortEnum.Ascending
-        ? asc(items[sortBy as ItemColumn])
-        : desc(items[sortBy as ItemColumn])
-    }
-
-    const conditions = [
+    const conditions: ReturnType<typeof and>[] = [
       isNull(items.deletedAt)
-    ]
+    ];
 
     if (query.categoryId) {
       conditions.push(eq(items.categoryId, +query.categoryId))
     }
 
+    if (query.type) {
+      conditions.push(eq(items.type, query.type))
+    }
+
     if (query.keyword) {
-      conditions.push(
-        like(items.name, `%${query.keyword}%`),
-      );
+      conditions.push(like(items.name, `%${query.keyword}%`))
     }
 
-    if (query.hideUnavailable) {
-      conditions.push(not(isNull(itemQuantityQuery.ownedBy)))
-    }
-
-    const [_items, [itemCount]] = await Promise.all([
-      db.with(latestAdjustment, latestMutations, availableQuantity, totalQuantity, itemQuantityQuery)
-        .select({
-          ...selectedColumns,
-          unit: units.name,
-          category: categories.name,
-          ownedBy: sql<number>`COALESCE(${itemQuantityQuery.ownedBy}, 0)`,
-          availableQuantity: sql<number>`COALESCE(${itemQuantityQuery.availableQuantity}, 0)`,
-          totalQuantity: sql<number>`COALESCE(${itemQuantityQuery.totalQuantity}, 0)`,
-        })
+    const [_items, [meta]] = await Promise.all([
+      db.select({
+        ...itemColumns,
+        category: categoryColumns,
+        unit: unitColumns,
+      })
         .from(items)
         .innerJoin(categories, eq(categories.id, items.categoryId))
         .innerJoin(units, eq(units.id, items.unitId))
-        .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
         .where(and(...conditions))
         .orderBy(orderBy)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
-      db.with(latestAdjustment, latestMutations, availableQuantity, totalQuantity, itemQuantityQuery)
-        .select({ value: count(items.id) })
+      db.select({
+        count: count().mapWith(Number),
+      })
         .from(items)
-        .innerJoin(categories, eq(categories.id, items.categoryId))
-        .innerJoin(units, eq(units.id, items.unitId))
-        .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
         .where(and(...conditions))
     ])
 
-    logger.debug(_items, 'ItemResult')
-
-    return [
-      _items,
-      itemCount.value
-    ]
+    return [_items, meta.count]
   }
 
-  static async get(id: number, user: User): Promise<ItemExtended> {
-    const latestAdjustment = db.$with('latest_adjustment').as(
-      db.select({
-        itemOwnerId: stockMutations.itemOwnerId,
-        time: sql<number>`MAX(${stockMutations.createdAt})`.mapWith(Number).as('time')
-      })
-        .from(stockMutations)
-        .where(eq(stockMutations.type, StockMutationTypeEnum.Adjustment))
-        .groupBy(stockMutations.itemOwnerId)
-    )
-
-    const latestMutations = db.$with('latest_mutation').as(
-      db
-        .select(getTableColumns(stockMutations))
-        .from(stockMutations)
-        .leftJoin(latestAdjustment, eq(latestAdjustment.itemOwnerId, stockMutations.itemOwnerId))
-        .where(or(
-          isNull(latestAdjustment.time),
-          gte(stockMutations.createdAt, latestAdjustment.time)
-        ))
-    )
-
-    const availableQuantity = db.$with('available_quantity').as(
-      db
-        .select({
-          ownerId: itemsOwners.ownerId,
-          itemId: itemsOwners.itemId,
-          value: sql<number>`SUM(
-          CASE ${latestMutations.type}
-            WHEN ${StockMutationTypeEnum.Adjustment} THEN ${latestMutations.quantity}
-            WHEN ${StockMutationTypeEnum.Addition} THEN ${latestMutations.quantity}
-            WHEN ${StockMutationTypeEnum.Reduction} THEN -${latestMutations.quantity}
-            ELSE 0
-          END
-        )`.mapWith(Number).as('available_quantity')
-        })
-        .from(itemsOwners)
-        .leftJoin(latestMutations, eq(latestMutations.itemOwnerId, itemsOwners.id))
-        .groupBy(itemsOwners.itemId, itemsOwners.ownerId)
-    )
-
-    const totalQuantity = db.$with('total_quantity').as(
-      db.select({
-        itemId: itemsOwners.itemId,
-        value: sql<number>`SUM(${itemsOwners.quantity})`.mapWith(Number).as('total_quantity')
-      })
-        .from(itemsOwners)
-        .groupBy(itemsOwners.itemId)
-    )
-
-    const itemQuantityQuery = db.$with('quantity_query').as(
-      db
-        .select({
-          itemId: availableQuantity.itemId,
-          availableQuantity: sql<number>`SUM(${availableQuantity.value})`.mapWith(Number).as('item_available_quantity'),
-          totalQuantity: totalQuantity.value,
-          ownedBy: countDistinct(availableQuantity.ownerId).as('owned_by')
-        })
-        .from(availableQuantity)
-        .innerJoin(totalQuantity, eq(totalQuantity.itemId, availableQuantity.itemId))
-        .groupBy(availableQuantity.itemId)
-    )
-
-    const conditions = [
-      eq(items.id, id),
-      isNull(items.deletedAt),
-    ]
-
-    if (user && user?.role !== RoleEnum.SuperAdmin) {
-      conditions.push(eq(branches.id, user.branchId))
-    }
-
+  static async get(id: number) {
     const [item] = await db
-      .with(latestAdjustment, latestMutations, availableQuantity, totalQuantity, itemQuantityQuery)
       .select({
         ...itemColumns,
-        owners: buildJsonGroupArray([
-          profileColumns.address,
-          profileColumns.id,
-          profileColumns.name,
-          profileColumns.phone,
-        ]),
-        products: buildJsonGroupArray([
-          productsItems.productId,
-          productsItems.overtimeMultiplier,
-          productsItems.overtimePrice,
-          productsItems.overtimeRatio,
-          productsItems.overtimeType,
-        ]),
-        images: buildJsonGroupArray([
-          images.id,
-          images.path,
-          images.url,
-        ]),
-        ownedBy: sql<number>`COALESCE(${itemQuantityQuery.ownedBy}, 0)`,
-        availableQuantity: sql<number>`COALESCE(${itemQuantityQuery.availableQuantity}, 0)`,
-        totalQuantity: sql<number>`COALESCE(${itemQuantityQuery.totalQuantity}, 0)`,
+        category: categoryColumns,
+        unit: unitColumns,
       })
       .from(items)
-      .leftJoin(productsItems, eq(productsItems.itemId, items.id))
-      .innerJoin(products, eq(products.id, productsItems.productId))
-      .innerJoin(branches, eq(branches.id, users.branchId))
       .innerJoin(categories, eq(categories.id, items.categoryId))
       .innerJoin(units, eq(units.id, items.unitId))
-      .leftJoin(itemQuantityQuery, eq(itemQuantityQuery.itemId, items.id))
-      .leftJoin(
-        images,
-        and(eq(images.reference, ImageReferenceEnum.EquipmentItem), eq(images.referenceId, items.id)),
-      )
-      .where(and(...conditions))
-      .groupBy(items.id)
+      .where(and(
+        isNull(items.deletedAt),
+        eq(items.id, id)
+      ))
       .limit(1)
 
     if (!item) {
-      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`));
+      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
     }
 
-    return {
-      ...item,
-      owners: (JSON.parse(item.owners) as unknown[]).map((owner) => ProfileSchema.parse(owner)),
-      products: (JSON.parse(item.products) as unknown[]).map((product) => ProductItemSchema.parse(product)),
-      images: (JSON.parse(item.images) as unknown[]).filter((image) => (image as Image).id).map((image) => ImageSchema.parse(image)),
+    return item;
+  }
+
+  static async create(payload: ItemRequest): Promise<Item> {
+    await CategoryService.check(payload.categoryId);
+    await UnitService.check(payload.unitId);
+
+    const [newItem] = await db
+      .insert(items)
+      .values(payload)
+      .returning({
+        id: items.id
+      })
+
+    const item = await this.get(newItem.id);
+
+    return item;
+  }
+
+  static async update(id: number, payload: ItemRequest): Promise<Item> {
+    await CategoryService.check(payload.categoryId);
+    await UnitService.check(payload.unitId);
+
+    const [updatedItem] = await db
+      .update(items)
+      .set(payload)
+      .where(and(
+        isNull(items.deletedAt),
+        eq(items.id, id)
+      ))
+      .returning({
+        id: items.id
+      })
+
+    if (!updatedItem) {
+      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
     }
-  }
 
-  static async create(payload: ItemRequest, user: User): Promise<ItemExtended> {
-    await this.checkConstraint(payload, user)
-    const { products: productsData, images: imagesData, ...itemsData } = payload
+    const item = await this.get(updatedItem.id);
 
-    const itemId = await db.transaction(async (transaction) => {
-      const [item] = await transaction
-        .insert(items)
-        .values(itemsData)
-        .returning({
-          id: itemColumns.id
-        })
-
-      await ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
-        reference: ImageReferenceEnum.EquipmentItem,
-        referenceId: item.id
-      })
-      await transaction.insert(productsItems)
-        .values(productsData
-          .filter((product) => typeof product !== 'number')
-          .map((product) => ({
-            ...product,
-            itemId: item.id
-          }))
-        )
-
-      await transaction.insert(stockMutations)
-        .values({
-          itemId: item.id,
-          quantity: payload.quantity || 0,
-          description: ItemMutationDescriptionEnum.ItemCreation,
-          type: StockMutationTypeEnum.Adjustment
-        })
-
-      return item.id
-    })
-
-    return await this.get(itemId, user)
-  }
-
-  static async update(id: number, payload: ItemRequest, user: User): Promise<ItemExtended> {
-    await this.checkConstraint(payload, user)
-    const { products: productsData, images: imagesData, ...itemsData } = payload
-
-    await db.transaction(async (transaction) => {
-      await transaction
-        .update(items)
-        .set(itemsData)
-        .where(and(
-          eq(items.id, id),
-          isNull(items.deletedAt)
-        ))
-
-      await transaction.delete(productsItems)
-        .where(notInArray(productsItems.productId, productsData.filter((product) => typeof product === 'number')))
-      await ImageService.delete(transaction, imagesData.filter((image) => typeof image === 'number'))
-      await ImageService.save(transaction, imagesData.filter((image) => typeof image === 'string'), {
-        reference: ImageReferenceEnum.EquipmentItem,
-        referenceId: id
-      })
-      await transaction.insert(productsItems)
-        .values(productsData
-          .filter((product) => typeof product !== 'number')
-          .map((product) => ({
-            ...product,
-            itemId: id
-          }))
-        )
-    })
-
-    return await this.get(id, user)
+    return item;
   }
 
   static async delete(id: number) {
-    const [item] = await db
+    const [deletedItem] = await db
       .update(items)
       .set({
         deletedAt: dayjs().unix(),
       })
-      .where(and(
-        eq(items.id, id),
-        isNull(items.deletedAt)
-      ))
-      .returning({ id: items.id })
+      .returning({
+        id: items.id
+      })
 
-    if (!item) {
+    if (!deletedItem) {
       throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
     }
-
-    await db
-      .update(productsItems)
-      .set({
-        deletedAt: dayjs().unix()
-      })
-      .where(and(
-        eq(productsItems.productId, id)
-      ))
   }
 
   static async check(id: number) {
-    const conditions = [
-      isNull(items.deletedAt),
-      eq(items.id, id),
-    ]
-
-    const [item] = await db.select(itemColumns)
+    const [item] = await db
+      .select({
+        ...itemColumns,
+        category: categoryColumns,
+        unit: unitColumns,
+      })
       .from(items)
-      .where(and(...conditions))
+      .innerJoin(categories, eq(categories.id, items.categoryId))
+      .innerJoin(units, eq(units.id, items.unitId))
+      .where(and(
+        isNull(items.deletedAt),
+        eq(items.id, id)
+      ))
       .limit(1)
 
     if (!item) {
-      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
+      throw new NotFoundException(messages.errorConstraint(`item with ID ${id}`))
     }
-
-    return item
   }
 
-  private static async checkConstraint(payload: ItemRequest, user: User) {
-    const productsConstraint = payload
-      .products
-      .filter((product) => typeof product !== 'number')
-      .map((product) => ProductService.check(product.productId, user))
-    await Promise.all([
-      UnitService.check(payload.unitId),
-      CategoryService.check(payload.categoryId),
-      UserService.check(payload.ownerId, user),
-      ...productsConstraint,
-    ])
-  }
+  private constructor() { };
 }

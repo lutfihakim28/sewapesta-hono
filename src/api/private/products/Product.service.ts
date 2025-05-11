@@ -7,10 +7,8 @@ import dayjs from 'dayjs';
 import { db } from 'db';
 import { products } from 'db/schema/products';
 import { and, asc, count, desc, eq, isNull, like } from 'drizzle-orm';
-import { User } from '../users/User.schema';
 import { productColumns } from './Product.column';
 import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
-import { productsItems } from 'db/schema/products-items';
 
 export abstract class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
@@ -111,13 +109,6 @@ export abstract class ProductService {
       .where(and(
         eq(products.id, product.id)
       ))
-
-    await db
-      .update(productsItems)
-      .set({
-        deletedAt: dayjs().unix()
-      })
-      .where(eq(productsItems.productId, id))
   }
 
   static async check(id: number) {

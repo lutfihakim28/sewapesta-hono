@@ -26,8 +26,8 @@ export function buildJsonGroupArray(fields: SQLiteColumn[], isPlainArray?: boole
 //   )}
 // )
 
-function buildJsonObject(fields: SQLiteColumn[]): SQL<string> {
-  return sql`
+export function buildJsonObject<T>(fields: SQLiteColumn[]): SQL<T> {
+  return sql<T>`
     json_object(
       ${sql.join(
     fields.map((column) => {

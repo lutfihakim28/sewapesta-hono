@@ -1,4 +1,3 @@
-import StockMutationController from '@/api/private/stock-mutations/StockMutation.controller';
 import { cors } from 'hono/cors'
 import { honoApp } from '@/lib/utils/hono'
 import { HTTPException } from 'hono/http-exception'
@@ -24,11 +23,8 @@ import { superadminMiddleware } from '@/lib/middlewares/superadmin.middleware'
 import UnitController from '@/api/private/units/Unit.controller'
 import ImageController from '@/api/private/images/Image.controller'
 import ItemController from '@/api/private/items/Item.controller'
-// import { ownerMiddleware } from '@/lib/middlewares/owner.middleware';
-// import { customerMiddleware } from '@/lib/middlewares/customer.middleware';
-import ProductItemController from '@/api/private/products-items/ProductItem.controller';
-import ItemOwnerController from '@/api/private/items-owners/ItemOwner.controller';
 import UserController from '@/api/private/users/User.controller';
+import EquipmentItemController from '@/api/private/equipment-items/EquipmentItem.controller'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -80,6 +76,7 @@ app.use('/static/*', serveStatic({ root: './' }))
 app.use('/api/private/products/*', adminMiddleware)
 app.use('/api/private/products-items/*', adminMiddleware)
 app.use('/api/private/items/*', adminMiddleware)
+app.use('/api/private/equipment-items/*', adminMiddleware)
 app.use('/api/private/items-owners/*', adminMiddleware)
 
 app.get('/api/private/users', adminMiddleware)
@@ -103,10 +100,8 @@ app.route('/api/auth', AuthController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
-app.route('/api/private/products-items', ProductItemController)
 app.route('/api/private/items', ItemController)
-app.route('/api/private/items-owners', ItemOwnerController)
-app.route('/api/private/stock-mutations', StockMutationController)
+app.route('/api/private/equipment-items', EquipmentItemController)
 app.route('/api/private/images', ImageController)
 app.route('/api/private/users', UserController)
 

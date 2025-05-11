@@ -10,7 +10,7 @@ import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { unitColumns } from './Unit.column';
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 
-export abstract class UnitService {
+export class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
     const where = this.buildWhereClause(query);
     return await Promise.all([
@@ -114,4 +114,6 @@ export abstract class UnitService {
 
     return and(...conditions)
   }
+
+  private constructor() { }
 }
