@@ -9,7 +9,6 @@ import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
 import { SortSchema } from '@/lib/schemas/Sort.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { messages } from '@/lib/constants/messages';
-import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
 import { CategorySchema } from '../categories/Category.schema';
 import { UnitSchema } from '../units/Unit.schema';
 import { ItemSchema } from '../items/Item.schema';
@@ -49,15 +48,15 @@ export const EquipmentItemListSchema = z.array(createSelectSchema(equipmentItems
 })).openapi('EquipmentItemList')
 
 export const EquipmentItemFilterSchema = z.object({
-  itemId: NumericSchema('Item ID').optional(),
-  ownerId: NumericSchema('Owner ID').optional(),
+  itemId: NumericSchema('Item ID', 1).optional(),
+  ownerId: NumericSchema('Owner ID', 1).optional(),
   status: z.nativeEnum(EquipmentItemStatusEnum, {
     invalid_type_error: validationMessages.enum('Status', EquipmentItemStatusEnum)
   }).optional(),
   number: z.string({
     invalid_type_error: validationMessages.string('Number'),
   }).optional(),
-  categoryId: NumericSchema('Category ID').optional(),
+  categoryId: NumericSchema('Category ID', 1).optional(),
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
@@ -74,10 +73,14 @@ export const EquipmentItemRequestSchema = createInsertSchema(equipmentItems, {
   ownerId: z.number({
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID')
+  }).positive({
+    message: validationMessages.positiveNumber('Owner ID')
   }),
   itemId: z.number({
     invalid_type_error: validationMessages.number('Item ID'),
     required_error: validationMessages.required('Item ID')
+  }).positive({
+    message: validationMessages.positiveNumber('Item ID')
   }),
 }).pick({
   ownerId: true,

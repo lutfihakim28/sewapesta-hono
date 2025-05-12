@@ -27,7 +27,7 @@ export const ItemFilterSchema = z.object({
   type: z.nativeEnum(ItemTypeEnum, {
     invalid_type_error: validationMessages.enum('Type', ItemTypeEnum)
   }).optional(),
-  categoryId: NumericSchema('Category ID').optional(),
+  categoryId: NumericSchema('Category ID', 1).optional(),
 })
   .merge(SearchSchema)
   .merge(SortSchema<ItemColumn>(['id', 'name', 'type']))
@@ -41,6 +41,8 @@ export const ItemRequestSchema = createInsertSchema(items, {
   categoryId: z.number({
     invalid_type_error: validationMessages.number('Category ID'),
     required_error: validationMessages.required('Category ID')
+  }).positive({
+    message: validationMessages.positiveNumber('Category ID')
   }),
   name: z.string({
     invalid_type_error: validationMessages.string('Name'),
@@ -49,6 +51,8 @@ export const ItemRequestSchema = createInsertSchema(items, {
   unitId: z.number({
     invalid_type_error: validationMessages.number('Unit ID'),
     required_error: validationMessages.required('Unit ID')
+  }).positive({
+    message: validationMessages.positiveNumber('Unit ID')
   }),
   type: z.nativeEnum(ItemTypeEnum, {
     invalid_type_error: validationMessages.enum('Type', ItemTypeEnum),

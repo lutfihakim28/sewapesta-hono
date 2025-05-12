@@ -42,10 +42,12 @@ const ImageSaveSchema = z.object({
     required_error: validationMessages.required('Image Reference'),
     invalid_type_error: validationMessages.enum('Image Reference', ImageReferenceEnum),
   }),
-  referenceId: z.string({
+  referenceId: z.number({
     required_error: validationMessages.required('Image Reference ID'),
-    invalid_type_error: validationMessages.string('Image Reference ID'),
-  }).transform((value) => Number(value)),
+    invalid_type_error: validationMessages.number('Image Reference ID'),
+  }).positive({
+    message: validationMessages.positiveNumber('Image Reference ID')
+  }),
 }).openapi('ImageSave')
 
 const ImageUploadSchema = ImageSchema.pick({ path: true })

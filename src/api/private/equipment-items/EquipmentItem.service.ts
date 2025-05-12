@@ -19,6 +19,7 @@ import { units } from 'db/schema/units';
 import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
 import dayjs from 'dayjs';
+import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
 
 export class EquipmentItemService {
   static async list(query: EquipmentItemFilter): Promise<[EquipmentItemList, number]> {
@@ -106,7 +107,7 @@ export class EquipmentItemService {
 
   static async create(payload: EquipmentItemRequest): Promise<EquipmentItem> {
     await UserService.check(payload.ownerId)
-    await ItemService.check(payload.itemId)
+    await ItemService.check(payload.itemId, ItemTypeEnum.Equipment)
 
     const newEquipmentItem = await db.transaction(async (transaction) => {
       const [_newEquipmentItem] = await transaction.insert(equipmentItems)

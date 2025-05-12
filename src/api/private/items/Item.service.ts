@@ -14,6 +14,7 @@ import { messages } from '@/lib/constants/messages';
 import { CategoryService } from '../categories/Category.service';
 import { UnitService } from '../units/Unit.service';
 import dayjs from 'dayjs';
+import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
 
 export class ItemService {
   static async list(query: ItemFilter): Promise<[Item[], number]> {
@@ -136,7 +137,15 @@ export class ItemService {
     }
   }
 
-  static async check(id: number) {
+  static async check(id: number, type?: ItemTypeEnum) {
+    const conditions = [
+      isNull(items.deletedAt),
+      eq(items.id, id)
+    ]
+    if (type) {
+      conditions.push(eq(items.type, type))
+    }
+
     const [item] = await db
       .select({
         ...itemColumns,
@@ -147,13 +156,16 @@ export class ItemService {
       .innerJoin(categories, eq(categories.id, items.categoryId))
       .innerJoin(units, eq(units.id, items.unitId))
       .where(and(
-        isNull(items.deletedAt),
-        eq(items.id, id)
+        ...conditions
       ))
       .limit(1)
 
-    if (!item) {
+    if (!item && !type) {
       throw new NotFoundException(messages.errorConstraint(`item with ID ${id}`))
+    }
+
+    if (!item && type) {
+      throw new NotFoundException(`Selected item with ID ${id} is not ${type} type.`)
     }
   }
 
