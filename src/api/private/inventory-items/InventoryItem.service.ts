@@ -19,6 +19,8 @@ import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import dayjs from 'dayjs';
+import { inventoryItemMutations } from 'db/schema/inventory-item-mutations';
+import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
 
 export class InventoryItemService {
   static async list(query: InventoryItemFilter): Promise<[InventoryItemList, number]> {
@@ -107,15 +109,27 @@ export class InventoryItemService {
     await ItemService.check(payload.itemId, ItemTypeEnum.Inventory);
     await UserService.check(payload.ownerId, [RoleEnum.Owner])
 
-    const [newInventoryItem] = await db
-      .insert(inventoryItems)
-      .values({
-        itemId: payload.itemId,
-        ownerId: payload.ownerId,
-      })
-      .returning(inventoryItemColumns)
+    const newInventoryItem = await db.transaction(async (transaction) => {
+      const [_newInventoryItem] = await transaction
+        .insert(inventoryItems)
+        .values({
+          itemId: payload.itemId,
+          ownerId: payload.ownerId,
+        })
+        .returning(inventoryItemColumns)
 
-    // TODO: Create InventoryItemMutation to save initial totalQuantity
+      await transaction
+        .insert(inventoryItemMutations)
+        .values({
+          inventoryItemId: _newInventoryItem.id,
+          itemId: _newInventoryItem.itemId,
+          quantity: payload.totalQuantity || 0,
+          mutateAt: dayjs().unix(),
+          description: ItemMutationDescriptionEnum.ItemCreation
+        })
+
+      return _newInventoryItem;
+    })
 
     return newInventoryItem;
   }
@@ -124,24 +138,38 @@ export class InventoryItemService {
     await ItemService.check(payload.itemId, ItemTypeEnum.Inventory);
     await UserService.check(payload.ownerId, [RoleEnum.Owner])
 
-    const [updatedInventoryItem] = await db
-      .update(inventoryItems)
-      .set({
-        itemId: payload.itemId,
-        ownerId: payload.ownerId,
-      })
-      .where(and(
-        isNull(inventoryItems.deletedAt),
-        eq(inventoryItems.id, id)
-      ))
-      .returning(inventoryItemColumns)
+    const updatedInventoryItem = await db.transaction(async (transaction) => {
+      const [_updatedInventoryItem] = await db
+        .update(inventoryItems)
+        .set({
+          itemId: payload.itemId,
+          ownerId: payload.ownerId,
+        })
+        .where(and(
+          isNull(inventoryItems.deletedAt),
+          eq(inventoryItems.id, id)
+        ))
+        .returning(inventoryItemColumns)
 
-    // TODO: Create Adjustment in InventoryItemMutation to update initial totalQuantity
+      if (!_updatedInventoryItem) {
+        throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
+      }
+
+      if (_updatedInventoryItem.totalQuantity !== payload.totalQuantity) {
+        await transaction
+          .insert(inventoryItemMutations)
+          .values({
+            inventoryItemId: _updatedInventoryItem.id,
+            itemId: _updatedInventoryItem.itemId,
+            quantity: payload.totalQuantity || 0,
+            mutateAt: dayjs().unix(),
+            description: ItemMutationDescriptionEnum.ItemAdjusted
+          })
+      }
 
 
-    if (!updatedInventoryItem) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
-    }
+      return _updatedInventoryItem;
+    })
 
     return updatedInventoryItem;
   }
@@ -160,6 +188,20 @@ export class InventoryItemService {
 
     if (!deletedInventoryItem) {
       throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
+    }
+  }
+
+  static async check(id: number) {
+    const [inventoryItem] = await db
+      .select(inventoryItemColumns)
+      .from(inventoryItems)
+      .where(and(
+        isNull(inventoryItems.deletedAt),
+        eq(inventoryItems.id, id)
+      ))
+
+    if (!inventoryItem) {
+      throw new NotFoundException(messages.errorConstraint(`invnetory item with ID ${id}`))
     }
   }
 

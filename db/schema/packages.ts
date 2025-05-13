@@ -11,7 +11,7 @@ export const packages = sqliteTable('packages', {
   productId: integer('product_id').references(() => products.id),
   price: integer('price').notNull(),
   ownerPrice: integer('owner_price'), // exac amount. e.g. 200.000
-  ownerRatio: real('owner_ratio'), // ratio from item. e.g. 50% => 0.5
+  ownerRatio: real('owner_ratio'), // ratio from price. e.g. 50% => 0.5
   term: text('term', { enum: [PackageTermEnum.Price, PackageTermEnum.Ratio] }).notNull(),
   includeEmployee: integer('include_employee', { mode: 'boolean' }), // if true, employees who responsible for send/retrieve this item are handled by the owner
   ...timestamps,

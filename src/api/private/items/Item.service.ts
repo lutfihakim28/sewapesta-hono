@@ -153,8 +153,6 @@ export class ItemService {
         unit: unitColumns,
       })
       .from(items)
-      .innerJoin(categories, eq(categories.id, items.categoryId))
-      .innerJoin(units, eq(units.id, items.unitId))
       .where(and(
         ...conditions
       ))

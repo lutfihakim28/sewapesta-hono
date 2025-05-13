@@ -7,7 +7,7 @@ export const inventoryItems = sqliteTable('inventory_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   itemId: integer('item_id').references(() => items.id).notNull(),
   ownerId: integer('owner_id').references(() => users.id).notNull(),
-  totalQuantity: integer('total_quantity').default(0),
+  totalQuantity: integer('total_quantity').notNull().default(0),
   ...timestamps,
 }, (table) => ([
   index('inventory_item_item_index').on(table.itemId),
