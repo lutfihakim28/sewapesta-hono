@@ -2,24 +2,24 @@ import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
-import { ProductFilterSchema, ProductRequestSchema, ProductResponseDataSchema, ProductResponseListSchema } from './Product.schema'
+import { PackageFilterSchema, PackageRequestSchema, PackageResponseDataSchema, PackageResponseListSchema } from './Package.schema'
 
-const tag = 'Product'
+const tag = 'Package'
 
-export const ProductListRoute = createRoute({
+export const PackageListRoute = createRoute({
   method: 'get',
   path: '/',
   tags: [tag],
   request: {
-    query: ProductFilterSchema,
+    query: PackageFilterSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ProductResponseListSchema, description: 'Get list products' },
+    successResponse: { schema: PackageResponseListSchema, description: 'Get list packages' },
     codes: [401, 403, 422],
   }),
 })
 
-export const ProductDetailRoute = createRoute({
+export const PackageDetailRoute = createRoute({
   method: 'get',
   path: '/{id}',
   tags: [tag],
@@ -27,12 +27,12 @@ export const ProductDetailRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ProductResponseDataSchema, description: 'Retrieve detail products' },
+    successResponse: { schema: PackageResponseDataSchema, description: 'Get detail package' },
     codes: [401, 403, 404],
   }),
 })
 
-export const ProductCreateRoute = createRoute({
+export const PackageCreateRoute = createRoute({
   method: 'post',
   path: '/',
   tags: [tag],
@@ -40,18 +40,18 @@ export const ProductCreateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: ProductRequestSchema
+          schema: PackageRequestSchema
         }
       },
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ProductResponseDataSchema, description: 'Product created' },
+    successResponse: { schema: PackageResponseDataSchema, description: 'Package created' },
     codes: [401, 403, 422],
   }),
 })
 
-export const ProductUpdateRoute = createRoute({
+export const PackageUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}',
   tags: [tag],
@@ -60,18 +60,18 @@ export const ProductUpdateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: ProductRequestSchema
+          schema: PackageRequestSchema
         }
       },
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: ProductResponseDataSchema, description: 'Product updated' },
+    successResponse: { schema: PackageResponseDataSchema, description: 'Package updated' },
     codes: [401, 403, 404, 422],
   }),
 })
 
-export const ProductDeleteRoute = createRoute({
+export const PackageDeleteRoute = createRoute({
   method: 'delete',
   path: '/{id}',
   tags: [tag],
@@ -79,7 +79,7 @@ export const ProductDeleteRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: SuccessSchema, description: 'Product deleted' },
+    successResponse: { schema: SuccessSchema, description: 'Package deleted' },
     codes: [401, 403, 404]
   }),
 })

@@ -1,6 +1,6 @@
 import { db } from 'db';
 import { users } from 'db/schema/users';
-import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, like, or, SQL } from 'drizzle-orm';
 import { ProfileColumn, ProfileRequest, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserRoleSchema, UserRoleUpdate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
@@ -316,15 +316,29 @@ export class UserService {
     return user.id
   }
 
-  static async check(id: number) {
+  static async check(id: number, roles?: RoleEnum[]) {
+    const conditions: ReturnType<typeof and>[] = [
+      eq(users.id, id),
+      isNull(users.deletedAt)
+    ]
+
+    if (roles) {
+      conditions.push(inArray(
+        users.id,
+        db.select({ id: users.id })
+          .from(usersRoles)
+          .innerJoin(users, eq(users.id, usersRoles.userId))
+          .where(inArray(
+            usersRoles.role,
+            roles
+          ))
+      ))
+    }
 
     const [user] = await db
       .select(userColumns)
       .from(users)
-      .where(and(
-        eq(users.id, id),
-        isNull(users.deletedAt)
-      ))
+      .where(and(...conditions))
       .limit(1)
 
     if (!user) {

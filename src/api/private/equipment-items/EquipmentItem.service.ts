@@ -20,6 +20,7 @@ import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
 import dayjs from 'dayjs';
 import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
+import { RoleEnum } from '@/lib/enums/RoleEnum';
 
 export class EquipmentItemService {
   static async list(query: EquipmentItemFilter): Promise<[EquipmentItemList, number]> {
@@ -106,7 +107,7 @@ export class EquipmentItemService {
   }
 
   static async create(payload: EquipmentItemRequest): Promise<EquipmentItem> {
-    await UserService.check(payload.ownerId)
+    await UserService.check(payload.ownerId, [RoleEnum.Owner])
     await ItemService.check(payload.itemId, ItemTypeEnum.Equipment)
 
     const newEquipmentItem = await db.transaction(async (transaction) => {
@@ -134,7 +135,7 @@ export class EquipmentItemService {
   }
 
   static async update(id: number, payload: EquipmentItemRequest): Promise<EquipmentItem> {
-    await UserService.check(payload.ownerId)
+    await UserService.check(payload.ownerId, [RoleEnum.Owner])
     await ItemService.check(payload.itemId)
 
     const [updatedEquipmentItem] = await db.update(equipmentItems)
