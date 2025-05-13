@@ -13,7 +13,7 @@ ProductController.openapi(ProductListRoute, async (context) => {
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('product')],
+    messages: [messages.successList('products')],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,

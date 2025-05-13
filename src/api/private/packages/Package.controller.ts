@@ -13,7 +13,7 @@ PackageController.openapi(PackageListRoute, async (context) => {
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('product')],
+    messages: [messages.successList('packages')],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,
@@ -25,24 +25,24 @@ PackageController.openapi(PackageListRoute, async (context) => {
 
 PackageController.openapi(PackageDetailRoute, async (context) => {
   const param = context.req.valid('param')
-  const product = await PackageService.get(+param.id)
+  const _package = await PackageService.get(+param.id)
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successDetail('product')],
-    data: product
+    messages: [messages.successDetail('package')],
+    data: _package
   }), 200)
 })
 
 PackageController.openapi(PackageCreateRoute, async (context) => {
   const payload = context.req.valid('json')
 
-  const product = await PackageService.create(payload)
+  const _package = await PackageService.create(payload)
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successCreate(`Package with name ${product.name}`)],
-    data: product
+    messages: [messages.successCreate(`Package with name ${_package.name}`)],
+    data: _package
   }), 200)
 })
 
@@ -50,12 +50,12 @@ PackageController.openapi(PackageUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
 
-  const product = await PackageService.update(+param.id, payload)
+  const _package = await PackageService.update(+param.id, payload)
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successUpdate(`Package with ID ${product.id}`)],
-    data: product
+    messages: [messages.successUpdate(`Package with ID ${_package.id}`)],
+    data: _package
   }), 200)
 })
 

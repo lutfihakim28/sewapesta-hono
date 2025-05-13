@@ -25,6 +25,8 @@ import ImageController from '@/api/private/images/Image.controller'
 import ItemController from '@/api/private/items/Item.controller'
 import UserController from '@/api/private/users/User.controller';
 import EquipmentItemController from '@/api/private/equipment-items/EquipmentItem.controller'
+import PackageController from '@/api/private/packages/Package.controller'
+import InventoryItemController from '@/api/private/inventory-items/InventoryItem.controller'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -74,9 +76,10 @@ app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
 app.use('/static/*', serveStatic({ root: './' }))
 
 app.use('/api/private/products/*', adminMiddleware)
-app.use('/api/private/products-items/*', adminMiddleware)
+app.use('/api/private/packages/*', adminMiddleware)
 app.use('/api/private/items/*', adminMiddleware)
 app.use('/api/private/equipment-items/*', adminMiddleware)
+app.use('/api/private/inventory-items/*', adminMiddleware)
 app.use('/api/private/items-owners/*', adminMiddleware)
 
 app.get('/api/private/users', adminMiddleware)
@@ -100,8 +103,10 @@ app.route('/api/auth', AuthController)
 app.route('/api/private/categories', CategoryController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
+app.route('/api/private/packages', PackageController)
 app.route('/api/private/items', ItemController)
 app.route('/api/private/equipment-items', EquipmentItemController)
+app.route('/api/private/inventory-items', InventoryItemController)
 app.route('/api/private/images', ImageController)
 app.route('/api/private/users', UserController)
 

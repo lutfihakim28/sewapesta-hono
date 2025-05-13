@@ -12,7 +12,7 @@ import { messages } from '@/lib/constants/messages';
 import { CategorySchema } from '../categories/Category.schema';
 import { UnitSchema } from '../units/Unit.schema';
 import { ItemSchema } from '../items/Item.schema';
-import { UserExtendedSchema, UserSchema } from '../users/User.schema';
+import { UserExtendedSchema } from '../users/User.schema';
 
 export type EquipmentItemColumn = keyof typeof equipmentItems.$inferSelect;
 

@@ -9,6 +9,8 @@ import { SortSchema } from '@/lib/schemas/Sort.schema';
 import { packages } from 'db/schema/packages';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { UserExtendedSchema } from '../users/User.schema';
+import { ProductSchema } from '../products/Product.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -25,9 +27,15 @@ export const PackageSchema = createSelectSchema(packages).pick({
 }).openapi('Package')
 
 export const PackageListSchema = z.array(PackageSchema.extend({
-  ownerName: z.string(),
-  ownerPhone: z.string(),
-  productName: z.string().nullable(),
+  owner: UserExtendedSchema.pick({
+    id: true,
+    phone: true,
+    name: true,
+  }),
+  product: ProductSchema.pick({
+    id: true,
+    name: true,
+  }).nullable()
 })).openapi('PackageList')
 
 export const PackageFilterSchema = SearchSchema

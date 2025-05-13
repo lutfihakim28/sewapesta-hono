@@ -1,7 +1,7 @@
 import { buildOrderBy } from '@/lib/utils/build-order-by';
 import { Package, PackageFilter, PackageList, PackageRequest } from './Package.schema';
 import { packages } from 'db/schema/packages';
-import { and, count, eq, isNull, like } from 'drizzle-orm';
+import { and, count, eq, isNull, like, or } from 'drizzle-orm';
 import { db } from 'db';
 import { users } from 'db/schema/users';
 import { products } from 'db/schema/products';
@@ -36,16 +36,27 @@ export class PackageService {
     }
 
     if (query.keyword) {
-      conditions.push(like(packages.name, `%${query.keyword}%`))
+      conditions.push(or(
+        like(packages.name, `%${query.keyword}%`),
+        like(profiles.name, `%${query.keyword}%`),
+        like(profiles.phone, `%${query.keyword}%`),
+        like(products.name, `%${query.keyword}%`),
+      ))
     }
 
     const [_packages, [meta]] = await Promise.all([
       db
         .select({
           ...packageColumns,
-          ownerName: profiles.name,
-          ownerPhone: profiles.phone,
-          productName: products.name
+          owner: {
+            id: users.id,
+            name: profiles.name,
+            phone: profiles.phone,
+          },
+          product: {
+            id: products.id,
+            name: products.name
+          }
         })
         .from(packages)
         .innerJoin(users, eq(users.id, packages.ownerId))
