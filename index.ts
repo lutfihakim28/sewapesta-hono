@@ -27,6 +27,7 @@ import UserController from '@/api/private/users/User.controller';
 import EquipmentItemController from '@/api/private/equipment-items/EquipmentItem.controller'
 import PackageController from '@/api/private/packages/Package.controller'
 import InventoryItemController from '@/api/private/inventory-items/InventoryItem.controller'
+import InventoryItemMutationController from '@/api/private/inventory-item-mutations/InventoryItemMutation.controller'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -80,6 +81,7 @@ app.use('/api/private/packages/*', adminMiddleware)
 app.use('/api/private/items/*', adminMiddleware)
 app.use('/api/private/equipment-items/*', adminMiddleware)
 app.use('/api/private/inventory-items/*', adminMiddleware)
+app.use('/api/private/inventory-item-mutations/*', adminMiddleware)
 app.use('/api/private/items-owners/*', adminMiddleware)
 
 app.get('/api/private/users', adminMiddleware)
@@ -107,6 +109,7 @@ app.route('/api/private/packages', PackageController)
 app.route('/api/private/items', ItemController)
 app.route('/api/private/equipment-items', EquipmentItemController)
 app.route('/api/private/inventory-items', InventoryItemController)
+app.route('/api/private/inventory-item-mutations', InventoryItemMutationController)
 app.route('/api/private/images', ImageController)
 app.route('/api/private/users', UserController)
 

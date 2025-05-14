@@ -147,11 +147,7 @@ export class ItemService {
     }
 
     const [item] = await db
-      .select({
-        ...itemColumns,
-        category: categoryColumns,
-        unit: unitColumns,
-      })
+      .select(itemColumns)
       .from(items)
       .where(and(
         ...conditions

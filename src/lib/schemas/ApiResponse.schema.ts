@@ -18,6 +18,7 @@ export function ApiResponseDataSchema<T extends z.ZodTypeAny>(schema: T, message
 
 export function ApiResponseListSchema<T extends z.ZodTypeAny>(schema: T, message: string) {
   return ApiResponseSchema(message).extend({
+    data: schema,
     meta: MetaSchema,
   })
 }

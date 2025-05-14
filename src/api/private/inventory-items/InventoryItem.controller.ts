@@ -66,7 +66,7 @@ InventoryItemController.openapi(InventoryItemDeleteRoute, async (context) => {
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete(`InventoryItem with ID ${param.id}`)],
+    messages: [messages.successDelete(`Inventory item with ID ${param.id}`)],
   }), 200)
 })
 

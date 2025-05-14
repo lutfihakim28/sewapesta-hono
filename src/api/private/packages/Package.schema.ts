@@ -70,16 +70,22 @@ export const PackageRequestSchema = createInsertSchema(packages, {
     message: validationMessages.positiveNumber('Owner ID')
   }),
   ownerPrice: z.number({
-    invalid_type_error: validationMessages.number('Owner Price'),
-    required_error: validationMessages.required('Owner Price')
+    invalid_type_error: validationMessages.number('Owner price'),
+    required_error: validationMessages.required('Owner price')
+  }).nonnegative({
+    message: validationMessages.nonNegativeNumber('Owner price')
   }),
   ownerRatio: z.number({
-    invalid_type_error: validationMessages.number('Owner Ratio'),
-    required_error: validationMessages.required('Owner Ratio')
+    invalid_type_error: validationMessages.number('Owner ratio'),
+    required_error: validationMessages.required('Owner ratio')
+  }).nonnegative({
+    message: validationMessages.nonNegativeNumber('Owner ratio')
   }),
   price: z.number({
     invalid_type_error: validationMessages.number('Price'),
     required_error: validationMessages.required('Price')
+  }).nonnegative({
+    message: validationMessages.nonNegativeNumber('price')
   }),
   productId: z.number({
     invalid_type_error: validationMessages.number('Product ID'),

@@ -2,7 +2,7 @@ import { ResponseConfig, ZodContentObject } from '@asteasolutions/zod-to-openapi
 import { ZodType } from 'zod';
 import { ServerErrorSchema } from '../schemas/ServerError.schema';
 import { UnauthorizedSchema } from '../schemas/Unauthorized.schema';
-import { ForbiddenSchema } from '../schemas/ForbiddenSchema';
+import { ForbiddenSchema } from '../schemas/Forbidden.schema';
 import { NotFoundSchema } from '../schemas/NotFound.schema';
 import { BadRequestSchema } from '../schemas/BadRequest.schema';
 

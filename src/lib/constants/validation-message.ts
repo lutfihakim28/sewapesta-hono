@@ -7,6 +7,7 @@ export const validationMessages = {
   number: (field: string) => `${field} should be valid number.`,
   numeric: (field: string) => `${field} should be numeric string.`,
   positiveNumber: (field: string) => `${field} should be valid positive number.`,
+  nonNegativeNumber: (field: string) => `${field} should be valid non negative number.`,
   maxNumber: (field: string, max: number) => `Maximum ${field} is ${max}.`,
   minNumber: (field: string, min: number) => `Minimum ${field} is ${min}.`,
   minLength: (field: string, length: number) => `${field} should be minimum ${length} length.`,

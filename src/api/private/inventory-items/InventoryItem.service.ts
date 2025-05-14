@@ -21,6 +21,7 @@ import { RoleEnum } from '@/lib/enums/RoleEnum';
 import dayjs from 'dayjs';
 import { inventoryItemMutations } from 'db/schema/inventory-item-mutations';
 import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
+import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 
 export class InventoryItemService {
   static async list(query: InventoryItemFilter): Promise<[InventoryItemList, number]> {
@@ -125,13 +126,17 @@ export class InventoryItemService {
           itemId: _newInventoryItem.itemId,
           quantity: payload.totalQuantity || 0,
           mutateAt: dayjs().unix(),
+          type: StockMutationTypeEnum.Adjustment,
           description: ItemMutationDescriptionEnum.ItemCreation
         })
 
       return _newInventoryItem;
     })
 
-    return newInventoryItem;
+    return {
+      ...newInventoryItem,
+      totalQuantity: payload.totalQuantity || 0,
+    };
   }
 
   static async update(id: number, payload: InventoryItemRequest): Promise<InventoryItem> {
@@ -163,6 +168,7 @@ export class InventoryItemService {
             itemId: _updatedInventoryItem.itemId,
             quantity: payload.totalQuantity || 0,
             mutateAt: dayjs().unix(),
+            type: StockMutationTypeEnum.Adjustment,
             description: ItemMutationDescriptionEnum.ItemAdjusted
           })
       }
@@ -171,7 +177,10 @@ export class InventoryItemService {
       return _updatedInventoryItem;
     })
 
-    return updatedInventoryItem;
+    return {
+      ...updatedInventoryItem,
+      totalQuantity: payload.totalQuantity || 0,
+    };
   }
 
   static async delete(id: number) {
@@ -191,7 +200,7 @@ export class InventoryItemService {
     }
   }
 
-  static async check(id: number) {
+  static async check(id: number): Promise<InventoryItem> {
     const [inventoryItem] = await db
       .select(inventoryItemColumns)
       .from(inventoryItems)
@@ -203,6 +212,8 @@ export class InventoryItemService {
     if (!inventoryItem) {
       throw new NotFoundException(messages.errorConstraint(`invnetory item with ID ${id}`))
     }
+
+    return inventoryItem;
   }
 
   private constructor() { }

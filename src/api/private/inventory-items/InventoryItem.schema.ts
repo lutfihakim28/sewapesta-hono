@@ -22,10 +22,7 @@ export const InventoryItemSchema = createSelectSchema(inventoryItems).pick({
   totalQuantity: true,
 }).openapi('InventoryItem')
 
-export const InventoryItemListSchema = z.array(InventoryItemSchema.omit({
-  itemId: true,
-  ownerId: true,
-}).extend({
+export const InventoryItemListSchema = z.array(InventoryItemSchema.extend({
   item: ItemSchema.pick({
     id: true,
     name: true,

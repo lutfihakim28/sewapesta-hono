@@ -4,7 +4,7 @@ import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
 import { InventoryItemFilterSchema, InventoryItemRequestSchema, InventoryItemResponseDataSchema, InventoryItemResponseListSchema } from './InventoryItem.schema'
 
-const tag = 'InventoryItem'
+const tag = 'Inventory Item'
 
 export const InventoryItemListRoute = createRoute({
   method: 'get',
@@ -46,7 +46,7 @@ export const InventoryItemCreateRoute = createRoute({
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: InventoryItemResponseDataSchema, description: 'InventoryItem created' },
+    successResponse: { schema: InventoryItemResponseDataSchema, description: 'Inventory item created' },
     codes: [401, 403, 422],
   }),
 })
@@ -66,7 +66,7 @@ export const InventoryItemUpdateRoute = createRoute({
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: InventoryItemResponseDataSchema, description: 'InventoryItem updated' },
+    successResponse: { schema: InventoryItemResponseDataSchema, description: 'Inventory item updated' },
     codes: [401, 403, 404, 422],
   }),
 })
@@ -79,7 +79,7 @@ export const InventoryItemDeleteRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: SuccessSchema, description: 'InventoryItem deleted' },
+    successResponse: { schema: SuccessSchema, description: 'Inventory item deleted' },
     codes: [401, 403, 404]
   }),
 })
