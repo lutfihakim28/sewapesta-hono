@@ -7,8 +7,6 @@ export const usersRoles = sqliteTable('users_roles', {
   role: text('role', {
     enum: [
       RoleEnum.Admin,
-      RoleEnum.Agent,
-      RoleEnum.Customer,
       RoleEnum.Employee,
       RoleEnum.Owner,
       RoleEnum.SuperAdmin,

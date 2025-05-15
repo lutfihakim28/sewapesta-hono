@@ -19,7 +19,6 @@ export const InventoryItemSchema = createSelectSchema(inventoryItems).pick({
   id: true,
   itemId: true,
   ownerId: true,
-  totalQuantity: true,
 }).openapi('InventoryItem')
 
 export const InventoryItemListSchema = z.array(InventoryItemSchema.extend({
@@ -41,7 +40,6 @@ export const InventoryItemFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .merge(SortSchema<InventoryItemColumn>([
     'id',
-    'totalQuantity',
   ]))
   .extend({
     itemId: NumericSchema('Item ID', 1).optional(),
@@ -63,17 +61,10 @@ export const InventoryItemRequestSchema = createInsertSchema(inventoryItems, {
   }).positive({
     message: validationMessages.positiveNumber('Item ID')
   }),
-  totalQuantity: z.number({
-    invalid_type_error: validationMessages.number('Total quantity'),
-    required_error: validationMessages.required('Total quantity')
-  }).positive({
-    message: validationMessages.positiveNumber('Total quantity')
-  }),
 })
   .pick({
     itemId: true,
     ownerId: true,
-    totalQuantity: true,
   })
   .openapi('InventoryItemRequest')
 

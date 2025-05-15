@@ -19,9 +19,6 @@ import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/lib/enums/RoleEnum';
 import dayjs from 'dayjs';
-import { inventoryItemMutations } from 'db/schema/inventory-item-mutations';
-import { ItemMutationDescriptionEnum } from '@/lib/enums/ItemMutationDescriptionEnum';
-import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 
 export class InventoryItemService {
   static async list(query: InventoryItemFilter): Promise<[InventoryItemList, number]> {
@@ -110,77 +107,37 @@ export class InventoryItemService {
     await ItemService.check(payload.itemId, ItemTypeEnum.Inventory);
     await UserService.check(payload.ownerId, [RoleEnum.Owner])
 
-    const newInventoryItem = await db.transaction(async (transaction) => {
-      const [_newInventoryItem] = await transaction
-        .insert(inventoryItems)
-        .values({
-          itemId: payload.itemId,
-          ownerId: payload.ownerId,
-        })
-        .returning(inventoryItemColumns)
+    const [newInventoryItem] = await db.insert(inventoryItems)
+      .values({
+        itemId: payload.itemId,
+        ownerId: payload.ownerId,
+      })
+      .returning(inventoryItemColumns)
 
-      await transaction
-        .insert(inventoryItemMutations)
-        .values({
-          inventoryItemId: _newInventoryItem.id,
-          itemId: _newInventoryItem.itemId,
-          quantity: payload.totalQuantity || 0,
-          mutateAt: dayjs().unix(),
-          type: StockMutationTypeEnum.Adjustment,
-          description: ItemMutationDescriptionEnum.ItemCreation
-        })
-
-      return _newInventoryItem;
-    })
-
-    return {
-      ...newInventoryItem,
-      totalQuantity: payload.totalQuantity || 0,
-    };
+    return newInventoryItem;
   }
 
   static async update(id: number, payload: InventoryItemRequest): Promise<InventoryItem> {
     await ItemService.check(payload.itemId, ItemTypeEnum.Inventory);
     await UserService.check(payload.ownerId, [RoleEnum.Owner])
 
-    const updatedInventoryItem = await db.transaction(async (transaction) => {
-      const [_updatedInventoryItem] = await db
-        .update(inventoryItems)
-        .set({
-          itemId: payload.itemId,
-          ownerId: payload.ownerId,
-        })
-        .where(and(
-          isNull(inventoryItems.deletedAt),
-          eq(inventoryItems.id, id)
-        ))
-        .returning(inventoryItemColumns)
+    const [updatedInventoryItem] = await db
+      .update(inventoryItems)
+      .set({
+        itemId: payload.itemId,
+        ownerId: payload.ownerId,
+      })
+      .where(and(
+        isNull(inventoryItems.deletedAt),
+        eq(inventoryItems.id, id)
+      ))
+      .returning(inventoryItemColumns)
 
-      if (!_updatedInventoryItem) {
-        throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
-      }
+    if (!updatedInventoryItem) {
+      throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
+    }
 
-      if (_updatedInventoryItem.totalQuantity !== payload.totalQuantity) {
-        await transaction
-          .insert(inventoryItemMutations)
-          .values({
-            inventoryItemId: _updatedInventoryItem.id,
-            itemId: _updatedInventoryItem.itemId,
-            quantity: payload.totalQuantity || 0,
-            mutateAt: dayjs().unix(),
-            type: StockMutationTypeEnum.Adjustment,
-            description: ItemMutationDescriptionEnum.ItemAdjusted
-          })
-      }
-
-
-      return _updatedInventoryItem;
-    })
-
-    return {
-      ...updatedInventoryItem,
-      totalQuantity: payload.totalQuantity || 0,
-    };
+    return updatedInventoryItem;
   }
 
   static async delete(id: number) {
