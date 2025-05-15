@@ -1,27 +1,27 @@
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamps } from './timestamps.helper';
 import { users } from './users';
-import { EquipmentItemStatusEnum } from '@/lib/enums/EquipmentItemStatusEnum';
 import dayjs from 'dayjs';
 import { items } from './items';
+import { EquipmentStatusEnum } from '@/lib/enums/EquipmentStatusEnum';
 // import { categories } from './categories';
 
-export const equipmentItems = sqliteTable('equipment_items', {
+export const equipments = sqliteTable('equipments', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   number: text('number').unique().notNull(),
   itemId: integer('item_id').references(() => items.id).notNull(),
   ownerId: integer('owner_id').references(() => users.id).notNull(),
   status: text('status', {
     enum: [
-      EquipmentItemStatusEnum.Available,
-      EquipmentItemStatusEnum.Damaged,
-      EquipmentItemStatusEnum.Maintenance,
-      EquipmentItemStatusEnum.Rented,
-      EquipmentItemStatusEnum.Repaired,
-      EquipmentItemStatusEnum.Reserved,
-      EquipmentItemStatusEnum.Returned,
+      EquipmentStatusEnum.Available,
+      EquipmentStatusEnum.Damaged,
+      EquipmentStatusEnum.Maintenance,
+      EquipmentStatusEnum.Rented,
+      EquipmentStatusEnum.Repaired,
+      EquipmentStatusEnum.Reserved,
+      EquipmentStatusEnum.Returned,
     ],
-  }).notNull().default(EquipmentItemStatusEnum.Available),
+  }).notNull().default(EquipmentStatusEnum.Available),
   registerDate: integer('register_date').notNull().$defaultFn(() => dayjs().unix()),
   lastMaintenanceDate: integer('last_maintenance_date').notNull().$defaultFn(() => dayjs().unix()),
   ...timestamps,

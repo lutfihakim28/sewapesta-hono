@@ -1,8 +1,7 @@
-import { equipmentItems } from 'db/schema/equipment-items';
+import { equipments } from 'db/schema/equipments';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { NumericSchema } from '@/lib/schemas/Numeric.schema';
-import { EquipmentItemStatusEnum } from '@/lib/enums/EquipmentItemStatusEnum';
 import { validationMessages } from '@/lib/constants/validation-message';
 import { SearchSchema } from '@/lib/schemas/Search.schema';
 import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
@@ -13,10 +12,11 @@ import { CategorySchema } from '../categories/Category.schema';
 import { UnitSchema } from '../units/Unit.schema';
 import { ItemSchema } from '../items/Item.schema';
 import { UserExtendedSchema } from '../users/User.schema';
+import { EquipmentStatusEnum } from '@/lib/enums/EquipmentStatusEnum';
 
-export type EquipmentItemColumn = keyof typeof equipmentItems.$inferSelect;
+export type EquipmentColumn = keyof typeof equipments.$inferSelect;
 
-export const EquipmentItemSchema = createSelectSchema(equipmentItems).pick({
+export const EquipmentSchema = createSelectSchema(equipments).pick({
   id: true,
   lastMaintenanceDate: true,
   number: true,
@@ -24,9 +24,9 @@ export const EquipmentItemSchema = createSelectSchema(equipmentItems).pick({
   status: true,
   itemId: true,
   ownerId: true,
-}).openapi('EquipmentItem')
+}).openapi('Equipment')
 
-export const EquipmentItemListSchema = z.array(createSelectSchema(equipmentItems).pick({
+export const EquipmentListSchema = z.array(createSelectSchema(equipments).pick({
   id: true,
   lastMaintenanceDate: true,
   number: true,
@@ -45,13 +45,13 @@ export const EquipmentItemListSchema = z.array(createSelectSchema(equipmentItems
     phone: true,
     name: true,
   })
-})).openapi('EquipmentItemList')
+})).openapi('EquipmentList')
 
-export const EquipmentItemFilterSchema = z.object({
+export const EquipmentFilterSchema = z.object({
   itemId: NumericSchema('Item ID', 1).optional(),
   ownerId: NumericSchema('Owner ID', 1).optional(),
-  status: z.nativeEnum(EquipmentItemStatusEnum, {
-    invalid_type_error: validationMessages.enum('Status', EquipmentItemStatusEnum)
+  status: z.nativeEnum(EquipmentStatusEnum, {
+    invalid_type_error: validationMessages.enum('Status', EquipmentStatusEnum)
   }).optional(),
   number: z.string({
     invalid_type_error: validationMessages.string('Number'),
@@ -60,16 +60,16 @@ export const EquipmentItemFilterSchema = z.object({
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
-  .merge(SortSchema<EquipmentItemColumn>([
+  .merge(SortSchema<EquipmentColumn>([
     'id',
     'number',
     'registerDate',
     'lastMaintenanceDate',
     'status'
   ]))
-  .openapi('EquipmentItemFilter')
+  .openapi('EquipmentFilter')
 
-export const EquipmentItemRequestSchema = createInsertSchema(equipmentItems, {
+export const EquipmentRequestSchema = createInsertSchema(equipments, {
   ownerId: z.number({
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID')
@@ -85,12 +85,12 @@ export const EquipmentItemRequestSchema = createInsertSchema(equipmentItems, {
 }).pick({
   ownerId: true,
   itemId: true,
-}).openapi('EquipmentItemRequest')
+}).openapi('EquipmentRequest')
 
-export const EquipmentItemResponseListSchema = ApiResponseListSchema(EquipmentItemListSchema, messages.successList('equipment items'))
-export const EquipmentItemResponseDataSchema = ApiResponseDataSchema(EquipmentItemSchema, messages.successDetail('equipment item'))
+export const EquipmentResponseListSchema = ApiResponseListSchema(EquipmentListSchema, messages.successList('equipment items'))
+export const EquipmentResponseDataSchema = ApiResponseDataSchema(EquipmentSchema, messages.successDetail('equipment item'))
 
-export type EquipmentItem = z.infer<typeof EquipmentItemSchema>
-export type EquipmentItemFilter = z.infer<typeof EquipmentItemFilterSchema>
-export type EquipmentItemRequest = z.infer<typeof EquipmentItemRequestSchema>
-export type EquipmentItemList = z.infer<typeof EquipmentItemListSchema>
+export type Equipment = z.infer<typeof EquipmentSchema>
+export type EquipmentFilter = z.infer<typeof EquipmentFilterSchema>
+export type EquipmentRequest = z.infer<typeof EquipmentRequestSchema>
+export type EquipmentList = z.infer<typeof EquipmentListSchema>

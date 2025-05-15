@@ -1,4 +1,4 @@
-export enum EquipmentItemStatusEnum {
+export enum EquipmentStatusEnum {
   Available = 'Available',
   Reserved = 'Reserved',
   Rented = 'Rented',

@@ -2,24 +2,24 @@ import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
-import { InventoryItemFilterSchema, InventoryItemRequestSchema, InventoryItemResponseDataSchema, InventoryItemResponseListSchema } from './InventoryItem.schema'
+import { InventoryFilterSchema, InventoryRequestSchema, InventoryResponseDataSchema, InventoryResponseListSchema } from './Inventory.schema'
 
-const tag = 'Inventory Item'
+const tag = 'Inventory'
 
-export const InventoryItemListRoute = createRoute({
+export const InventoryListRoute = createRoute({
   method: 'get',
   path: '/',
   tags: [tag],
   request: {
-    query: InventoryItemFilterSchema,
+    query: InventoryFilterSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: InventoryItemResponseListSchema, description: 'Get list inventory items' },
+    successResponse: { schema: InventoryResponseListSchema, description: 'Get list inventories' },
     codes: [401, 403, 422],
   }),
 })
 
-export const InventoryItemDetailRoute = createRoute({
+export const InventoryDetailRoute = createRoute({
   method: 'get',
   path: '/{id}',
   tags: [tag],
@@ -27,12 +27,12 @@ export const InventoryItemDetailRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: InventoryItemResponseDataSchema, description: 'Get detail ivnentory item' },
+    successResponse: { schema: InventoryResponseDataSchema, description: 'Get detail ivnentory' },
     codes: [401, 403, 404],
   }),
 })
 
-export const InventoryItemCreateRoute = createRoute({
+export const InventoryCreateRoute = createRoute({
   method: 'post',
   path: '/',
   tags: [tag],
@@ -40,18 +40,18 @@ export const InventoryItemCreateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: InventoryItemRequestSchema
+          schema: InventoryRequestSchema
         }
       },
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: InventoryItemResponseDataSchema, description: 'Inventory item created' },
+    successResponse: { schema: InventoryResponseDataSchema, description: 'Inventory created' },
     codes: [401, 403, 422],
   }),
 })
 
-export const InventoryItemUpdateRoute = createRoute({
+export const InventoryUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}',
   tags: [tag],
@@ -60,18 +60,18 @@ export const InventoryItemUpdateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: InventoryItemRequestSchema
+          schema: InventoryRequestSchema
         }
       },
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: InventoryItemResponseDataSchema, description: 'Inventory item updated' },
+    successResponse: { schema: InventoryResponseDataSchema, description: 'Inventory updated' },
     codes: [401, 403, 404, 422],
   }),
 })
 
-export const InventoryItemDeleteRoute = createRoute({
+export const InventoryDeleteRoute = createRoute({
   method: 'delete',
   path: '/{id}',
   tags: [tag],
@@ -79,7 +79,7 @@ export const InventoryItemDeleteRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: SuccessSchema, description: 'Inventory item deleted' },
+    successResponse: { schema: SuccessSchema, description: 'Inventory deleted' },
     codes: [401, 403, 404]
   }),
 })

@@ -1,4 +1,4 @@
-import { inventoryItemMutations } from 'db/schema/inventory-item-mutations';
+import { inventoryMutations } from 'db/schema/inventory-mutations';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { ItemSchema } from '../items/Item.schema';
@@ -11,21 +11,21 @@ import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { messages } from '@/lib/constants/messages';
 
-export type InventoryItemMutaionColumn = keyof typeof inventoryItemMutations.$inferSelect
+export type InventoryMutaionColumn = keyof typeof inventoryMutations.$inferSelect
 
-export const InventoryItemMutationSchema = createSelectSchema(inventoryItemMutations)
+export const InventoryMutationSchema = createSelectSchema(inventoryMutations)
   .pick({
     description: true,
     id: true,
-    inventoryItemId: true,
+    inventoryId: true,
     itemId: true,
     mutateAt: true,
     quantity: true,
     type: true,
   })
-  .openapi('InventoryItemMutation')
+  .openapi('InventoryMutation')
 
-export const InventoryItemMutationListSchema = z.array(InventoryItemMutationSchema.extend({
+export const InventoryMutationListSchema = z.array(InventoryMutationSchema.extend({
   item: ItemSchema.pick({
     id: true,
     name: true,
@@ -34,21 +34,21 @@ export const InventoryItemMutationListSchema = z.array(InventoryItemMutationSche
     id: true,
     name: true,
   })
-})).openapi('InventoryItemMutationList')
+})).openapi('InventoryMutationList')
 
-export const InventoryItemMutationFilterSchema = SearchSchema
+export const InventoryMutationFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .extend({
-    inventoryItemId: NumericSchema('Inventory item ID').optional(),
+    inventoryId: NumericSchema('Inventory item ID').optional(),
     itemId: NumericSchema('Item ID').optional(),
   })
-  .openapi('InventoryItemMutationFilter')
+  .openapi('InventoryMutationFilter')
 
-export const InventoryItemMutationRequestSchema = createInsertSchema(inventoryItemMutations, {
+export const InventoryMutationRequestSchema = createInsertSchema(inventoryMutations, {
   description: z.string({
     invalid_type_error: validationMessages.string('Description')
   }).optional(),
-  inventoryItemId: z.number({
+  inventoryId: z.number({
     invalid_type_error: validationMessages.number('Inventory item ID'),
     required_error: validationMessages.required('Inventory item ID')
   }).positive({
@@ -66,15 +66,15 @@ export const InventoryItemMutationRequestSchema = createInsertSchema(inventoryIt
   })
 }).pick({
   description: true,
-  inventoryItemId: true,
+  inventoryId: true,
   quantity: true,
   type: true,
 }).openapi('InventoryMutationRequest')
 
-export const InventoryItemMutationResponseListSchema = ApiResponseListSchema(InventoryItemMutationListSchema, messages.successList('inventory item mutations'))
-export const InventoryItemMutationResponseDataSchema = ApiResponseDataSchema(InventoryItemMutationSchema, messages.successDetail('inventory item mutation'))
+export const InventoryMutationResponseListSchema = ApiResponseListSchema(InventoryMutationListSchema, messages.successList('inventory item mutations'))
+export const InventoryMutationResponseDataSchema = ApiResponseDataSchema(InventoryMutationSchema, messages.successDetail('inventory item mutation'))
 
-export type InventoryItemMutation = z.infer<typeof InventoryItemMutationSchema>
-export type InventoryItemMutationList = z.infer<typeof InventoryItemMutationListSchema>
-export type InventoryItemMutationFilter = z.infer<typeof InventoryItemMutationFilterSchema>
-export type InventoryItemMutationRequest = z.infer<typeof InventoryItemMutationRequestSchema>
+export type InventoryMutation = z.infer<typeof InventoryMutationSchema>
+export type InventoryMutationList = z.infer<typeof InventoryMutationListSchema>
+export type InventoryMutationFilter = z.infer<typeof InventoryMutationFilterSchema>
+export type InventoryMutationRequest = z.infer<typeof InventoryMutationRequestSchema>

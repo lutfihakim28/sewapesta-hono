@@ -1,4 +1,4 @@
-import { inventoryItems } from 'db/schema/inventory-items';
+import { inventories } from 'db/schema/inventories';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { CategorySchema } from '../categories/Category.schema';
@@ -13,15 +13,15 @@ import { validationMessages } from '@/lib/constants/validation-message';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
 import { messages } from '@/lib/constants/messages';
 
-export type InventoryItemColumn = keyof typeof inventoryItems.$inferSelect;
+export type InventoryColumn = keyof typeof inventories.$inferSelect;
 
-export const InventoryItemSchema = createSelectSchema(inventoryItems).pick({
+export const InventorySchema = createSelectSchema(inventories).pick({
   id: true,
   itemId: true,
   ownerId: true,
-}).openapi('InventoryItem')
+}).openapi('Inventory')
 
-export const InventoryItemListSchema = z.array(InventoryItemSchema.extend({
+export const InventoryListSchema = z.array(InventorySchema.extend({
   item: ItemSchema.pick({
     id: true,
     name: true,
@@ -34,11 +34,11 @@ export const InventoryItemListSchema = z.array(InventoryItemSchema.extend({
     phone: true,
     name: true,
   })
-})).openapi('InventoryItemList')
+})).openapi('InventoryList')
 
-export const InventoryItemFilterSchema = SearchSchema
+export const InventoryFilterSchema = SearchSchema
   .merge(PaginationSchema)
-  .merge(SortSchema<InventoryItemColumn>([
+  .merge(SortSchema<InventoryColumn>([
     'id',
   ]))
   .extend({
@@ -46,9 +46,9 @@ export const InventoryItemFilterSchema = SearchSchema
     ownerId: NumericSchema('Owner ID', 1).optional(),
     categoryId: NumericSchema('Category ID', 1).optional(),
   })
-  .openapi('InventoryItemFilter')
+  .openapi('InventoryFilter')
 
-export const InventoryItemRequestSchema = createInsertSchema(inventoryItems, {
+export const InventoryRequestSchema = createInsertSchema(inventories, {
   ownerId: z.number({
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID')
@@ -66,12 +66,12 @@ export const InventoryItemRequestSchema = createInsertSchema(inventoryItems, {
     itemId: true,
     ownerId: true,
   })
-  .openapi('InventoryItemRequest')
+  .openapi('InventoryRequest')
 
-export const InventoryItemResponseListSchema = ApiResponseListSchema(InventoryItemListSchema, messages.successList('inventory items'))
-export const InventoryItemResponseDataSchema = ApiResponseDataSchema(InventoryItemSchema, messages.successDetail('inventory item'))
+export const InventoryResponseListSchema = ApiResponseListSchema(InventoryListSchema, messages.successList('inventory items'))
+export const InventoryResponseDataSchema = ApiResponseDataSchema(InventorySchema, messages.successDetail('inventory item'))
 
-export type InventoryItem = z.infer<typeof InventoryItemSchema>
-export type InventoryItemList = z.infer<typeof InventoryItemListSchema>
-export type InventoryItemFilter = z.infer<typeof InventoryItemFilterSchema>
-export type InventoryItemRequest = z.infer<typeof InventoryItemRequestSchema>
+export type Inventory = z.infer<typeof InventorySchema>
+export type InventoryList = z.infer<typeof InventoryListSchema>
+export type InventoryFilter = z.infer<typeof InventoryFilterSchema>
+export type InventoryRequest = z.infer<typeof InventoryRequestSchema>

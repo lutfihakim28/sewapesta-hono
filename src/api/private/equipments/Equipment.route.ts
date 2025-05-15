@@ -2,25 +2,24 @@ import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/lib/schemas/Success.schema'
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
-import { UniqueCheckSchema } from '@/lib/schemas/UniqueCheck.schema'
-import { EquipmentItemFilterSchema, EquipmentItemRequestSchema, EquipmentItemResponseDataSchema, EquipmentItemResponseListSchema } from './EquipmentItem.schema'
+import { EquipmentFilterSchema, EquipmentRequestSchema, EquipmentResponseDataSchema, EquipmentResponseListSchema } from './Equipment.schema'
 
-const tag = 'Equipment Item'
+const tag = 'Equipment'
 
-export const EquipmentItemListRoute = createRoute({
+export const EquipmentListRoute = createRoute({
   method: 'get',
   path: '/',
   tags: [tag],
   request: {
-    query: EquipmentItemFilterSchema,
+    query: EquipmentFilterSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: EquipmentItemResponseListSchema, description: 'Get list equipment items' },
+    successResponse: { schema: EquipmentResponseListSchema, description: 'Get list equipment items' },
     codes: [401, 403],
   }),
 })
 
-export const EquipmentItemDetailRoute = createRoute({
+export const EquipmentDetailRoute = createRoute({
   method: 'get',
   path: '/{id}',
   tags: [tag],
@@ -28,12 +27,12 @@ export const EquipmentItemDetailRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: EquipmentItemResponseDataSchema, description: 'Equipment item created' },
+    successResponse: { schema: EquipmentResponseDataSchema, description: 'Equipment created' },
     codes: [401, 403, 404, 422],
   }),
 })
 
-export const EquipmentItemCreateRoute = createRoute({
+export const EquipmentCreateRoute = createRoute({
   method: 'post',
   path: '/',
   tags: [tag],
@@ -41,18 +40,18 @@ export const EquipmentItemCreateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: EquipmentItemRequestSchema
+          schema: EquipmentRequestSchema
         }
       },
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: EquipmentItemResponseDataSchema, description: 'Equipment item created' },
+    successResponse: { schema: EquipmentResponseDataSchema, description: 'Equipment created' },
     codes: [401, 403, 422],
   }),
 })
 
-export const EquipmentItemUpdateRoute = createRoute({
+export const EquipmentUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}',
   tags: [tag],
@@ -61,18 +60,18 @@ export const EquipmentItemUpdateRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: EquipmentItemRequestSchema
+          schema: EquipmentRequestSchema
         }
       },
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: EquipmentItemResponseDataSchema, description: 'Equipment item updated' },
+    successResponse: { schema: EquipmentResponseDataSchema, description: 'Equipment updated' },
     codes: [401, 403, 404, 422],
   }),
 })
 
-export const EquipmentItemDeleteRoute = createRoute({
+export const EquipmentDeleteRoute = createRoute({
   method: 'delete',
   path: '/{id}',
   tags: [tag],
@@ -80,7 +79,7 @@ export const EquipmentItemDeleteRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: SuccessSchema, description: 'Equipment item deleted' },
+    successResponse: { schema: SuccessSchema, description: 'Equipment deleted' },
     codes: [401, 403, 404]
   }),
 })

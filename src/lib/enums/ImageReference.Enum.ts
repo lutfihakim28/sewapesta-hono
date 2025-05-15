@@ -1,5 +1,5 @@
 export enum ImageReferenceEnum {
-  EquipmentItem = 'EquipmentItem',
-  InventoryItem = 'InventoryItem',
+  Equipment = 'Equipment',
+  Inventory = 'Inventory',
   Profile = 'Profile',
 }

@@ -6,7 +6,7 @@ export const images = sqliteTable('images', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   path: text('path').notNull().unique(),
   url: text('url').notNull().unique(),
-  reference: text('reference', { enum: [ImageReferenceEnum.Profile, ImageReferenceEnum.EquipmentItem, ImageReferenceEnum.InventoryItem] }).notNull(),
+  reference: text('reference', { enum: [ImageReferenceEnum.Profile, ImageReferenceEnum.Equipment, ImageReferenceEnum.Inventory] }).notNull(),
   referenceId: integer('reference_id').notNull(),
   createdAt: integer('created_at').notNull().$defaultFn(() => dayjs().unix()),
 }, (table) => [
