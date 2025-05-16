@@ -1,12 +1,12 @@
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { pinoLogger } from '@/utils/helpers/logger';
-import dayjs from 'dayjs';
 import { db } from 'db';
 import { images } from 'db/schema/images';
 import { and, eq } from 'drizzle-orm';
 import { unlink } from 'node:fs/promises';
 import { imageColumns } from './Image.column';
 import { Image, ImageFilter, ImageRequest, ImageSave, ImageUpload } from './Image.schema';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class ImageService {
   static async getByReference(request: ImageFilter): Promise<Image[]> {
@@ -21,7 +21,7 @@ export class ImageService {
 
   static async upload(request: ImageRequest): Promise<ImageUpload> {
     const [fileName, ext] = request.image.name.split('.');
-    const name = `${fileName}_${dayjs().unix()}.${ext}`
+    const name = `${fileName}_${new AppDate().unix}.${ext}`
     const path = `static/.temp/${name}`
     await Bun.write(path, request.image);
 

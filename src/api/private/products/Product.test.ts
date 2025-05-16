@@ -273,7 +273,7 @@
 //     })
 
 //     test('Deleted', async () => {
-//       await db.update(products).set({ deletedAt: dayjs().unix() }).where(eq(products.id, testedProduct.id));
+//       await db.update(products).set({ deletedAt: new AppDate().unix }).where(eq(products.id, testedProduct.id));
 
 //       const _response = await app.request(`${path}/${testedProduct.id}`, {
 //         method: 'PUT',
@@ -350,7 +350,7 @@
 //     })
 
 //     test('Deleted', async () => {
-//       await db.update(products).set({ deletedAt: dayjs().unix() }).where(eq(products.id, testedProduct.id));
+//       await db.update(products).set({ deletedAt: new AppDate().unix }).where(eq(products.id, testedProduct.id));
 
 //       const _response = await app.request(`${path}/${testedProduct.id}`, {
 //         method: 'DELETE',

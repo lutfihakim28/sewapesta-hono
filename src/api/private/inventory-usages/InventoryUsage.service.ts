@@ -11,7 +11,7 @@ import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { messages } from '@/utils/constants/messages';
 import { InventoryService } from '../inventories/Inventory.service';
-import dayjs from 'dayjs';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class InventoryUsageService {
   static async list(query: InventoryUsageFilter): Promise<[InventoryUsageList, number]> {
@@ -135,7 +135,7 @@ export class InventoryUsageService {
     const [deletedUsage] = await db
       .update(inventoryUsages)
       .set({
-        deletedAt: dayjs().unix()
+        deletedAt: new AppDate().unix
       })
       .where(and(
         isNull(inventories.deletedAt),

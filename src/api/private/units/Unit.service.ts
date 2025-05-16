@@ -3,12 +3,12 @@ import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 import { countOffset } from '@/utils/helpers/count-offset';
-import dayjs from 'dayjs';
 import { db } from 'db';
 import { units } from 'db/schema/units';
 import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { unitColumns } from './Unit.column';
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
@@ -49,7 +49,7 @@ export class UnitService {
     await db
       .update(units)
       .set({
-        deletedAt: dayjs().unix()
+        deletedAt: new AppDate().unix
       })
       .where(and(
         isNull(units.deletedAt),

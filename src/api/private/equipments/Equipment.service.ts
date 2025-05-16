@@ -17,9 +17,9 @@ import { categories } from 'db/schema/categories';
 import { units } from 'db/schema/units';
 import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
-import dayjs from 'dayjs';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class EquipmentService {
   static async list(query: EquipmentFilter): Promise<[EquipmentList, number]> {
@@ -183,7 +183,7 @@ export class EquipmentService {
   static async delete(id: number) {
     const [deletedEquipment] = await db.update(equipments)
       .set({
-        deletedAt: dayjs().unix(),
+        deletedAt: new AppDate().unix,
       })
       .where(and(
         isNull(equipments.deletedAt),

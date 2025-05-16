@@ -3,12 +3,12 @@ import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
 import { countOffset } from '@/utils/helpers/count-offset';
-import dayjs from 'dayjs';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { messages } from '@/utils/constants/messages';
 import { categoryColumns } from './Category.column';
 import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
@@ -51,7 +51,7 @@ export class CategoryService {
     await db
       .update(categories)
       .set({
-        deletedAt: dayjs().unix()
+        deletedAt: new AppDate().unix
       })
       .where(and(
         isNull(categories.deletedAt),

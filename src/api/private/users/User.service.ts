@@ -10,12 +10,12 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { profileColumns, userColumns } from './User.column';
 import { locationQuery } from '@/api/public/locations/Location.query';
 import { countOffset } from '@/utils/helpers/count-offset';
-import dayjs from 'dayjs';
 import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { usersRoles } from 'db/schema/users-roles';
 import { buildJsonGroupArray } from '@/utils/helpers/build-json-group-array';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
@@ -202,7 +202,7 @@ export class UserService {
       const [user] = await transaction
         .update(users)
         .set({
-          deletedAt: dayjs().unix(),
+          deletedAt: new AppDate().unix,
         })
         .where(and(
           isNull(users.deletedAt),
@@ -217,7 +217,7 @@ export class UserService {
       await transaction
         .update(profiles)
         .set({
-          deletedAt: dayjs().unix(),
+          deletedAt: new AppDate().unix,
         })
         .where(eq(profiles.userId, id))
     })

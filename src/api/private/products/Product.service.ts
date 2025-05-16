@@ -2,12 +2,12 @@ import { messages } from '@/utils/constants/messages';
 import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { countOffset } from '@/utils/helpers/count-offset';
-import dayjs from 'dayjs';
 import { db } from 'db';
 import { products } from 'db/schema/products';
 import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
 import { productColumns } from './Product.column';
 import { Product, ProductColumn, ProductFilter, ProductListColumn, ProductRequest, sortableProductColumn } from './Product.schema';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export abstract class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
@@ -103,7 +103,7 @@ export abstract class ProductService {
     const product = await this.get(id)
     await db
       .update(products)
-      .set({ deletedAt: dayjs().unix() })
+      .set({ deletedAt: new AppDate().unix })
       .where(and(
         eq(products.id, product.id)
       ))

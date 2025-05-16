@@ -12,7 +12,7 @@ import { messages } from '@/utils/constants/messages';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { ProductService } from '../products/Product.service';
-import dayjs from 'dayjs';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
@@ -159,7 +159,7 @@ export class PackageService {
     const [deletedPackage] = await db
       .update(packages)
       .set({
-        deletedAt: dayjs().unix(),
+        deletedAt: new AppDate().unix,
       })
       .where(and(
         isNull(packages.deletedAt),

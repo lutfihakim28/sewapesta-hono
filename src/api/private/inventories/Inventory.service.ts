@@ -17,7 +17,7 @@ import { ItemService } from '../items/Item.service';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
-import dayjs from 'dayjs';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class InventoryService {
   static async list(query: InventoryFilter): Promise<[InventoryList, number]> {
@@ -170,7 +170,7 @@ export class InventoryService {
     const [deletedInventory] = await db
       .update(inventories)
       .set({
-        deletedAt: dayjs().unix(),
+        deletedAt: new AppDate().unix,
       })
       .where(and(
         isNull(inventories.deletedAt),

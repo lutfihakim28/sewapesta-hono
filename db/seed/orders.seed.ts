@@ -24,7 +24,7 @@
 //     note: faker.lorem.sentence(5),
 //     startDate: startDate.unix(),
 //     middleman: faker.datatype.boolean(),
-//     status: dayjs().unix() >= endDate ? OrderStatusEnum.Done : OrderStatusEnum.Created,
+//     status: new AppDate().unix >= endDate ? OrderStatusEnum.Done : OrderStatusEnum.Created,
 //     endDate,
 //     orderedProducts: new Array(faker.number.int({ min: 1, max: 3 })).fill(0).map(() => {
 //       return {

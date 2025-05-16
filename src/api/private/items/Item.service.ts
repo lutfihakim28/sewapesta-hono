@@ -12,8 +12,8 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { messages } from '@/utils/constants/messages';
 import { CategoryService } from '../categories/Category.service';
 import { UnitService } from '../units/Unit.service';
-import dayjs from 'dayjs';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class ItemService {
   static async list(query: ItemFilter): Promise<[Item[], number]> {
@@ -139,7 +139,7 @@ export class ItemService {
     const [deletedItem] = await db
       .update(items)
       .set({
-        deletedAt: dayjs().unix(),
+        deletedAt: new AppDate().unix,
       })
       .returning({
         id: items.id

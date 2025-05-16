@@ -1,5 +1,5 @@
 import { User } from '@/api/private/users/User.schema';
-import dayjs from 'dayjs';
+import { AppDate } from '../libs/AppDate';
 
 export class JwtPayload {
   user!: User
@@ -11,7 +11,7 @@ export class JwtPayload {
     if (data.user) {
       this.user = data.user;
     }
-    this.exp = data.exp || dayjs().add(1, 'day').unix()
-    this.iat = data.iat || dayjs().unix()
+    this.exp = data.exp || new AppDate().add(1, 'day').unix
+    this.iat = data.iat || new AppDate().unix
   }
 }

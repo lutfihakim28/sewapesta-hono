@@ -1,9 +1,9 @@
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamps } from './timestamps.helper';
 import { users } from './users';
-import dayjs from 'dayjs';
 import { items } from './items';
 import { EquipmentStatusEnum } from '@/utils/enums/EquipmentStatusEnum';
+import { AppDate } from '@/utils/libs/AppDate';
 // import { categories } from './categories';
 
 export const equipments = sqliteTable('equipments', {
@@ -22,8 +22,8 @@ export const equipments = sqliteTable('equipments', {
       EquipmentStatusEnum.Returned,
     ],
   }).notNull().default(EquipmentStatusEnum.Available),
-  registerDate: integer('register_date').notNull().$defaultFn(() => dayjs().unix()),
-  lastMaintenanceDate: integer('last_maintenance_date').notNull().$defaultFn(() => dayjs().unix()),
+  registerDate: integer('register_date').notNull().$defaultFn(() => new AppDate().unix),
+  lastMaintenanceDate: integer('last_maintenance_date').notNull().$defaultFn(() => new AppDate().unix),
   ...timestamps,
 }, (table) => [
   index('equipment_item_status_index').on(table.status),

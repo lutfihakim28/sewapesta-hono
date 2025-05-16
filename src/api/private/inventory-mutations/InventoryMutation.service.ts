@@ -11,7 +11,7 @@ import { inventoryMutationColumns } from './InventoryMutation.column';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { messages } from '@/utils/constants/messages';
 import { InventoryService } from '../inventories/Inventory.service';
-import dayjs from 'dayjs';
+import { AppDate } from '@/utils/libs/AppDate';
 
 export class InventoryMutationService {
   static async list(query: InventoryMutationFilter): Promise<[InventoryMutationList, number]> {
@@ -95,7 +95,7 @@ export class InventoryMutationService {
       .values({
         ...payload,
         itemId: inventory.itemId,
-        mutateAt: dayjs().unix(),
+        mutateAt: new AppDate().unix,
       })
       .returning(inventoryMutationColumns)
 
@@ -128,7 +128,7 @@ export class InventoryMutationService {
     const [deletedMutation] = await db
       .update(inventoryMutations)
       .set({
-        deletedAt: dayjs().unix()
+        deletedAt: new AppDate().unix
       })
       .where(and(
         isNull(inventories.deletedAt),
