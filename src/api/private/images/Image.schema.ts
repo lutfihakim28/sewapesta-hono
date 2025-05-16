@@ -39,15 +39,19 @@ const ImageFilterSchema = createSelectSchema(images).pick({
 
 const ImageSaveSchema = z.object({
   reference: z.nativeEnum(ImageReferenceEnum, {
-    required_error: validationMessages.required('Image Reference'),
-    invalid_type_error: validationMessages.enum('Image Reference', ImageReferenceEnum),
+    required_error: validationMessages.required('Image reference'),
+    invalid_type_error: validationMessages.enum('Image reference', ImageReferenceEnum),
   }),
   referenceId: z.number({
-    required_error: validationMessages.required('Image Reference ID'),
-    invalid_type_error: validationMessages.number('Image Reference ID'),
-  }).positive({
-    message: validationMessages.positiveNumber('Image Reference ID')
-  }),
+    required_error: validationMessages.required('Image reference ID'),
+    invalid_type_error: validationMessages.number('Image reference ID'),
+  })
+    .int({
+      message: validationMessages.integer('Image reference ID')
+    })
+    .positive({
+      message: validationMessages.positiveNumber('Image reference ID')
+    }),
 }).openapi('ImageSave')
 
 const ImageUploadSchema = ImageSchema.pick({ path: true })

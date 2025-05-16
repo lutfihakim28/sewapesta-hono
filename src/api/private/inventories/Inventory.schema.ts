@@ -60,15 +60,23 @@ export const InventoryRequestSchema = createInsertSchema(inventories, {
   ownerId: z.number({
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID')
-  }).positive({
-    message: validationMessages.positiveNumber('Owner ID')
-  }),
+  })
+    .int({
+      message: validationMessages.integer('Owner ID')
+    })
+    .positive({
+      message: validationMessages.positiveNumber('Owner ID')
+    }),
   itemId: z.number({
     invalid_type_error: validationMessages.number('Item ID'),
     required_error: validationMessages.required('Item ID')
-  }).positive({
-    message: validationMessages.positiveNumber('Item ID')
-  }),
+  })
+    .int({
+      message: validationMessages.integer('Item ID')
+    })
+    .positive({
+      message: validationMessages.positiveNumber('Item ID')
+    }),
 })
   .pick({
     itemId: true,

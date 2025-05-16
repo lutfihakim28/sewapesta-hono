@@ -19,8 +19,8 @@ export class InventoryMutationService {
       isNull(inventoryMutations.deletedAt),
     ];
 
-    if (query.inventoryId) {
-      conditions.push(eq(inventoryMutations.inventoryId, +query.inventoryId))
+    if (query.ownerId) {
+      conditions.push(eq(users.id, +query.ownerId))
     }
 
     if (query.itemId) {

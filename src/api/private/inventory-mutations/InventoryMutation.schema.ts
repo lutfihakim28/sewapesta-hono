@@ -39,7 +39,7 @@ export const InventoryMutationListSchema = z.array(InventoryMutationSchema.exten
 export const InventoryMutationFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .extend({
-    inventoryId: NumericSchema('Inventory item ID').optional(),
+    ownerId: NumericSchema('Owner ID').optional(),
     itemId: NumericSchema('Item ID').optional(),
   })
   .openapi('InventoryMutationFilter')
@@ -51,15 +51,23 @@ export const InventoryMutationRequestSchema = createInsertSchema(inventoryMutati
   inventoryId: z.number({
     invalid_type_error: validationMessages.number('Inventory item ID'),
     required_error: validationMessages.required('Inventory item ID')
-  }).positive({
-    message: validationMessages.positiveNumber('Inventory item ID')
-  }),
+  })
+    .int({
+      message: validationMessages.integer('Inventory ID')
+    })
+    .positive({
+      message: validationMessages.positiveNumber('Inventory item ID')
+    }),
   quantity: z.number({
     invalid_type_error: validationMessages.number('Quantity'),
     required_error: validationMessages.required('Quantity')
-  }).positive({
-    message: validationMessages.positiveNumber('Quantity')
-  }),
+  })
+    .int({
+      message: validationMessages.integer('Quantity')
+    })
+    .positive({
+      message: validationMessages.positiveNumber('Quantity')
+    }),
   type: z.nativeEnum(StockMutationTypeEnum, {
     invalid_type_error: validationMessages.enum('Type', StockMutationTypeEnum),
     required_error: validationMessages.required('Type')

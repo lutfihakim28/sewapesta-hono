@@ -70,9 +70,13 @@ export const PackageRequestSchema = createInsertSchema(packages, {
   ownerId: z.number({
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID')
-  }).positive({
-    message: validationMessages.positiveNumber('Owner ID')
-  }),
+  })
+    .int({
+      message: validationMessages.integer('Owner ID')
+    })
+    .positive({
+      message: validationMessages.positiveNumber('Owner ID')
+    }),
   ownerPrice: z.number({
     invalid_type_error: validationMessages.number('Owner price'),
     required_error: validationMessages.required('Owner price')

@@ -11,6 +11,7 @@ export const inventoryUsages = sqliteTable('inventory_usages', {
   orderQuantity: integer('order_quantity').notNull(),
   returnQuantity: integer('return_quantity').notNull(),
   description: text('description'),
+  usedAt: integer('return_at').notNull(),
   returnAt: integer('return_at'),
   ...timestamps,
 }, (table) => [

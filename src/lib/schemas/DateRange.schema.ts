@@ -1,16 +1,13 @@
 import { z } from '@hono/zod-openapi';
+import { NumericSchema } from './Numeric.schema';
 
 export const DateRangeSchema = z.object({
-  startAt: z
-    .string()
-    .date()
+  from: NumericSchema('Start at', 0)
     .openapi({
-      description: 'YYYY-MM-DD',
+      description: 'Unix timestamp in seconds.',
     }),
-  endAt: z
-    .string()
-    .date()
+  to: NumericSchema('Start at', 0)
     .openapi({
-      description: 'YYYY-MM-DD',
+      description: 'Unix timestamp in seconds.',
     }),
 }).partial().openapi('DateRange')

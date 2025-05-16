@@ -5,6 +5,7 @@ export const validationMessages = {
   string: (field: string) => `${field} should be string.`,
   boolean: (field: string) => `${field} should be boolean value.`,
   number: (field: string) => `${field} should be valid number.`,
+  integer: (field: string) => `${field} should be valid integer.`,
   numeric: (field: string) => `${field} should be numeric string.`,
   positiveNumber: (field: string) => `${field} should be valid positive number.`,
   nonNegativeNumber: (field: string) => `${field} should be valid non negative number.`,
