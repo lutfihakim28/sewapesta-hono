@@ -1,7 +1,7 @@
 import { profiles } from 'db/schema/profiles';
 import { db } from '..';
 import { faker } from '@faker-js/faker/locale/id_ID';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { users } from 'db/schema/users';
 
 export async function seedUsers(subdistrictsCode: string[], role: RoleEnum = RoleEnum.SuperAdmin, id: number = 0) {

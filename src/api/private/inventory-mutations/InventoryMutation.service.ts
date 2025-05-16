@@ -6,10 +6,10 @@ import { profiles } from 'db/schema/profiles';
 import { db } from 'db';
 import { inventories } from 'db/schema/inventories';
 import { users } from 'db/schema/users';
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 import { inventoryMutationColumns } from './InventoryMutation.column';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { messages } from '@/lib/constants/messages';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
+import { messages } from '@/utils/constants/messages';
 import { InventoryService } from '../inventories/Inventory.service';
 import dayjs from 'dayjs';
 

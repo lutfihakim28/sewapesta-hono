@@ -6,7 +6,7 @@ import { seedSubdistricts } from 'db/seed/subdistricts.seed';
 import { subdistricts } from 'db/schema/subdistricts';
 import { like } from 'drizzle-orm';
 import { users } from 'db/schema/users';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { profiles } from 'db/schema/profiles';
 import { usersRoles } from 'db/schema/users-roles';
 

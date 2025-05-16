@@ -1,7 +1,7 @@
-import { messages } from '@/lib/constants/messages';
-import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
-import { ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
-import { SearchSchema } from '@/lib/schemas/Search.schema';
+import { messages } from '@/utils/constants/messages';
+import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
+import { ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
+import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { z } from '@hono/zod-openapi';
 import { provinces } from 'db/schema/provinces';
 import { createSelectSchema } from 'drizzle-zod';

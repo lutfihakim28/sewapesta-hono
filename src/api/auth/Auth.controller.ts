@@ -1,10 +1,10 @@
-import { honoApp } from '@/lib/utils/hono';
+import { honoApp } from '@/utils/helpers/hono';
 import { LoginRoute, LogoutRoute, RefreshRoute } from './Auth.route';
 import { UserService } from '../private/users/User.service';
 import { AuthService } from './Auth.service';
-import { ApiResponse, ApiResponseData } from '@/lib/dtos/ApiResponse.dto';
-import { messages } from '@/lib/constants/messages';
-import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
+import { ApiResponse, ApiResponseData } from '@/utils/dtos/ApiResponse.dto';
+import { messages } from '@/utils/constants/messages';
+import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
 
 const AuthController = honoApp()
 

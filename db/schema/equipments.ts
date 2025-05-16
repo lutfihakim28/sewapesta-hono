@@ -3,7 +3,7 @@ import { timestamps } from './timestamps.helper';
 import { users } from './users';
 import dayjs from 'dayjs';
 import { items } from './items';
-import { EquipmentStatusEnum } from '@/lib/enums/EquipmentStatusEnum';
+import { EquipmentStatusEnum } from '@/utils/enums/EquipmentStatusEnum';
 // import { categories } from './categories';
 
 export const equipments = sqliteTable('equipments', {

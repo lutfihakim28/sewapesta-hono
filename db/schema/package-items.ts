@@ -1,7 +1,7 @@
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { items } from './items';
 import { packages } from './packages';
-import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
+import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 
 export const packageItems = sqliteTable('package_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),

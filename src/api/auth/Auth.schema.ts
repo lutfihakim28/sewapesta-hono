@@ -1,7 +1,7 @@
 import { UserSchema } from '@/api/private/users/User.schema';
-import { messages } from '@/lib/constants/messages';
-import { validationMessages } from '@/lib/constants/validation-message';
-import { ApiResponseDataSchema } from '@/lib/schemas/ApiResponse.schema';
+import { messages } from '@/utils/constants/messages';
+import { validationMessages } from '@/utils/constants/validation-message';
+import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
 import { z } from '@hono/zod-openapi';
 
 /**======================

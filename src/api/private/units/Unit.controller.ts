@@ -1,9 +1,9 @@
-import { honoApp } from '@/lib/utils/hono';
+import { honoApp } from '@/utils/helpers/hono';
 import { UnitCheckRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from 'src/api/private/units/Unit.route';
 import { UnitService } from './Unit.service';
-import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { messages } from '@/lib/constants/messages';
-import { Meta } from '@/lib/dtos/Meta.dto';
+import { ApiResponse, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
+import { messages } from '@/utils/constants/messages';
+import { Meta } from '@/utils/dtos/Meta.dto';
 
 const UnitController = honoApp()
 

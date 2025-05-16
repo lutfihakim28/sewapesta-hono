@@ -2,13 +2,13 @@ import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 import dayjs from 'dayjs';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { messages } from '@/lib/constants/messages';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
+import { messages } from '@/utils/constants/messages';
 import { categoryColumns } from './Category.column';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
-import { UniqueCheck } from '@/lib/schemas/UniqueCheck.schema';
+import { BadRequestException } from '@/utils/exceptions/BadRequestException';
+import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 
 export class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {

@@ -1,10 +1,10 @@
 import { db } from 'db';
 import { and, count, eq, like } from 'drizzle-orm';
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 import { subdistricts } from 'db/schema/subdistricts';
 import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
-import { messages } from '@/lib/constants/messages';
+import { BadRequestException } from '@/utils/exceptions/BadRequestException';
+import { messages } from '@/utils/constants/messages';
 
 export class SubdistrictService {
   static async list(query: SubdistrictFilter): Promise<Subdistrict[]> {

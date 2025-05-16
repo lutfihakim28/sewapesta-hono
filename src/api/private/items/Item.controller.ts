@@ -1,10 +1,10 @@
-import { honoApp } from '@/lib/utils/hono';
+import { honoApp } from '@/utils/helpers/hono';
 import { ItemCreateRoute, ItemDeleteRoute, ItemDetailRoute, ItemListRoute, ItemUpdateRoute } from 'src/api/private/items/Item.route';
 import { ItemService } from './Item.service';
-import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
-import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { Meta } from '@/lib/dtos/Meta.dto';
-import { messages } from '@/lib/constants/messages';
+import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
+import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
+import { Meta } from '@/utils/dtos/Meta.dto';
+import { messages } from '@/utils/constants/messages';
 
 const ItemController = honoApp()
 

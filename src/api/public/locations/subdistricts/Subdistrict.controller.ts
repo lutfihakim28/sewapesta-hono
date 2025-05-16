@@ -1,9 +1,9 @@
-import { messages } from '@/lib/constants/messages';
-import { honoApp } from '@/lib/utils/hono';
-import { Meta } from '@/lib/dtos/Meta.dto';
+import { messages } from '@/utils/constants/messages';
+import { honoApp } from '@/utils/helpers/hono';
+import { Meta } from '@/utils/dtos/Meta.dto';
 import { SubdistrictRoute } from 'src/api/public/locations/subdistricts/Subdistrict.route';
 import { SubdistrictService } from './Subdistrict.service';
-import { ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
+import { ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 
 const SubdistrictController = honoApp()
 

@@ -1,10 +1,10 @@
-import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
+import { StockMutationTypeEnum } from '@/utils/enums/StockMutationType.Enum';
 import { faker } from '@faker-js/faker';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { stockMutations } from 'db/schema/inventory-mutations';
 import { itemsOwners } from 'db/schema/items-owners';
-import { StockMutationDefaultDescriptionEnum } from '@/lib/enums/StockMutationDefaultDescriptionEnum';
+import { StockMutationDefaultDescriptionEnum } from '@/utils/enums/StockMutationDefaultDescriptionEnum';
 
 type ItemOwnerSeedProp = {
   ownersId: number[];

@@ -1,11 +1,11 @@
-import { messages } from '@/lib/constants/messages';
-import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
-import { ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
-import { SearchSchema } from '@/lib/schemas/Search.schema';
+import { messages } from '@/utils/constants/messages';
+import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
+import { ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
+import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { z } from '@hono/zod-openapi';
 import { subdistricts } from 'db/schema/subdistricts';
 import { createSelectSchema } from 'drizzle-zod';
-import { validationMessages } from '@/lib/constants/validation-message';
+import { validationMessages } from '@/utils/constants/validation-message';
 
 const SubdistrictSchema = createSelectSchema(subdistricts)
   .omit({ districtCode: true })

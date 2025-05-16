@@ -1,9 +1,9 @@
-import { messages } from '@/lib/constants/messages';
-import { honoApp } from '@/lib/utils/hono';
-import { Meta } from '@/lib/dtos/Meta.dto';
+import { messages } from '@/utils/constants/messages';
+import { honoApp } from '@/utils/helpers/hono';
+import { Meta } from '@/utils/dtos/Meta.dto';
 import { DistrictRoute } from 'src/api/public/locations/districts/District.route';
 import { DistrictService } from './District.service';
-import { ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
+import { ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 
 const DistrictController = honoApp()
 

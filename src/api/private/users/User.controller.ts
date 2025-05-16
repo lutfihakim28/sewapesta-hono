@@ -1,13 +1,13 @@
-import { honoApp } from '@/lib/utils/hono';
+import { honoApp } from '@/utils/helpers/hono';
 import { UserChangePasswordRoute, UserCreateRoute, UserDeleteRoute, UserDetailRoute, UserListRoute, UserRoleUpdateRoute, UserUpdateRoute } from './User.route';
 import { UserService } from './User.service';
-import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { messages } from '@/lib/constants/messages';
-import { Meta } from '@/lib/dtos/Meta.dto';
-import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { ForbiddenException } from '@/lib/exceptions/ForbiddenException';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
+import { messages } from '@/utils/constants/messages';
+import { Meta } from '@/utils/dtos/Meta.dto';
+import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
+import { ForbiddenException } from '@/utils/exceptions/ForbiddenException';
+import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 
 const UserController = honoApp();
 

@@ -1,8 +1,8 @@
-import { honoApp } from '@/lib/utils/hono';
+import { honoApp } from '@/utils/helpers/hono';
 import { InventoryService } from './Inventory.service';
-import { messages } from '@/lib/constants/messages';
-import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { Meta } from '@/lib/dtos/Meta.dto';
+import { messages } from '@/utils/constants/messages';
+import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
+import { Meta } from '@/utils/dtos/Meta.dto';
 import { InventoryCreateRoute, InventoryDeleteRoute, InventoryDetailRoute, InventoryListRoute, InventoryUpdateRoute } from './Inventory.route';
 
 const InventoryController = honoApp()

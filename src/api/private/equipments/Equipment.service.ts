@@ -5,21 +5,21 @@ import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
 import { db } from 'db';
 import { users } from 'db/schema/users';
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 import { equipmentColumns } from './Equipment.column';
 import { itemColumns } from '../items/Item.column';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { messages } from '@/lib/constants/messages';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
+import { messages } from '@/utils/constants/messages';
 import { UserService } from '../users/User.service';
 import { ItemService } from '../items/Item.service';
-import { generateNumber } from '@/lib/utils/generate-number';
+import { generateNumber } from '@/utils/helpers/generate-number';
 import { categories } from 'db/schema/categories';
 import { units } from 'db/schema/units';
 import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
 import dayjs from 'dayjs';
-import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
 
 export class EquipmentService {
   static async list(query: EquipmentFilter): Promise<[EquipmentList, number]> {

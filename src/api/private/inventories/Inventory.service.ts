@@ -7,16 +7,16 @@ import { db } from 'db';
 import { users } from 'db/schema/users';
 import { categories } from 'db/schema/categories';
 import { units } from 'db/schema/units';
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 import { inventoryColumns } from './Inventory.column';
 import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { messages } from '@/lib/constants/messages';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
+import { messages } from '@/utils/constants/messages';
 import { ItemService } from '../items/Item.service';
-import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
+import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { UserService } from '../users/User.service';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
 import dayjs from 'dayjs';
 
 export class InventoryService {

@@ -3,19 +3,19 @@ import { users } from 'db/schema/users';
 import { and, asc, count, desc, eq, inArray, isNull, like, or, SQL } from 'drizzle-orm';
 import { ProfileColumn, ProfileRequest, sortableUserColumns, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserListColumn, UserRoleSchema, UserRoleUpdate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
-import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
-import { messages } from '@/lib/constants/messages';
+import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
+import { messages } from '@/utils/constants/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { profileColumns, userColumns } from './User.column';
 import { locationQuery } from '@/api/public/locations/Location.query';
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 import dayjs from 'dayjs';
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
-import { RoleEnum } from '@/lib/enums/RoleEnum';
-import { validationMessages } from '@/lib/constants/validation-message';
+import { BadRequestException } from '@/utils/exceptions/BadRequestException';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
+import { validationMessages } from '@/utils/constants/validation-message';
 import { usersRoles } from 'db/schema/users-roles';
-import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
+import { buildJsonGroupArray } from '@/utils/helpers/build-json-group-array';
 
 export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {

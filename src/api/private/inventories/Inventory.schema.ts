@@ -5,13 +5,13 @@ import { CategorySchema } from '../categories/Category.schema';
 import { ItemSchema } from '../items/Item.schema';
 import { UnitSchema } from '../units/Unit.schema';
 import { UserExtendedSchema } from '../users/User.schema';
-import { SearchSchema } from '@/lib/schemas/Search.schema';
-import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
-import { SortSchema } from '@/lib/schemas/Sort.schema';
-import { NumericSchema } from '@/lib/schemas/Numeric.schema';
-import { validationMessages } from '@/lib/constants/validation-message';
-import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
-import { messages } from '@/lib/constants/messages';
+import { SearchSchema } from '@/utils/schemas/Search.schema';
+import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
+import { SortSchema } from '@/utils/schemas/Sort.schema';
+import { NumericSchema } from '@/utils/schemas/Numeric.schema';
+import { validationMessages } from '@/utils/constants/validation-message';
+import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
+import { messages } from '@/utils/constants/messages';
 
 export type InventoryColumn = keyof typeof inventories.$inferSelect;
 

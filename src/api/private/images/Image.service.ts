@@ -1,5 +1,5 @@
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { pinoLogger } from '@/lib/utils/logger';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
+import { pinoLogger } from '@/utils/helpers/logger';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { images } from 'db/schema/images';

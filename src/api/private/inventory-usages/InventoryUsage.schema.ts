@@ -3,14 +3,14 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { ItemSchema } from '../items/Item.schema';
 import { UserExtendedSchema } from '../users/User.schema';
 import { z } from 'zod';
-import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
-import { SearchSchema } from '@/lib/schemas/Search.schema';
-import { DateRangeSchema } from '@/lib/schemas/DateRange.schema';
-import { SortSchema } from '@/lib/schemas/Sort.schema';
-import { NumericSchema } from '@/lib/schemas/Numeric.schema';
-import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
-import { messages } from '@/lib/constants/messages';
-import { validationMessages } from '@/lib/constants/validation-message';
+import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
+import { SearchSchema } from '@/utils/schemas/Search.schema';
+import { DateRangeSchema } from '@/utils/schemas/DateRange.schema';
+import { SortSchema } from '@/utils/schemas/Sort.schema';
+import { NumericSchema } from '@/utils/schemas/Numeric.schema';
+import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
+import { messages } from '@/utils/constants/messages';
+import { validationMessages } from '@/utils/constants/validation-message';
 
 export type inventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
 

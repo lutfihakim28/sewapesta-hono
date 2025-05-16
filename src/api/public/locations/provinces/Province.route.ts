@@ -1,6 +1,6 @@
 import { createRoute } from '@hono/zod-openapi'
 import { ProvinceFilterSchema, ProvinceResponseListSchema } from './Province.schema'
-import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
+import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
 
 export const ProvinceRoute = createRoute({
   method: 'get',

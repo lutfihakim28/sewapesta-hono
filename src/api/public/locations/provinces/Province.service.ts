@@ -2,7 +2,7 @@ import { db } from 'db';
 import { provinces } from 'db/schema/provinces';
 import { count, like } from 'drizzle-orm';
 import { Province, ProvinceFilter } from './Province.schema';
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 
 export class ProvinceService {
   static async list(query: ProvinceFilter): Promise<Province[]> {

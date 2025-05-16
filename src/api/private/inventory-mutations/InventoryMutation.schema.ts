@@ -3,13 +3,13 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { ItemSchema } from '../items/Item.schema';
 import { UserExtendedSchema } from '../users/User.schema';
-import { SearchSchema } from '@/lib/schemas/Search.schema';
-import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
-import { NumericSchema } from '@/lib/schemas/Numeric.schema';
-import { validationMessages } from '@/lib/constants/validation-message';
-import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
-import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
-import { messages } from '@/lib/constants/messages';
+import { SearchSchema } from '@/utils/schemas/Search.schema';
+import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
+import { NumericSchema } from '@/utils/schemas/Numeric.schema';
+import { validationMessages } from '@/utils/constants/validation-message';
+import { StockMutationTypeEnum } from '@/utils/enums/StockMutationType.Enum';
+import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
+import { messages } from '@/utils/constants/messages';
 
 export type InventoryMutaionColumn = keyof typeof inventoryMutations.$inferSelect
 

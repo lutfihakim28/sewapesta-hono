@@ -1,4 +1,4 @@
-import { BadRequestException } from '@/lib/exceptions/BadRequestException';
+import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { pinoLogger } from './logger';
 

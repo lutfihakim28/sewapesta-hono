@@ -1,4 +1,4 @@
-import { OvertimeTypeEnum } from '@/lib/enums/OvertimeTypeEnum'
+import { OvertimeTypeEnum } from '@/utils/enums/OvertimeTypeEnum'
 import { faker } from '@faker-js/faker'
 import { db } from 'db'
 import { productsItems } from 'db/schema/products-items'

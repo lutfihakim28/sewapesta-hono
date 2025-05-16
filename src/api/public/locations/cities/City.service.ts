@@ -1,4 +1,4 @@
-import { countOffset } from '@/lib/utils/count-offset';
+import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
 import { cities } from 'db/schema/cities';
 import { and, count, eq, like } from 'drizzle-orm';

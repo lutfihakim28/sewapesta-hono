@@ -1,4 +1,4 @@
-import { pinoLogger } from '@/lib/utils/logger';
+import { pinoLogger } from '@/utils/helpers/logger';
 import { Database } from 'bun:sqlite';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 
@@ -9,10 +9,10 @@ export const db = drizzle(connection, {
       if (query.toLowerCase().includes('create table')) return;
       if (query.toLowerCase().includes('create index')) return;
       if (query.toLowerCase().includes('create unique index')) return;
-      if (query.toLowerCase().includes('insert into \"provinces\"')) return;
-      if (query.toLowerCase().includes('insert into \"cities\"')) return;
-      if (query.toLowerCase().includes('insert into \"districts\"')) return;
-      if (query.toLowerCase().includes('insert into \"subdistricts\"')) return;
+      if (query.toLowerCase().includes('insert into "provinces"')) return;
+      if (query.toLowerCase().includes('insert into "cities"')) return;
+      if (query.toLowerCase().includes('insert into "districts"')) return;
+      if (query.toLowerCase().includes('insert into "subdistricts"')) return;
       pinoLogger.info({ sql: query, params }, 'Executing SQL Query');
     },
   },

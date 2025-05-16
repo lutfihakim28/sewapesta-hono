@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
-import { SuccessSchema } from '@/lib/schemas/Success.schema'
-import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
-import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
+import { SuccessSchema } from '@/utils/schemas/Success.schema'
+import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
+import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
 import { ProfileRequestSchema, UserChangePasswordSchema, UserCreateSchema, UserFilterSchema, UserResponseDataSchema, UserResponseListSchema, UserRoleUpdateSchema } from './User.schema'
 
 const tag = 'User'

@@ -1,9 +1,9 @@
-import { messages } from '@/lib/constants/messages';
-import { honoApp } from '@/lib/utils/hono';
+import { messages } from '@/utils/constants/messages';
+import { honoApp } from '@/utils/helpers/hono';
 import { ProvinceRoute } from 'src/api/public/locations/provinces/Province.route';
 import { ProvinceService } from './Province.service';
-import { Meta } from '@/lib/dtos/Meta.dto';
-import { ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
+import { Meta } from '@/utils/dtos/Meta.dto';
+import { ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 
 const ProvinceController = honoApp()
 

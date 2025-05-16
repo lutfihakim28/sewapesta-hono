@@ -1,7 +1,7 @@
-import { messages } from '@/lib/constants/messages';
-import { validationMessages } from '@/lib/constants/validation-message';
-import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
-import { ApiResponseDataSchema } from '@/lib/schemas/ApiResponse.schema';
+import { messages } from '@/utils/constants/messages';
+import { validationMessages } from '@/utils/constants/validation-message';
+import { ImageReferenceEnum } from '@/utils/enums/ImageReference.Enum';
+import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
 import { images } from 'db/schema/images';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from '@hono/zod-openapi';

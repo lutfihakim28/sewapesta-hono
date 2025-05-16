@@ -1,6 +1,6 @@
 import { createRoute } from '@hono/zod-openapi'
 import { SubdistrictFilterSchema, SubdistrictResponseListSchema } from './Subdistrict.schema'
-import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
+import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
 
 export const SubdistrictRoute = createRoute({
   method: 'get',

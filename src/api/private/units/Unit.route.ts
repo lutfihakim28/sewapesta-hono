@@ -1,9 +1,9 @@
 import { createRoute } from '@hono/zod-openapi'
-import { SuccessSchema } from '@/lib/schemas/Success.schema'
-import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto'
+import { SuccessSchema } from '@/utils/schemas/Success.schema'
+import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
 import { UnitFilterSchema, UnitRequestSchema, UnitResponseSchema } from './Unit.schema'
-import { ParamIdSchema } from '@/lib/schemas/ParamId.schema'
-import { UniqueCheckSchema } from '@/lib/schemas/UniqueCheck.schema'
+import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
+import { UniqueCheckSchema } from '@/utils/schemas/UniqueCheck.schema'
 
 const tag = 'Unit'
 

@@ -1,4 +1,4 @@
-import { StockMutationTypeEnum } from '@/lib/enums/StockMutationType.Enum';
+import { StockMutationTypeEnum } from '@/utils/enums/StockMutationType.Enum';
 import { timestamps } from 'db/schema/timestamps.helper';
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import dayjs from 'dayjs';

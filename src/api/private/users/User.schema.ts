@@ -4,14 +4,14 @@ import { z } from '@hono/zod-openapi'
 
 import { LocationSchema } from '@/api/public/locations/Location.schema'
 import { profiles } from 'db/schema/profiles'
-import { validationMessages } from '@/lib/constants/validation-message'
-import { PhoneSchema } from '@/lib/schemas/Phone.schema'
-import { ApiResponseDataSchema, ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema'
-import { messages } from '@/lib/constants/messages'
-import { RoleEnum } from '@/lib/enums/RoleEnum'
-import { SearchSchema } from '@/lib/schemas/Search.schema'
-import { PaginationSchema } from '@/lib/schemas/Pagination.schema'
-import { SortSchema } from '@/lib/schemas/Sort.schema'
+import { validationMessages } from '@/utils/constants/validation-message'
+import { PhoneSchema } from '@/utils/schemas/Phone.schema'
+import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema'
+import { messages } from '@/utils/constants/messages'
+import { RoleEnum } from '@/utils/enums/RoleEnum'
+import { SearchSchema } from '@/utils/schemas/Search.schema'
+import { PaginationSchema } from '@/utils/schemas/Pagination.schema'
+import { SortSchema } from '@/utils/schemas/Sort.schema'
 
 export type UserColumn = keyof typeof users.$inferSelect
 export type ProfileColumn = keyof typeof profiles.$inferSelect

@@ -1,8 +1,8 @@
-import { honoApp } from '@/lib/utils/hono';
+import { honoApp } from '@/utils/helpers/hono';
 import { EquipmentCreateRoute, EquipmentDeleteRoute, EquipmentDetailRoute, EquipmentListRoute, EquipmentUpdateRoute } from './Equipment.route';
-import { ApiResponse, ApiResponseData, ApiResponseList } from '@/lib/dtos/ApiResponse.dto';
-import { messages } from '@/lib/constants/messages';
-import { Meta } from '@/lib/dtos/Meta.dto';
+import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
+import { messages } from '@/utils/constants/messages';
+import { Meta } from '@/utils/dtos/Meta.dto';
 import { EquipmentService } from './Equipment.service';
 
 const EquipmentController = honoApp()

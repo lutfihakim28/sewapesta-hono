@@ -1,5 +1,5 @@
 import app from 'index'
-import { ApiResponse, ApiResponseList } from '@/lib/dtos/ApiResponse.dto'
+import { ApiResponse, ApiResponseList } from '@/utils/dtos/ApiResponse.dto'
 import { describe, expect, test } from 'bun:test'
 import { Province } from './provinces/Province.schema'
 import { City } from './cities/City.schema'

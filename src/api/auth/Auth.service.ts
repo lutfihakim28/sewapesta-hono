@@ -1,17 +1,17 @@
-import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
+import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
 import { db } from 'db';
 import { users } from 'db/schema/users';
 import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 import { JWTPayload } from 'hono/utils/jwt/types';
-import { messages } from '@/lib/constants/messages';
-import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
+import { messages } from '@/utils/constants/messages';
+import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
 import { LoginData, RefreshRequest } from './Auth.schema';
 import { UserService } from '../private/users/User.service';
 import { userColumns } from '../private/users/User.column';
 import { usersRoles } from 'db/schema/users-roles';
-import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
-import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { buildJsonGroupArray } from '@/utils/helpers/build-json-group-array';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { UserRoleSchema } from '../private/users/User.schema';
 
 export abstract class AuthService {

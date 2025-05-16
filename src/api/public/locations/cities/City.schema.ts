@@ -1,12 +1,12 @@
-import { messages } from '@/lib/constants/messages';
-import { PaginationSchema } from '@/lib/schemas/Pagination.schema';
-import { ApiResponseListSchema } from '@/lib/schemas/ApiResponse.schema';
-import { SearchSchema } from '@/lib/schemas/Search.schema';
+import { messages } from '@/utils/constants/messages';
+import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
+import { ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
+import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { z } from '@hono/zod-openapi';
 import { cities } from 'db/schema/cities';
 import { createSelectSchema } from 'drizzle-zod';
 // import { ProvinceSchema } from '../provinces/Province.schema';
-import { validationMessages } from '@/lib/constants/validation-message';
+import { validationMessages } from '@/utils/constants/validation-message';
 
 const CitySchema = createSelectSchema(cities)
   .omit({ provinceCode: true })

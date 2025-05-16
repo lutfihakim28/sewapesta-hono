@@ -2,7 +2,7 @@ import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core
 import { timestamps } from './timestamps.helper';
 import { products } from './products';
 import { users } from './users';
-import { PackageTermEnum } from '@/lib/enums/PackageTermEnum';
+import { PackageTermEnum } from '@/utils/enums/PackageTermEnum';
 
 export const packages = sqliteTable('packages', {
   id: integer('id').primaryKey({ autoIncrement: true }),

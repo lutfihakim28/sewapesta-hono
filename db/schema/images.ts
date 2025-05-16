@@ -1,4 +1,4 @@
-import { ImageReferenceEnum } from '@/lib/enums/ImageReference.Enum';
+import { ImageReferenceEnum } from '@/utils/enums/ImageReference.Enum';
 import dayjs from 'dayjs';
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
