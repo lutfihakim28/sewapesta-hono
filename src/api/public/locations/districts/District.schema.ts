@@ -5,7 +5,7 @@ import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { z } from '@hono/zod-openapi';
 import { districts } from 'db/schema/districts';
 import { createSelectSchema } from 'drizzle-zod';
-import { validationMessages } from '@/utils/constants/validation-message';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 const DistrictSchema = createSelectSchema(districts)
   .omit({ cityCode: true })
@@ -17,7 +17,7 @@ const DistrictSchema = createSelectSchema(districts)
 //   .openapi('DistrictExtended');
 export const DistrictFilterSchema = z
   .object({
-    cityCode: z.string({ message: validationMessages.required('City code') }).openapi({ example: '33.74' })
+    cityCode: new StringSchema('City code').schema.openapi({ example: '33.74' })
   })
   .merge(SearchSchema)
   .merge(PaginationSchema)

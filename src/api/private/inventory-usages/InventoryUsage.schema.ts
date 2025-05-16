@@ -7,10 +7,10 @@ import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { DateRangeSchema } from '@/utils/schemas/DateRange.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
-import { NumericSchema } from '@/utils/schemas/Numeric.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 export type inventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
 
@@ -35,8 +35,8 @@ export const InventoryUsageFilterSchema = PaginationSchema
   .merge(SearchSchema)
   .merge(DateRangeSchema)
   .extend({
-    ownerId: NumericSchema('Owner ID', 1).optional(),
-    itemId: NumericSchema('Owner ID', 1).optional(),
+    ownerId: new StringSchema('Owner ID').numeric({ min: 1 }).optional(),
+    itemId: new StringSchema('Item ID').numeric({ min: 1 }).optional(),
   })
   .openapi('InventoryUsageFilter')
 
@@ -44,9 +44,7 @@ export const InventoryUsageResponseListSchema = ApiResponseListSchema(InventoryU
 export const InventoryUsageResponseDataSchema = ApiResponseDataSchema(InventoryUsageSchema, messages.successDetail('inventory usages'))
 
 export const InventoryUsageRequestSchema = createInsertSchema(inventoryUsages, {
-  description: z.string({
-    invalid_type_error: validationMessages.string('Description'),
-  }),
+  description: new StringSchema('Description').optional().schema,
   inventoryId: z.number({
     invalid_type_error: validationMessages.number('Inventory ID'),
     required_error: validationMessages.required('Inventory ID')

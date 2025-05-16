@@ -7,7 +7,7 @@ import { z } from '@hono/zod-openapi';
 import { products } from 'db/schema/products';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
-import { NumericSchema } from '@/utils/schemas/Numeric.schema';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
@@ -25,10 +25,7 @@ export const sortableProductColumn: ProductListColumn[] = [
   'name'
 ]
 
-export const ProductFilterSchema = z.object({
-  branchId: NumericSchema('Branch ID').optional()
-})
-  .merge(SearchSchema)
+export const ProductFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .merge(SortSchema(sortableProductColumn))
   .openapi('ProductFilter')
@@ -38,10 +35,7 @@ const ProductListSchema = z.array(ProductSchema)
 export const ProductResponseListSchema = ApiResponseListSchema(ProductListSchema, messages.successList('products'))
 
 export const ProductRequestSchema = createInsertSchema(products, {
-  name: z.string({
-    required_error: validationMessages.required('Name'),
-    invalid_type_error: validationMessages.string('Name'),
-  }),
+  name: new StringSchema('Name').schema,
 }).pick({
   name: true,
 }).openapi('ProductRequest')

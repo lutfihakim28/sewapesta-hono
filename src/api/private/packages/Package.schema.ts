@@ -2,7 +2,6 @@ import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { PackageTermEnum } from '@/utils/enums/PackageTermEnum';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { NumericSchema } from '@/utils/schemas/Numeric.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
@@ -11,6 +10,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { UserExtendedSchema } from '../users/User.schema';
 import { ProductSchema } from '../products/Product.schema';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -50,8 +50,8 @@ export const PackageFilterSchema = SearchSchema
   .merge(SortSchema(sortablePackageColumns))
   .merge(PaginationSchema)
   .extend({
-    ownerId: NumericSchema('Owner ID').optional(),
-    productId: NumericSchema('Product ID').optional(),
+    ownerId: new StringSchema('Owner ID').numeric({ min: 1 }).optional(),
+    productId: new StringSchema('Product ID').numeric({ min: 1 }).optional(),
     term: z.nativeEnum(PackageTermEnum, {
       invalid_type_error: validationMessages.enum('Term', PackageTermEnum)
     }).optional()
@@ -63,10 +63,7 @@ export const PackageRequestSchema = createInsertSchema(packages, {
     invalid_type_error: validationMessages.boolean('Include employee'),
     required_error: validationMessages.required('Include employee')
   }),
-  name: z.string({
-    invalid_type_error: validationMessages.string('Name'),
-    required_error: validationMessages.required('Name'),
-  }),
+  name: new StringSchema('Name').schema,
   ownerId: z.number({
     invalid_type_error: validationMessages.number('Owner ID'),
     required_error: validationMessages.required('Owner ID')

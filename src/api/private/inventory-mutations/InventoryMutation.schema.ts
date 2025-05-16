@@ -5,11 +5,11 @@ import { ItemSchema } from '../items/Item.schema';
 import { UserExtendedSchema } from '../users/User.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
-import { NumericSchema } from '@/utils/schemas/Numeric.schema';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { StockMutationTypeEnum } from '@/utils/enums/StockMutationType.Enum';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { messages } from '@/utils/constants/messages';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 export type InventoryMutaionColumn = keyof typeof inventoryMutations.$inferSelect
 
@@ -39,15 +39,13 @@ export const InventoryMutationListSchema = z.array(InventoryMutationSchema.exten
 export const InventoryMutationFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .extend({
-    ownerId: NumericSchema('Owner ID').optional(),
-    itemId: NumericSchema('Item ID').optional(),
+    ownerId: new StringSchema('Owner ID').numeric({ min: 1 }).optional(),
+    itemId: new StringSchema('Item ID').numeric({ min: 1 }).optional(),
   })
   .openapi('InventoryMutationFilter')
 
 export const InventoryMutationRequestSchema = createInsertSchema(inventoryMutations, {
-  description: z.string({
-    invalid_type_error: validationMessages.string('Description')
-  }).optional(),
+  description: new StringSchema('Description').optional().schema,
   inventoryId: z.number({
     invalid_type_error: validationMessages.number('Inventory item ID'),
     required_error: validationMessages.required('Inventory item ID')

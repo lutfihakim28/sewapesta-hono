@@ -2,6 +2,7 @@ import { UserSchema } from '@/api/private/users/User.schema';
 import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
+import { StringSchema } from '@/utils/schemas/String.schema';
 import { z } from '@hono/zod-openapi';
 
 /**======================
@@ -9,24 +10,18 @@ import { z } from '@hono/zod-openapi';
  *========================**/
 
 export const LoginRequestSchema = z.object({
-  username: z.string({
-    required_error: validationMessages.required('Username'),
-    invalid_type_error: validationMessages.string('Username')
-  }).openapi({
+  username: new StringSchema('Username').schema.openapi({
     example: 'superadmin',
   }),
-  password: z
-    .string({
-      required_error: validationMessages.required('Password'),
-      invalid_type_error: validationMessages.string('Password')
-    })
+  password: new StringSchema('Password')
+    .schema
     .openapi({
       example: 'password',
     }),
 }).openapi('Login');
 export const LoginDataSchema = z.object({
-  token: z
-    .string()
+  token: new StringSchema('Token')
+    .schema
     .openapi({
       example: 'eyJH*************',
     }),
@@ -57,7 +52,7 @@ export type RefreshRequest = z.infer<typeof RefreshRequestSchema>
 /*==== END OF REFRESH ====*/
 
 export const CheckUsernameSchema = z.object({
-  username: z.string()
+  username: new StringSchema('Username').schema
 })
 
 export type CheckUsername = z.infer<typeof CheckUsernameSchema>

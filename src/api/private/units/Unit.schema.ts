@@ -1,11 +1,11 @@
 import { messages } from '@/utils/constants/messages';
-import { validationMessages } from '@/utils/constants/validation-message';
 import { ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { units } from 'db/schema/units';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from '@hono/zod-openapi';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 export const UnitSchema = createSelectSchema(units)
   .pick({
@@ -15,10 +15,7 @@ export const UnitSchema = createSelectSchema(units)
   .openapi('Unit')
 
 export const UnitRequestSchema = createInsertSchema(units, {
-  name: z.string({
-    required_error: validationMessages.required('Name'),
-    invalid_type_error: validationMessages.string('Name')
-  }),
+  name: new StringSchema('Name').schema,
 })
   .pick({
     name: true,

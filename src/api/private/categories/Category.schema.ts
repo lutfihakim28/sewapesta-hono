@@ -6,6 +6,7 @@ import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { categories } from 'db/schema/categories';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from '@hono/zod-openapi';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 export const CategorySchema = createSelectSchema(categories)
   .pick({
@@ -15,10 +16,7 @@ export const CategorySchema = createSelectSchema(categories)
   .openapi('Category')
 
 export const CategoryRequestSchema = createInsertSchema(categories, {
-  name: z.string({
-    required_error: validationMessages.required('Name'),
-    invalid_type_error: validationMessages.string('Name')
-  }),
+  name: new StringSchema('Name').schema,
 })
   .pick({
     name: true,

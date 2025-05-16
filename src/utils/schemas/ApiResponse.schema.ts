@@ -1,12 +1,13 @@
 import { z } from '@hono/zod-openapi';
 import { MetaSchema } from './Meta.schema';
+import { StringSchema } from './String.schema';
 
 export function ApiResponseSchema(message: string, code: number = 200) {
   return z.object({
     code: z.number().openapi({
       example: code,
     }),
-    messages: z.array(z.string()).openapi({ example: [message] })
+    messages: z.array(new StringSchema('Message').schema).openapi({ example: [message] })
   })
 }
 

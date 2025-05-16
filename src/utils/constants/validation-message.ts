@@ -11,8 +11,9 @@ export const validationMessages = {
   nonNegativeNumber: (field: string) => `${field} should be valid non negative number.`,
   maxNumber: (field: string, max: number) => `Maximum ${field} is ${max}.`,
   minNumber: (field: string, min: number) => `Minimum ${field} is ${min}.`,
-  minLength: (field: string, length: number) => `${field} should be minimum ${length} length.`,
-  maxLength: (field: string, length: number) => `${field} should be maximum ${length} length.`,
+  minLength: (field: string, length: number) => `${field} should be minimum ${length} characters length.`,
+  length: (field: string, length: number) => `${field} should be exactly has ${length} charactes length.`,
+  maxLength: (field: string, length: number) => `${field} should be maximum ${length} characters length.`,
   enum: (field: string, enums: EnumLike) => `${field} should be one of [${Object.values(enums)}].`,
   array: (field: string) => `${field} should be an array.`
 }
