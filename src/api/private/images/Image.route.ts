@@ -5,6 +5,7 @@ import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto';
 export const ImageUploadRoute = createRoute({
   method: 'post',
   path: '/',
+  description: 'Upload single file of image.',
   tags: ['Image'],
   request: {
     body: {

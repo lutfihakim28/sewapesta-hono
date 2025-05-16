@@ -4,7 +4,7 @@ import { HTTPException } from 'hono/http-exception'
 import { jwt, } from 'hono/jwt'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
 import { logger } from 'hono/logger'
-import { logger as pinoLogger } from '@/lib/utils/logger'
+import { pinoLogger } from '@/lib/utils/logger'
 import { messages } from '@/lib/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/bun'
@@ -28,6 +28,7 @@ import EquipmentController from '@/api/private/equipments/Equipment.controller'
 import PackageController from '@/api/private/packages/Package.controller'
 import InventoryController from '@/api/private/inventories/Inventory.controller'
 import InventoryMutationController from '@/api/private/inventory-mutations/InventoryMutation.controller'
+import { Scalar } from '@scalar/hono-api-reference'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -127,6 +128,8 @@ app.get(
     persistAuthorization: true,
   })
 )
+
+app.get('/scalar', Scalar({ url: '/docs', theme: 'alternate' }))
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'bearerAuth', {
   type: 'http',

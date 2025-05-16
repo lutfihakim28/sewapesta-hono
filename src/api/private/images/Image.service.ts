@@ -1,5 +1,5 @@
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
-import { logger } from '@/lib/utils/logger';
+import { pinoLogger } from '@/lib/utils/logger';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { images } from 'db/schema/images';
@@ -40,7 +40,7 @@ export class ImageService {
         const newPath = _newPath.join('/');
         await Bun.write(newPath, file);
 
-        logger.debug({
+        pinoLogger.debug({
           path: newPath,
           url: `${Bun.env.APP_URL}/${newPath}`,
           reference: request.reference,
@@ -56,14 +56,14 @@ export class ImageService {
       } catch (error) {
         if (attempt < 3) {
           const delay = attempt * 1000;
-          logger.warn({
+          pinoLogger.warn({
             path,
             attempt
           }, `Retrying ${path} in ${delay / 1000}s (Attempt ${attempt + 1})...`)
           await new Promise((resolve) => setTimeout(resolve, delay));
           await processFile(path, attempt + 1);
         } else {
-          logger.error({
+          pinoLogger.error({
             path,
             error,
           }, `Retrying ${path} (Attempt ${attempt + 1})...`)

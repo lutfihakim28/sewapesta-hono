@@ -1,4 +1,4 @@
-import { createRoute, z } from '@hono/zod-openapi';
+import { createRoute } from '@hono/zod-openapi';
 import { LoginRequestSchema, LoginResponseSchema, RefreshRequestSchema } from './Auth.schema';
 import { SuccessSchema } from '@/lib/schemas/Success.schema';
 import { OpenApiResponse } from '@/lib/dtos/OpenApiResponse.dto';
@@ -25,6 +25,7 @@ export const LoginRoute = createRoute({
 export const RefreshRoute = createRoute({
   method: 'put',
   path: '/refresh',
+  description: 'Refresh the expired user\'s token.',
   tags: ['Auth'],
   request: {
     body: {

@@ -1,31 +1,29 @@
 import { messages } from '@/lib/constants/messages';
-import { SortEnum } from '@/lib/enums/SortEnum';
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
 import { db } from 'db';
 import { products } from 'db/schema/products';
-import { and, asc, count, desc, eq, isNull, like } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
 import { productColumns } from './Product.column';
-import { Product, ProductColumn, ProductFilter, ProductRequest } from './Product.schema';
+import { Product, ProductColumn, ProductFilter, ProductListColumn, ProductRequest, sortableProductColumn } from './Product.schema';
 
 export abstract class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
-    let sort: SortEnum = SortEnum.Ascending;
-    let sortBy: ProductColumn = 'id';
+    let orders: SQL<unknown>[] = [];
 
-    if (query.sort) {
-      sort = query.sort
-    }
+    query.asc.forEach((col) => {
+      if (!sortableProductColumn.includes(col as ProductListColumn)) return;
+      if (query.desc.includes(col as ProductListColumn)) return;
+      orders.push(asc(products[col as ProductColumn]))
+    })
 
-    if (query.sortBy) {
-      sortBy = query.sortBy
-    }
-
-    const orderBy = sort === SortEnum.Ascending
-      ? asc(products[sortBy])
-      : desc(products[sortBy])
+    query.desc.forEach((col) => {
+      if (!sortableProductColumn.includes(col as ProductListColumn)) return;
+      if (query.asc.includes(col as ProductListColumn)) return;
+      orders.push(desc(products[col as ProductColumn]))
+    })
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(products.deletedAt),
@@ -41,7 +39,7 @@ export abstract class ProductService {
       db.select(productColumns)
         .from(products)
         .where(and(...conditions))
-        .orderBy(orderBy)
+        .orderBy(...orders)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db

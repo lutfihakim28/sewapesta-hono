@@ -20,6 +20,7 @@
   "dependencies": {
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.12.2",
+    "@scalar/hono-api-reference": "^0.8.10",
     "dayjs": "^1.11.13",
     "drizzle-orm": "^0.40.1",
     "drizzle-zod": "^0.5.1",

@@ -74,18 +74,18 @@ export const UserExtendedSchema = UserSchema
   .merge(ProfileExtendedSchema)
   .openapi('UserExtended')
 
+const UserListSchema = z.array(UserExtendedSchema)
+
+export type UserListColumn = keyof Pick<z.infer<typeof UserExtendedSchema>, 'id' | 'name' | 'phone' | 'username'>
+export const sortableUserColumns: UserListColumn[] = ['id', 'name', 'phone', 'username']
+
 export const UserFilterSchema = z.object({
   role: UserRoleSchema.optional()
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
-  .merge(SortSchema<UserColumn | ProfileColumn>([
-    'id',
-    'name',
-    'username',
-  ])).openapi('UserFilter')
+  .merge(SortSchema(sortableUserColumns)).openapi('UserFilter')
 
-const UserListSchema = z.array(UserExtendedSchema)
 
 export const UserResponseListSchema = ApiResponseListSchema(UserListSchema, messages.successList('users'))
 

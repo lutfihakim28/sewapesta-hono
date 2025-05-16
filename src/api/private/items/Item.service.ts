@@ -1,7 +1,6 @@
-import { Item, ItemFilter, ItemRequest } from './Item.schema';
-import { buildOrderBy } from '@/lib/utils/build-order-by';
+import { Item, ItemColumn, ItemFilter, ItemListColumn, ItemRequest, sortableItemColumns } from './Item.schema';
 import { items } from 'db/schema/items';
-import { and, count, eq, isNull, like } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
 import { db } from 'db';
 import { itemColumns } from './Item.column';
 import { categories } from 'db/schema/categories';
@@ -18,7 +17,21 @@ import { ItemTypeEnum } from '@/lib/enums/ItemTypeEnum';
 
 export class ItemService {
   static async list(query: ItemFilter): Promise<[Item[], number]> {
-    const orderBy = buildOrderBy(items, query.sortBy || 'id', query.sort);
+    let orders: SQL<unknown>[] = [];
+
+    query.asc.forEach((col) => {
+      if (!sortableItemColumns.includes(col as ItemListColumn)) return;
+      if (query.desc.includes(col as ItemListColumn)) return;
+
+      orders.push(asc(items[col as ItemColumn]))
+    })
+
+    query.desc.forEach((col) => {
+      if (!sortableItemColumns.includes(col as ItemListColumn)) return;
+      if (query.asc.includes(col as ItemListColumn)) return;
+
+      orders.push(desc(items[col as ItemColumn]))
+    })
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(items.deletedAt)
@@ -46,7 +59,7 @@ export class ItemService {
         .innerJoin(categories, eq(categories.id, items.categoryId))
         .innerJoin(units, eq(units.id, items.unitId))
         .where(and(...conditions))
-        .orderBy(orderBy)
+        .orderBy(...orders)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

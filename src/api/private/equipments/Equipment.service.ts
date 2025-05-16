@@ -1,7 +1,6 @@
-import { buildOrderBy } from '@/lib/utils/build-order-by';
-import { Equipment, EquipmentFilter, EquipmentList, EquipmentRequest } from './Equipment.schema';
+import { Equipment, EquipmentListColumn, EquipmentFilter, EquipmentList, EquipmentRequest, sortableEquipmentColumns, EquipmentColumn } from './Equipment.schema';
 import { equipments } from 'db/schema/equipments';
-import { and, count, eq, isNull, like, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
 import { db } from 'db';
@@ -24,7 +23,35 @@ import { RoleEnum } from '@/lib/enums/RoleEnum';
 
 export class EquipmentService {
   static async list(query: EquipmentFilter): Promise<[EquipmentList, number]> {
-    const orderBy = buildOrderBy(equipments, query.sortBy || 'id', query.sort);
+    let orders: SQL<unknown>[] = [];
+
+    query.asc.forEach((col) => {
+      if (!sortableEquipmentColumns.includes(col as EquipmentListColumn)) return;
+      if (query.desc.includes(col as EquipmentListColumn)) return;
+      if (col === 'item') {
+        orders.push(asc(items.name))
+        return;
+      }
+      if (col === 'owner') {
+        orders.push(asc(profiles.name))
+        return;
+      }
+      orders.push(asc(equipments[col as EquipmentColumn]))
+    })
+
+    query.desc.forEach((col) => {
+      if (!sortableEquipmentColumns.includes(col as EquipmentListColumn)) return;
+      if (query.asc.includes(col as EquipmentListColumn)) return;
+      if (col === 'item') {
+        orders.push(desc(items.name))
+        return;
+      }
+      if (col === 'owner') {
+        orders.push(desc(profiles.name))
+        return;
+      }
+      orders.push(desc(equipments[col as EquipmentColumn]))
+    })
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(equipments.deletedAt),
@@ -73,7 +100,7 @@ export class EquipmentService {
         .innerJoin(users, eq(users.id, equipments.ownerId))
         .innerJoin(profiles, eq(profiles.userId, users.id))
         .where(and(...conditions))
-        .orderBy(orderBy)
+        .orderBy(...orders)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

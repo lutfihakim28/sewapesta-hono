@@ -1,7 +1,6 @@
-import { buildOrderBy } from '@/lib/utils/build-order-by';
-import { Package, PackageFilter, PackageList, PackageRequest } from './Package.schema';
+import { Package, PackageColumn, PackageFilter, PackageList, PackageListColumn, PackageRequest, sortablePackageColumns } from './Package.schema';
 import { packages } from 'db/schema/packages';
-import { and, count, eq, isNull, like, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
 import { db } from 'db';
 import { users } from 'db/schema/users';
 import { products } from 'db/schema/products';
@@ -17,7 +16,35 @@ import dayjs from 'dayjs';
 
 export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
-    const orderBy = buildOrderBy(packages, query.sortBy || 'id', query.sort);
+    let orders: SQL<unknown>[] = [];
+
+    query.asc.forEach((col) => {
+      if (!sortablePackageColumns.includes(col as PackageListColumn)) return;
+      if (query.desc.includes(col as PackageListColumn)) return;
+      if (col === 'product') {
+        orders.push(asc(products.name))
+        return;
+      }
+      if (col === 'owner') {
+        orders.push(asc(profiles.name))
+        return;
+      }
+      orders.push(asc(packages[col as PackageColumn]))
+    })
+
+    query.desc.forEach((col) => {
+      if (!sortablePackageColumns.includes(col as PackageListColumn)) return;
+      if (query.asc.includes(col as PackageListColumn)) return;
+      if (col === 'product') {
+        orders.push(desc(products.name))
+        return;
+      }
+      if (col === 'owner') {
+        orders.push(desc(profiles.name))
+        return;
+      }
+      orders.push(desc(packages[col as PackageColumn]))
+    })
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(packages.deletedAt),
@@ -63,7 +90,7 @@ export class PackageService {
         .innerJoin(profiles, eq(profiles.userId, users.id))
         .leftJoin(products, eq(products.id, packages.productId))
         .where(and(...conditions))
-        .orderBy(orderBy)
+        .orderBy(...orders)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

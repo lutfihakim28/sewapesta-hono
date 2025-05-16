@@ -26,7 +26,7 @@ export const PackageSchema = createSelectSchema(packages).pick({
   term: true,
 }).openapi('Package')
 
-export const PackageListSchema = z.array(PackageSchema.extend({
+const PackageListItemSchema = PackageSchema.extend({
   owner: UserExtendedSchema.pick({
     id: true,
     phone: true,
@@ -36,14 +36,18 @@ export const PackageListSchema = z.array(PackageSchema.extend({
     id: true,
     name: true,
   }).nullable()
-})).openapi('PackageList')
+})
+
+export type PackageListColumn = keyof Pick<z.infer<typeof PackageListItemSchema>, 'id' | 'name' | 'owner' | 'price' | 'product'>
+
+export const sortablePackageColumns: PackageListColumn[] = [
+  'id', 'name', 'owner', 'price', 'product'
+]
+
+export const PackageListSchema = z.array(PackageListItemSchema).openapi('PackageList')
 
 export const PackageFilterSchema = SearchSchema
-  .merge(SortSchema<PackageColumn>([
-    'id',
-    'name',
-    'price'
-  ]))
+  .merge(SortSchema(sortablePackageColumns))
   .merge(PaginationSchema)
   .extend({
     ownerId: NumericSchema('Owner ID').optional(),

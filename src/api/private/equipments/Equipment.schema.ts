@@ -26,13 +26,7 @@ export const EquipmentSchema = createSelectSchema(equipments).pick({
   ownerId: true,
 }).openapi('Equipment')
 
-export const EquipmentListSchema = z.array(createSelectSchema(equipments).pick({
-  id: true,
-  lastMaintenanceDate: true,
-  number: true,
-  registerDate: true,
-  status: true,
-}).extend({
+const EquipmentListItemSchema = EquipmentSchema.extend({
   item: ItemSchema.pick({
     id: true,
     name: true,
@@ -45,7 +39,24 @@ export const EquipmentListSchema = z.array(createSelectSchema(equipments).pick({
     phone: true,
     name: true,
   })
-})).openapi('EquipmentList')
+})
+
+export const EquipmentListSchema = z.array(EquipmentListItemSchema).openapi('EquipmentList')
+
+export type EquipmentListColumn = keyof Pick<z.infer<typeof EquipmentListItemSchema>, 'id' |
+  'number' |
+  'registerDate' |
+  'lastMaintenanceDate' |
+  'item' |
+  'owner'>;
+export const sortableEquipmentColumns: EquipmentListColumn[] = [
+  'id',
+  'number',
+  'registerDate',
+  'lastMaintenanceDate',
+  'item',
+  'owner',
+]
 
 export const EquipmentFilterSchema = z.object({
   itemId: NumericSchema('Item ID', 1).optional(),
@@ -60,13 +71,7 @@ export const EquipmentFilterSchema = z.object({
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
-  .merge(SortSchema<EquipmentColumn>([
-    'id',
-    'number',
-    'registerDate',
-    'lastMaintenanceDate',
-    'status'
-  ]))
+  .merge(SortSchema(sortableEquipmentColumns))
   .openapi('EquipmentFilter')
 
 export const EquipmentRequestSchema = createInsertSchema(equipments, {

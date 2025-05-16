@@ -1,21 +1,44 @@
 import { JwtPayload } from '@/lib/dtos/JwtPayload.dto';
 import { db } from 'db';
 import { users } from 'db/schema/users';
-import { and, eq, getTableColumns, isNotNull } from 'drizzle-orm';
+import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 import { JWTPayload } from 'hono/utils/jwt/types';
 import { messages } from '@/lib/constants/messages';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { LoginData, RefreshRequest } from './Auth.schema';
 import { UserService } from '../private/users/User.service';
-
-// const { createdAt, deletedAt, password, refreshToken, updatedAt, ...columns } = getTableColumns(users)
+import { userColumns } from '../private/users/User.column';
+import { usersRoles } from 'db/schema/users-roles';
+import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
+import { NotFoundException } from '@/lib/exceptions/NotFoundException';
+import { UserRoleSchema } from '../private/users/User.schema';
 
 export abstract class AuthService {
   static async login(userId: number): Promise<LoginData> {
     const secretKey = Bun.env.JWT_SECRET;
 
-    const user = await UserService.get(userId);
+    const [_user] = await db.select({
+      ...userColumns,
+      roles: buildJsonGroupArray([usersRoles.role], true),
+    })
+      .from(users)
+      .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
+      .where(and(
+        isNull(users.deletedAt),
+        eq(users.id, userId)
+      ))
+      .limit(1)
+
+    if (!_user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const user = {
+      ..._user,
+      roles: (JSON.parse(_user.roles) as unknown[]).map((role) => UserRoleSchema.parse(role))
+    }
+
 
     await db
       .update(users)

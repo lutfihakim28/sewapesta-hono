@@ -54,6 +54,7 @@ export const UserCreateRoute = createRoute({
 export const UserUpdateRoute = createRoute({
   method: 'put',
   path: '/{id}/profiles',
+  description: 'Update user\'s profile.',
   tags: [tag],
   request: {
     params: ParamIdSchema,
@@ -87,6 +88,7 @@ export const UserDeleteRoute = createRoute({
 export const UserChangePasswordRoute = createRoute({
   method: 'patch',
   path: '/{id}/passwords',
+  description: 'Change user\'s password.',
   tags: [tag],
   request: {
     params: ParamIdSchema,
@@ -107,6 +109,7 @@ export const UserChangePasswordRoute = createRoute({
 export const UserRoleUpdateRoute = createRoute({
   method: 'patch',
   path: '/{id}/roles',
+  description: 'Assign or unassign one role to user.',
   tags: [tag],
   request: {
     params: ParamIdSchema,

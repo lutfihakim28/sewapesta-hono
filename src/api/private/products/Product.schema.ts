@@ -18,15 +18,19 @@ export const ProductSchema = createSelectSchema(products)
   })
   .openapi('Product')
 
+export type ProductListColumn = keyof Pick<z.infer<typeof ProductSchema>, 'id' |
+  'name'>;
+export const sortableProductColumn: ProductListColumn[] = [
+  'id',
+  'name'
+]
+
 export const ProductFilterSchema = z.object({
   branchId: NumericSchema('Branch ID').optional()
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
-  .merge(SortSchema<ProductColumn>([
-    'id',
-    'name',
-  ]))
+  .merge(SortSchema(sortableProductColumn))
   .openapi('ProductFilter')
 
 const ProductListSchema = z.array(ProductSchema)

@@ -21,7 +21,7 @@ export const InventorySchema = createSelectSchema(inventories).pick({
   ownerId: true,
 }).openapi('Inventory')
 
-export const InventoryListSchema = z.array(InventorySchema.extend({
+const InventoryListItemSchema = InventorySchema.extend({
   item: ItemSchema.pick({
     id: true,
     name: true,
@@ -34,13 +34,21 @@ export const InventoryListSchema = z.array(InventorySchema.extend({
     phone: true,
     name: true,
   })
-})).openapi('InventoryList')
+});
+
+export type InventoryListColumn = keyof Pick<z.infer<typeof InventoryListItemSchema>, 'id' | 'item' | 'owner'>
+
+export const sortableInventoryColumns: InventoryListColumn[] = [
+  'id',
+  'item',
+  'owner'
+]
+
+export const InventoryListSchema = z.array(InventoryListItemSchema).openapi('InventoryList')
 
 export const InventoryFilterSchema = SearchSchema
   .merge(PaginationSchema)
-  .merge(SortSchema<InventoryColumn>([
-    'id',
-  ]))
+  .merge(SortSchema(sortableInventoryColumns))
   .extend({
     itemId: NumericSchema('Item ID', 1).optional(),
     ownerId: NumericSchema('Owner ID', 1).optional(),

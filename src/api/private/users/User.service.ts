@@ -1,14 +1,13 @@
 import { db } from 'db';
 import { users } from 'db/schema/users';
 import { and, asc, count, desc, eq, inArray, isNull, like, or, SQL } from 'drizzle-orm';
-import { ProfileColumn, ProfileRequest, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserRoleSchema, UserRoleUpdate } from './User.schema';
+import { ProfileColumn, ProfileRequest, sortableUserColumns, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserListColumn, UserRoleSchema, UserRoleUpdate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
 import { UnauthorizedException } from '@/lib/exceptions/UnauthorizedException';
 import { messages } from '@/lib/constants/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 import { NotFoundException } from '@/lib/exceptions/NotFoundException';
 import { profileColumns, userColumns } from './User.column';
-import { SortEnum } from '@/lib/enums/SortEnum';
 import { locationQuery } from '@/api/public/locations/Location.query';
 import { countOffset } from '@/lib/utils/count-offset';
 import dayjs from 'dayjs';
@@ -20,28 +19,27 @@ import { buildJsonGroupArray } from '@/lib/utils/build-json-group-array';
 
 export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
-    let sort: SortEnum = SortEnum.Ascending;
-    let sortBy: UserColumn | ProfileColumn = 'id';
+    let orders: SQL<unknown>[] = [];
 
-    if (query.sort) {
-      sort = query.sort
-    }
+    query.asc.forEach((col) => {
+      if (!sortableUserColumns.includes(col as UserListColumn)) return;
+      if (query.desc.includes(col as UserListColumn)) return;
+      if (col === 'name' || col === 'phone') {
+        orders.push(asc(profiles[col as ProfileColumn]))
+        return;
+      }
+      orders.push(asc(users[col as UserColumn]))
+    })
 
-    if (query.sortBy) {
-      sortBy = query.sortBy
-    }
-
-    let orderBy: SQL = asc(users.id);
-
-    if (sortBy === 'name') {
-      orderBy = sort === SortEnum.Ascending
-        ? asc(profiles[sortBy])
-        : desc(profiles[sortBy])
-    } else if (sortBy === 'id' || sortBy === 'username') {
-      orderBy = sort === SortEnum.Ascending
-        ? asc(users[sortBy])
-        : desc(users[sortBy])
-    }
+    query.desc.forEach((col) => {
+      if (!sortableUserColumns.includes(col as UserListColumn)) return;
+      if (query.asc.includes(col as UserListColumn)) return;
+      if (col === 'name' || col === 'phone') {
+        orders.push(desc(profiles[col as ProfileColumn]))
+        return;
+      }
+      orders.push(desc(users[col as UserColumn]))
+    })
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(users.deletedAt),
@@ -84,7 +82,7 @@ export class UserService {
         .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
         .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
         .where(and(...conditions))
-        .orderBy(orderBy)
+        .orderBy(...orders)
         .groupBy(users.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),

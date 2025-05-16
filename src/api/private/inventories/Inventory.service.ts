@@ -1,7 +1,6 @@
-import { buildOrderBy } from '@/lib/utils/build-order-by';
-import { Inventory, InventoryFilter, InventoryList, InventoryRequest } from './Inventory.schema';
+import { Inventory, InventoryColumn, InventoryFilter, InventoryList, InventoryListColumn, InventoryRequest, sortableInventoryColumns } from './Inventory.schema';
 import { inventories } from 'db/schema/inventories';
-import { and, count, eq, isNull, like, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
 import { db } from 'db';
@@ -22,8 +21,35 @@ import dayjs from 'dayjs';
 
 export class InventoryService {
   static async list(query: InventoryFilter): Promise<[InventoryList, number]> {
-    const orderBy = buildOrderBy(inventories, query.sortBy || 'id', query.sort)
+    let orders: SQL<unknown>[] = [];
 
+    query.asc.forEach((col) => {
+      if (!sortableInventoryColumns.includes(col as InventoryListColumn)) return;
+      if (query.desc.includes(col as InventoryListColumn)) return;
+      if (col === 'item') {
+        orders.push(asc(items.name))
+        return;
+      }
+      if (col === 'owner') {
+        orders.push(asc(profiles.name))
+        return;
+      }
+      orders.push(asc(inventories[col as InventoryColumn]))
+    })
+
+    query.desc.forEach((col) => {
+      if (!sortableInventoryColumns.includes(col as InventoryListColumn)) return;
+      if (query.asc.includes(col as InventoryListColumn)) return;
+      if (col === 'item') {
+        orders.push(desc(items.name))
+        return;
+      }
+      if (col === 'owner') {
+        orders.push(desc(profiles.name))
+        return;
+      }
+      orders.push(desc(inventories[col as InventoryColumn]))
+    })
     const conditions: ReturnType<typeof and>[] = [
       isNull(inventories.deletedAt)
     ];
@@ -71,7 +97,7 @@ export class InventoryService {
         .innerJoin(users, eq(users.id, inventories.ownerId))
         .innerJoin(profiles, eq(profiles.userId, users.id))
         .where(and(...conditions))
-        .orderBy(orderBy)
+        .orderBy(...orders)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

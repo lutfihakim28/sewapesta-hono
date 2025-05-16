@@ -1,6 +1,6 @@
 import { BadRequestException } from '@/lib/exceptions/BadRequestException';
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { logger } from './logger';
+import { pinoLogger } from './logger';
 
 export function honoApp() {
   return new OpenAPIHono({
@@ -8,7 +8,7 @@ export function honoApp() {
       if (result.success) {
         return;
       }
-      logger.info({ message: 'ZodError', error: result.error.errors })
+      pinoLogger.info({ message: 'ZodError', error: result.error.errors })
       throw new BadRequestException(result.error.errors.map((err) => err.message).join(','))
     },
   })

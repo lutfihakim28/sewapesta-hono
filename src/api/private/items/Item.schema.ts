@@ -23,6 +23,13 @@ export const ItemSchema = createSelectSchema(items).pick({
   category: CategorySchema,
 }).openapi('Item')
 
+export type ItemListColumn = keyof Pick<z.infer<typeof ItemSchema>, 'id' | 'name' | 'type'>;
+export const sortableItemColumns: ItemListColumn[] = [
+  'id',
+  'name',
+  'type'
+]
+
 export const ItemFilterSchema = z.object({
   type: z.nativeEnum(ItemTypeEnum, {
     invalid_type_error: validationMessages.enum('Type', ItemTypeEnum)
@@ -30,7 +37,7 @@ export const ItemFilterSchema = z.object({
   categoryId: NumericSchema('Category ID', 1).optional(),
 })
   .merge(SearchSchema)
-  .merge(SortSchema<ItemColumn>(['id', 'name', 'type']))
+  .merge(SortSchema(sortableItemColumns))
   .merge(PaginationSchema)
   .openapi('ItemFilter')
 
