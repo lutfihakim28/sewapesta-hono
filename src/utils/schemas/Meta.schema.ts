@@ -1,4 +1,3 @@
-import { z } from '@hono/zod-openapi';
 import { NumberSchema } from './Number.schema';
 import { ObjectSchema } from './Object.schema';
 

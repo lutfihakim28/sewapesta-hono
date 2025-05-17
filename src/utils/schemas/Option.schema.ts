@@ -1,11 +1,11 @@
-import { z } from '@hono/zod-openapi';
 import { StringSchema } from './String.schema';
 import { NumberSchema } from './Number.schema';
 import { ObjectSchema } from './Object.schema';
 import { SchemaType } from '../types/Schema.type';
+import { UnionSchema } from './Union.schema';
 
 export const OptionSchema = new ObjectSchema({
-  value: z.union([new StringSchema('Value').getSchema(), new NumberSchema('Value').natural().getSchema()]),
+  value: new UnionSchema([new StringSchema('Value').getSchema(), new NumberSchema('Value').natural().getSchema()]).getSchema(),
   label: new StringSchema('Message').getSchema(),
 }).getSchema().openapi('Option')
 
