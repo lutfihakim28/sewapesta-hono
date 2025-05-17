@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { UserExtendedSchema } from '../users/User.schema';
 import { ProductSchema } from '../products/Product.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -50,8 +51,8 @@ export const PackageFilterSchema = SearchSchema
   .merge(SortSchema(sortablePackageColumns))
   .merge(PaginationSchema)
   .extend({
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1 }).optional(),
-    productId: new StringSchema('Product ID').numeric({ min: 1 }).optional(),
+    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    productId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
     term: z.nativeEnum(PackageTermEnum, {
       invalid_type_error: validationMessages.enum('Term', PackageTermEnum)
     }).optional()
@@ -63,38 +64,12 @@ export const PackageRequestSchema = createInsertSchema(packages, {
     invalid_type_error: validationMessages.boolean('Include employee'),
     required_error: validationMessages.required('Include employee')
   }),
-  name: new StringSchema('Name').schema,
-  ownerId: z.number({
-    invalid_type_error: validationMessages.number('Owner ID'),
-    required_error: validationMessages.required('Owner ID')
-  })
-    .int({
-      message: validationMessages.integer('Owner ID')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Owner ID')
-    }),
-  ownerPrice: z.number({
-    invalid_type_error: validationMessages.number('Owner price'),
-    required_error: validationMessages.required('Owner price')
-  }).nonnegative({
-    message: validationMessages.nonNegativeNumber('Owner price')
-  }),
-  ownerRatio: z.number({
-    invalid_type_error: validationMessages.number('Owner ratio'),
-    required_error: validationMessages.required('Owner ratio')
-  }).nonnegative({
-    message: validationMessages.nonNegativeNumber('Owner ratio')
-  }),
-  price: z.number({
-    invalid_type_error: validationMessages.number('Price'),
-    required_error: validationMessages.required('Price')
-  }).nonnegative({
-    message: validationMessages.nonNegativeNumber('price')
-  }),
-  productId: z.number({
-    invalid_type_error: validationMessages.number('Product ID'),
-  }),
+  name: new StringSchema('Name').getSchema(),
+  ownerId: new NumberSchema('Owner ID').natural().getSchema(),
+  ownerPrice: new NumberSchema('Owner ID').whole().getSchema(),
+  ownerRatio: new NumberSchema('Owner ID').nonnegative().getSchema(),
+  price: new NumberSchema('Owner ID').whole().getSchema(),
+  productId: new NumberSchema('Product ID').natural().getSchema(),
   term: z.nativeEnum(PackageTermEnum, {
     invalid_type_error: validationMessages.enum('Term', PackageTermEnum),
     required_error: validationMessages.required('Term')

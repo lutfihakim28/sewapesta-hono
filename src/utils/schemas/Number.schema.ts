@@ -13,7 +13,7 @@ export class NumberSchema {
     this.#field = field;
   }
 
-  get schema() {
+  getSchema() {
     return this.#schema;
   }
 

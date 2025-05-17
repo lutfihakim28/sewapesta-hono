@@ -11,6 +11,7 @@ import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { messages } from '@/utils/constants/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 export type ItemColumn = keyof typeof items.$inferSelect;
 
@@ -34,7 +35,7 @@ export const ItemFilterSchema = z.object({
   type: z.nativeEnum(ItemTypeEnum, {
     invalid_type_error: validationMessages.enum('Type', ItemTypeEnum)
   }).optional(),
-  categoryId: new StringSchema('Product ID').numeric({ min: 1 }).optional(),
+  categoryId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
 })
   .merge(SearchSchema)
   .merge(SortSchema(sortableItemColumns))
@@ -45,27 +46,9 @@ export const ItemResponseListSchema = ApiResponseListSchema(z.array(ItemSchema),
 export const ItemResponseDataSchema = ApiResponseDataSchema(ItemSchema, messages.successDetail('item')).openapi('ItemResponseData')
 
 export const ItemRequestSchema = createInsertSchema(items, {
-  categoryId: z.number({
-    invalid_type_error: validationMessages.number('Category ID'),
-    required_error: validationMessages.required('Category ID')
-  })
-    .int({
-      message: validationMessages.integer('Category ID')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Category ID')
-    }),
-  name: new StringSchema('Name').schema,
-  unitId: z.number({
-    invalid_type_error: validationMessages.number('Unit ID'),
-    required_error: validationMessages.required('Unit ID')
-  })
-    .int({
-      message: validationMessages.integer('Unit ID')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Unit ID')
-    }),
+  categoryId: new NumberSchema('Category ID').natural().getSchema(),
+  name: new StringSchema('Name').getSchema(),
+  unitId: new NumberSchema('Unit ID').natural().getSchema(),
   type: z.nativeEnum(ItemTypeEnum, {
     invalid_type_error: validationMessages.enum('Type', ItemTypeEnum),
     required_error: validationMessages.required('Type')

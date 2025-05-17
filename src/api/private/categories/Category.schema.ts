@@ -16,7 +16,7 @@ export const CategorySchema = createSelectSchema(categories)
   .openapi('Category')
 
 export const CategoryRequestSchema = createInsertSchema(categories, {
-  name: new StringSchema('Name').schema,
+  name: new StringSchema('Name').getSchema(),
 })
   .pick({
     name: true,

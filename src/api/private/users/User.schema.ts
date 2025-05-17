@@ -38,10 +38,10 @@ const ProfileExtendedSchema = ProfileSchema
   }).openapi('ProfileExtended')
 
 export const ProfileRequestSchema = createInsertSchema(profiles, {
-  address: new StringSchema('Address').schema,
-  name: new StringSchema('Name').schema,
-  phone: new StringSchema('Phone').phone(),
-  subdistrictCode: new StringSchema('Subdistrict code').subdistrictCode().schema
+  address: new StringSchema('Address').getSchema(),
+  name: new StringSchema('Name').getSchema(),
+  phone: new StringSchema('Phone').phone().getSchema(),
+  subdistrictCode: new StringSchema('Subdistrict code').subdistrictCode().getSchema()
 }).pick({
   address: true,
   name: true,
@@ -97,8 +97,8 @@ export const UserCreateSchema = createInsertSchema(users)
 export const UserResponseDataSchema = ApiResponseDataSchema(UserExtendedSchema, messages.successDetail('user'))
 
 export const UserChangePasswordSchema = z.object({
-  oldPassword: new StringSchema('Old Password').optional().schema,
-  newPassword: new StringSchema('Name').min(8).schema
+  oldPassword: new StringSchema('Old Password').getSchema().optional(),
+  newPassword: new StringSchema('Name').min(8).getSchema()
 }).openapi('UserChangePassword')
 
 export type User = z.infer<typeof UserSchema>

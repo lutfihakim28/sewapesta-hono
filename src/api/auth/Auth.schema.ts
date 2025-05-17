@@ -2,6 +2,7 @@ import { UserSchema } from '@/api/private/users/User.schema';
 import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { z } from '@hono/zod-openapi';
 
@@ -10,18 +11,18 @@ import { z } from '@hono/zod-openapi';
  *========================**/
 
 export const LoginRequestSchema = z.object({
-  username: new StringSchema('Username').schema.openapi({
+  username: new StringSchema('Username').getSchema().openapi({
     example: 'superadmin',
   }),
   password: new StringSchema('Password')
-    .schema
+    .getSchema()
     .openapi({
       example: 'password',
     }),
 }).openapi('Login');
 export const LoginDataSchema = z.object({
   token: new StringSchema('Token')
-    .schema
+    .getSchema()
     .openapi({
       example: 'eyJH*************',
     }),
@@ -39,10 +40,7 @@ export type LoginData = z.infer<typeof LoginDataSchema>
  *========================**/
 
 export const RefreshRequestSchema = z.object({
-  userId: z.number({
-    invalid_type_error: validationMessages.number('User ID'),
-    required_error: validationMessages.required('User ID'),
-  }).openapi({
+  userId: new NumberSchema('User ID').natural().getSchema().openapi({
     example: 1,
   }),
 })
@@ -52,7 +50,7 @@ export type RefreshRequest = z.infer<typeof RefreshRequestSchema>
 /*==== END OF REFRESH ====*/
 
 export const CheckUsernameSchema = z.object({
-  username: new StringSchema('Username').schema
+  username: new StringSchema('Username').getSchema()
 })
 
 export type CheckUsername = z.infer<typeof CheckUsernameSchema>

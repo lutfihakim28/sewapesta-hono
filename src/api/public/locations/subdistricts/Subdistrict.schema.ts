@@ -18,7 +18,7 @@ const SubdistrictSchema = createSelectSchema(subdistricts)
 //   .openapi('SubdistrictExtended');
 export const SubdistrictFilterSchema = z
   .object({
-    districtCode: new StringSchema('District code').schema.openapi({ example: '33.74.12' })
+    districtCode: new StringSchema('District code').getSchema().openapi({ example: '33.74.12' })
   })
   .merge(SearchSchema)
   .merge(PaginationSchema)

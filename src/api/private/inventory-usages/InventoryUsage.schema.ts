@@ -11,6 +11,7 @@ import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/Ap
 import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 export type inventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
 
@@ -35,8 +36,8 @@ export const InventoryUsageFilterSchema = PaginationSchema
   .merge(SearchSchema)
   .merge(DateRangeSchema)
   .extend({
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1 }).optional(),
-    itemId: new StringSchema('Item ID').numeric({ min: 1 }).optional(),
+    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
   })
   .openapi('InventoryUsageFilter')
 
@@ -44,57 +45,12 @@ export const InventoryUsageResponseListSchema = ApiResponseListSchema(InventoryU
 export const InventoryUsageResponseDataSchema = ApiResponseDataSchema(InventoryUsageSchema, messages.successDetail('inventory usages'))
 
 export const InventoryUsageRequestSchema = createInsertSchema(inventoryUsages, {
-  description: new StringSchema('Description').optional().schema,
-  inventoryId: z.number({
-    invalid_type_error: validationMessages.number('Inventory ID'),
-    required_error: validationMessages.required('Inventory ID')
-  })
-    .int({
-      message: validationMessages.integer('Inventory ID'),
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Inventory ID')
-    }),
-  orderQuantity: z.number({
-    invalid_type_error: validationMessages.number('Order quantity'),
-    required_error: validationMessages.required('Order quantity')
-  })
-    .int({
-      message: validationMessages.integer('Order quantity'),
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Order quantity')
-    }),
-  returnAt: z.number({
-    invalid_type_error: validationMessages.number('Return at'),
-    required_error: validationMessages.required('Return at')
-  })
-    .int({
-      message: validationMessages.integer('Return at'),
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Return at')
-    }),
-  usedAt: z.number({
-    invalid_type_error: validationMessages.number('Used at'),
-    required_error: validationMessages.required('Used at')
-  })
-    .int({
-      message: validationMessages.integer('Used at'),
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Used at')
-    }),
-  returnQuantity: z.number({
-    invalid_type_error: validationMessages.number('Return quantity'),
-    required_error: validationMessages.required('Return quantity')
-  })
-    .int({
-      message: validationMessages.integer('Return quantity'),
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Return quantity')
-    }),
+  description: new StringSchema('Description').getSchema().optional(),
+  inventoryId: new NumberSchema('Inventory ID').natural().getSchema(),
+  orderQuantity: new NumberSchema('Order quantity').natural().getSchema(),
+  returnAt: new NumberSchema('Return at').natural().getSchema(),
+  usedAt: new NumberSchema('Used at').natural().getSchema(),
+  returnQuantity: new NumberSchema('Return quantity').natural().getSchema(),
 }).pick({
   description: true,
   inventoryId: true,

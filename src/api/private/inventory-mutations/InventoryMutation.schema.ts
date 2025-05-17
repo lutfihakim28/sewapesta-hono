@@ -10,6 +10,7 @@ import { StockMutationTypeEnum } from '@/utils/enums/StockMutationType.Enum';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { messages } from '@/utils/constants/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 export type InventoryMutaionColumn = keyof typeof inventoryMutations.$inferSelect
 
@@ -39,33 +40,15 @@ export const InventoryMutationListSchema = z.array(InventoryMutationSchema.exten
 export const InventoryMutationFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .extend({
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1 }).optional(),
-    itemId: new StringSchema('Item ID').numeric({ min: 1 }).optional(),
+    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
   })
   .openapi('InventoryMutationFilter')
 
 export const InventoryMutationRequestSchema = createInsertSchema(inventoryMutations, {
-  description: new StringSchema('Description').optional().schema,
-  inventoryId: z.number({
-    invalid_type_error: validationMessages.number('Inventory item ID'),
-    required_error: validationMessages.required('Inventory item ID')
-  })
-    .int({
-      message: validationMessages.integer('Inventory ID')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Inventory item ID')
-    }),
-  quantity: z.number({
-    invalid_type_error: validationMessages.number('Quantity'),
-    required_error: validationMessages.required('Quantity')
-  })
-    .int({
-      message: validationMessages.integer('Quantity')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Quantity')
-    }),
+  description: new StringSchema('Description').getSchema().optional(),
+  inventoryId: new NumberSchema('Inventory ID').natural().getSchema(),
+  quantity: new NumberSchema('Quantity').natural().getSchema(),
   type: z.nativeEnum(StockMutationTypeEnum, {
     invalid_type_error: validationMessages.enum('Type', StockMutationTypeEnum),
     required_error: validationMessages.required('Type')

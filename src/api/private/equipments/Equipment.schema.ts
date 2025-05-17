@@ -13,6 +13,7 @@ import { ItemSchema } from '../items/Item.schema';
 import { UserExtendedSchema } from '../users/User.schema';
 import { EquipmentStatusEnum } from '@/utils/enums/EquipmentStatusEnum';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 export type EquipmentColumn = keyof typeof equipments.$inferSelect;
 
@@ -59,13 +60,13 @@ export const sortableEquipmentColumns: EquipmentListColumn[] = [
 ]
 
 export const EquipmentFilterSchema = z.object({
-  itemId: new StringSchema('Item ID').numeric({ min: 1 }).optional(),
-  ownerId: new StringSchema('Owner ID').numeric({ min: 1 }).optional(),
+  itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+  ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
   status: z.nativeEnum(EquipmentStatusEnum, {
     invalid_type_error: validationMessages.enum('Status', EquipmentStatusEnum)
   }).optional(),
-  number: new StringSchema('Number').optional().schema,
-  categoryId: new StringSchema('Category ID').numeric({ min: 1 }).optional(),
+  number: new StringSchema('Number').getSchema().optional(),
+  categoryId: new StringSchema('Category ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
 })
   .merge(SearchSchema)
   .merge(PaginationSchema)
@@ -73,26 +74,8 @@ export const EquipmentFilterSchema = z.object({
   .openapi('EquipmentFilter')
 
 export const EquipmentRequestSchema = createInsertSchema(equipments, {
-  ownerId: z.number({
-    invalid_type_error: validationMessages.number('Owner ID'),
-    required_error: validationMessages.required('Owner ID')
-  })
-    .int({
-      message: validationMessages.integer('Owner ID')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Owner ID')
-    }),
-  itemId: z.number({
-    invalid_type_error: validationMessages.number('Item ID'),
-    required_error: validationMessages.required('Item ID')
-  })
-    .int({
-      message: validationMessages.integer('Item ID')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Item ID')
-    }),
+  ownerId: new NumberSchema('Owner ID').natural().getSchema(),
+  itemId: new NumberSchema('Item ID').natural().getSchema(),
 }).pick({
   ownerId: true,
   itemId: true,

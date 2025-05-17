@@ -15,7 +15,7 @@ export const UnitSchema = createSelectSchema(units)
   .openapi('Unit')
 
 export const UnitRequestSchema = createInsertSchema(units, {
-  name: new StringSchema('Name').schema,
+  name: new StringSchema('Name').getSchema(),
 })
   .pick({
     name: true,

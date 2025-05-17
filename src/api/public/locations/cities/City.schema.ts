@@ -16,7 +16,7 @@ const CitySchema = createSelectSchema(cities)
 //   .openapi('CityExtended')
 export const CityFilterSchema = z
   .object({
-    provinceCode: new StringSchema('Province code').provinceCode().openapi({ example: '33' })
+    provinceCode: new StringSchema('Province code').provinceCode().getSchema().openapi({ example: '33' })
   })
   .merge(SearchSchema)
   .merge(PaginationSchema)

@@ -17,7 +17,7 @@ const DistrictSchema = createSelectSchema(districts)
 //   .openapi('DistrictExtended');
 export const DistrictFilterSchema = z
   .object({
-    cityCode: new StringSchema('City code').schema.openapi({ example: '33.74' })
+    cityCode: new StringSchema('City code').getSchema().openapi({ example: '33.74' })
   })
   .merge(SearchSchema)
   .merge(PaginationSchema)

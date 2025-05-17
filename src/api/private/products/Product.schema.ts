@@ -35,7 +35,7 @@ const ProductListSchema = z.array(ProductSchema)
 export const ProductResponseListSchema = ApiResponseListSchema(ProductListSchema, messages.successList('products'))
 
 export const ProductRequestSchema = createInsertSchema(products, {
-  name: new StringSchema('Name').schema,
+  name: new StringSchema('Name').getSchema(),
 }).pick({
   name: true,
 }).openapi('ProductRequest')

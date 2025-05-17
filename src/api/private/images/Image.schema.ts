@@ -5,6 +5,7 @@ import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
 import { images } from 'db/schema/images';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from '@hono/zod-openapi';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 const MAX_FILE_SIZE = 10000000;
 const accept = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];
@@ -42,16 +43,7 @@ const ImageSaveSchema = z.object({
     required_error: validationMessages.required('Image reference'),
     invalid_type_error: validationMessages.enum('Image reference', ImageReferenceEnum),
   }),
-  referenceId: z.number({
-    required_error: validationMessages.required('Image reference ID'),
-    invalid_type_error: validationMessages.number('Image reference ID'),
-  })
-    .int({
-      message: validationMessages.integer('Image reference ID')
-    })
-    .positive({
-      message: validationMessages.positiveNumber('Image reference ID')
-    }),
+  referenceId: new NumberSchema('Reference ID').natural().getSchema(),
 }).openapi('ImageSave')
 
 const ImageUploadSchema = ImageSchema.pick({ path: true })

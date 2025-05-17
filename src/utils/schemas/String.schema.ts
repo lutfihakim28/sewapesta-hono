@@ -13,7 +13,7 @@ export class StringSchema {
     this.#field = field;
   }
 
-  get schema() {
+  getSchema() {
     return this.#schema;
   }
 
@@ -22,23 +22,37 @@ export class StringSchema {
     return this;
   }
 
-  numeric(option?: { min: number }) {
-    return this.#schema
+  numeric(option?: Partial<{ min: number, subset: 'whole' | 'natural' | 'integer' }>) {
+    this.#schema
       .regex(/^\d+(\.\d+)?$/, {
         message: validationMessages.numeric(this.#field),
       }).refine((value) => {
         if (!option?.min) return true;
         return Number(value) >= option.min;
       })
+      .refine((value) => {
+        if (!option?.subset) return true;
+        if (option.subset === 'integer') {
+          return Number.isInteger(value)
+        }
+        if (option.subset === 'natural') {
+          return Number.isInteger(value) && Number(value) > 0
+        }
+        if (option.subset === 'whole') {
+          return Number.isInteger(value) && Number(value) >= 0
+        }
+      })
+    return this;
   }
 
   phone() {
-    return this.#schema
+    this.#schema
       .regex(/^\d+(\.\d+)?$/, {
         message: validationMessages.numeric('Phone number'),
       }).regex(/^628[1-9][0-9]{6,9}$/, {
         message: 'Phone number should start with 628 with minimum 10 digits and maximum 13 digits.'
       })
+    return this;
   }
 
   min(length: number) {
