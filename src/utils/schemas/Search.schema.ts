@@ -1,6 +1,7 @@
 import { z } from '@hono/zod-openapi';
 import { StringSchema } from './String.schema';
+import { ObjectSchema } from './Object.schema';
 
-export const SearchSchema = z.object({
+export const SearchSchema = new ObjectSchema({
   keyword: new StringSchema('Message').min(3).getSchema().optional(),
-}).openapi('Search')
+}).getSchema().openapi('Search')

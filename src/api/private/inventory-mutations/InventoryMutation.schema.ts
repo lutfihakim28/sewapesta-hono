@@ -11,6 +11,7 @@ import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/Ap
 import { messages } from '@/utils/constants/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export type InventoryMutaionColumn = keyof typeof inventoryMutations.$inferSelect
 
@@ -63,7 +64,7 @@ export const InventoryMutationRequestSchema = createInsertSchema(inventoryMutati
 export const InventoryMutationResponseListSchema = ApiResponseListSchema(InventoryMutationListSchema, messages.successList('inventory item mutations'))
 export const InventoryMutationResponseDataSchema = ApiResponseDataSchema(InventoryMutationSchema, messages.successDetail('inventory item mutation'))
 
-export type InventoryMutation = z.infer<typeof InventoryMutationSchema>
-export type InventoryMutationList = z.infer<typeof InventoryMutationListSchema>
-export type InventoryMutationFilter = z.infer<typeof InventoryMutationFilterSchema>
-export type InventoryMutationRequest = z.infer<typeof InventoryMutationRequestSchema>
+export type InventoryMutation = SchemaType<typeof InventoryMutationSchema>
+export type InventoryMutationList = SchemaType<typeof InventoryMutationListSchema>
+export type InventoryMutationFilter = SchemaType<typeof InventoryMutationFilterSchema>
+export type InventoryMutationRequest = SchemaType<typeof InventoryMutationRequestSchema>

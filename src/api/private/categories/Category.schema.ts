@@ -5,8 +5,8 @@ import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { categories } from 'db/schema/categories';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from '@hono/zod-openapi';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export const CategorySchema = createSelectSchema(categories)
   .pick({
@@ -29,6 +29,6 @@ export const CategoryFilterSchema = SearchSchema
 
 export const CategoryResponseSchema = ApiResponseListSchema(CategorySchema, messages.successList('categories'))
 
-export type Category = z.infer<typeof CategorySchema>
-export type CategoryFilter = z.infer<typeof CategoryFilterSchema>
-export type CategoryRequest = z.infer<typeof CategoryRequestSchema>
+export type Category = SchemaType<typeof CategorySchema>
+export type CategoryFilter = SchemaType<typeof CategoryFilterSchema>
+export type CategoryRequest = SchemaType<typeof CategoryRequestSchema>

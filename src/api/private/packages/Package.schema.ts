@@ -12,6 +12,7 @@ import { UserExtendedSchema } from '../users/User.schema';
 import { ProductSchema } from '../products/Product.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -39,7 +40,7 @@ const PackageListItemSchema = PackageSchema.extend({
   }).nullable()
 })
 
-export type PackageListColumn = keyof Pick<z.infer<typeof PackageListItemSchema>, 'id' | 'name' | 'owner' | 'price' | 'product'>
+export type PackageListColumn = keyof Pick<SchemaType<typeof PackageListItemSchema>, 'id' | 'name' | 'owner' | 'price' | 'product'>
 
 export const sortablePackageColumns: PackageListColumn[] = [
   'id', 'name', 'owner', 'price', 'product'
@@ -88,7 +89,7 @@ export const PackageRequestSchema = createInsertSchema(packages, {
 export const PackageResponseListSchema = ApiResponseListSchema(PackageListSchema, messages.successList('packages'))
 export const PackageResponseDataSchema = ApiResponseDataSchema(PackageSchema, messages.successDetail('package'))
 
-export type Package = z.infer<typeof PackageSchema>
-export type PackageList = z.infer<typeof PackageListSchema>
-export type PackageFilter = z.infer<typeof PackageFilterSchema>
-export type PackageRequest = z.infer<typeof PackageRequestSchema>
+export type Package = SchemaType<typeof PackageSchema>
+export type PackageList = SchemaType<typeof PackageListSchema>
+export type PackageFilter = SchemaType<typeof PackageFilterSchema>
+export type PackageRequest = SchemaType<typeof PackageRequestSchema>

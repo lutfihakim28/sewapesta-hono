@@ -4,8 +4,8 @@ import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { units } from 'db/schema/units';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from '@hono/zod-openapi';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export const UnitSchema = createSelectSchema(units)
   .pick({
@@ -28,6 +28,6 @@ export const UnitFilterSchema = SearchSchema
 
 export const UnitResponseSchema = ApiResponseListSchema(UnitSchema, messages.successList('units'))
 
-export type Unit = z.infer<typeof UnitSchema>
-export type UnitFilter = z.infer<typeof UnitFilterSchema>
-export type UnitRequest = z.infer<typeof UnitRequestSchema>
+export type Unit = SchemaType<typeof UnitSchema>
+export type UnitFilter = SchemaType<typeof UnitFilterSchema>
+export type UnitRequest = SchemaType<typeof UnitRequestSchema>

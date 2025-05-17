@@ -13,6 +13,7 @@ import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/Ap
 import { messages } from '@/utils/constants/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export type InventoryColumn = keyof typeof inventories.$inferSelect;
 
@@ -37,7 +38,7 @@ const InventoryListItemSchema = InventorySchema.extend({
   })
 });
 
-export type InventoryListColumn = keyof Pick<z.infer<typeof InventoryListItemSchema>, 'id' | 'item' | 'owner'>
+export type InventoryListColumn = keyof Pick<SchemaType<typeof InventoryListItemSchema>, 'id' | 'item' | 'owner'>
 
 export const sortableInventoryColumns: InventoryListColumn[] = [
   'id',
@@ -70,7 +71,7 @@ export const InventoryRequestSchema = createInsertSchema(inventories, {
 export const InventoryResponseListSchema = ApiResponseListSchema(InventoryListSchema, messages.successList('inventory items'))
 export const InventoryResponseDataSchema = ApiResponseDataSchema(InventorySchema, messages.successDetail('inventory item'))
 
-export type Inventory = z.infer<typeof InventorySchema>
-export type InventoryList = z.infer<typeof InventoryListSchema>
-export type InventoryFilter = z.infer<typeof InventoryFilterSchema>
-export type InventoryRequest = z.infer<typeof InventoryRequestSchema>
+export type Inventory = SchemaType<typeof InventorySchema>
+export type InventoryList = SchemaType<typeof InventoryListSchema>
+export type InventoryFilter = SchemaType<typeof InventoryFilterSchema>
+export type InventoryRequest = SchemaType<typeof InventoryRequestSchema>

@@ -4,8 +4,10 @@ import { ImageReferenceEnum } from '@/utils/enums/ImageReference.Enum';
 import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
 import { images } from 'db/schema/images';
 import { createSelectSchema } from 'drizzle-zod';
-import { z } from '@hono/zod-openapi';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { ObjectSchema } from '@/utils/schemas/Object.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
+import { z } from 'zod';
 
 const MAX_FILE_SIZE = 10000000;
 const accept = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];
@@ -20,7 +22,7 @@ export const ImageSchema = createSelectSchema(images).pick({
   path: true,
 }).openapi('Image')
 
-export const ImageRequestSchema = z.object({
+export const ImageRequestSchema = new ObjectSchema({
   image: z.any({
     required_error: validationMessages.required('Image')
   })
@@ -31,29 +33,29 @@ export const ImageRequestSchema = z.object({
       format: 'binary',
       description: 'Available for .png, .jpeg, or .jpg. Max size 10MB',
     })
-});
+}).getSchema();
 
 const ImageFilterSchema = createSelectSchema(images).pick({
   reference: true,
   referenceId: true,
 })
 
-const ImageSaveSchema = z.object({
+const ImageSaveSchema = new ObjectSchema({
   reference: z.nativeEnum(ImageReferenceEnum, {
     required_error: validationMessages.required('Image reference'),
     invalid_type_error: validationMessages.enum('Image reference', ImageReferenceEnum),
   }),
   referenceId: new NumberSchema('Reference ID').natural().getSchema(),
-}).openapi('ImageSave')
+}).getSchema().openapi('ImageSave')
 
 const ImageUploadSchema = ImageSchema.pick({ path: true })
 export const ImageUploadResponse = ApiResponseDataSchema(ImageUploadSchema, messages.successUpload('Image'))
 
-export type ImageSave = z.infer<typeof ImageSaveSchema>
+export type ImageSave = SchemaType<typeof ImageSaveSchema>
 
 export type ImageRequest = {
   image: File
 }
-export type ImageFilter = z.infer<typeof ImageFilterSchema>
-export type Image = z.infer<typeof ImageSchema>
-export type ImageUpload = z.infer<typeof ImageUploadSchema>
+export type ImageFilter = SchemaType<typeof ImageFilterSchema>
+export type Image = SchemaType<typeof ImageSchema>
+export type ImageUpload = SchemaType<typeof ImageUploadSchema>

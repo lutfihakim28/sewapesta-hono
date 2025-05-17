@@ -12,6 +12,7 @@ import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/Ap
 import { messages } from '@/utils/constants/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export type ItemColumn = keyof typeof items.$inferSelect;
 
@@ -24,22 +25,22 @@ export const ItemSchema = createSelectSchema(items).pick({
   category: CategorySchema,
 }).openapi('Item')
 
-export type ItemListColumn = keyof Pick<z.infer<typeof ItemSchema>, 'id' | 'name' | 'type'>;
+export type ItemListColumn = keyof Pick<SchemaType<typeof ItemSchema>, 'id' | 'name' | 'type'>;
 export const sortableItemColumns: ItemListColumn[] = [
   'id',
   'name',
   'type'
 ]
 
-export const ItemFilterSchema = z.object({
-  type: z.nativeEnum(ItemTypeEnum, {
-    invalid_type_error: validationMessages.enum('Type', ItemTypeEnum)
-  }).optional(),
-  categoryId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-})
-  .merge(SearchSchema)
+export const ItemFilterSchema = SearchSchema
   .merge(SortSchema(sortableItemColumns))
   .merge(PaginationSchema)
+  .extend({
+    type: z.nativeEnum(ItemTypeEnum, {
+      invalid_type_error: validationMessages.enum('Type', ItemTypeEnum)
+    }).optional(),
+    categoryId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+  })
   .openapi('ItemFilter')
 
 export const ItemResponseListSchema = ApiResponseListSchema(z.array(ItemSchema), messages.successList('items')).openapi('ItemResponseList')
@@ -60,6 +61,6 @@ export const ItemRequestSchema = createInsertSchema(items, {
   categoryId: true,
 }).openapi('ItemRequest')
 
-export type Item = z.infer<typeof ItemSchema>
-export type ItemFilter = z.infer<typeof ItemFilterSchema>
-export type ItemRequest = z.infer<typeof ItemRequestSchema>
+export type Item = SchemaType<typeof ItemSchema>
+export type ItemFilter = SchemaType<typeof ItemFilterSchema>
+export type ItemRequest = SchemaType<typeof ItemRequestSchema>

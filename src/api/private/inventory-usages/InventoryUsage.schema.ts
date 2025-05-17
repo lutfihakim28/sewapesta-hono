@@ -12,6 +12,7 @@ import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export type inventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
 
@@ -60,7 +61,7 @@ export const InventoryUsageRequestSchema = createInsertSchema(inventoryUsages, {
   returnQuantity: true,
 }).openapi('InventoryUsageRequest')
 
-export type InventoryUsage = z.infer<typeof InventoryUsageSchema>
-export type InventoryUsageList = z.infer<typeof InventoryUsageListSchema>
-export type InventoryUsageFilter = z.infer<typeof InventoryUsageFilterSchema>
-export type InventoryUsageRequest = z.infer<typeof InventoryUsageRequestSchema>
+export type InventoryUsage = SchemaType<typeof InventoryUsageSchema>
+export type InventoryUsageList = SchemaType<typeof InventoryUsageListSchema>
+export type InventoryUsageFilter = SchemaType<typeof InventoryUsageFilterSchema>
+export type InventoryUsageRequest = SchemaType<typeof InventoryUsageRequestSchema>

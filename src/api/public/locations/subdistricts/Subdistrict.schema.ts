@@ -2,11 +2,12 @@ import { messages } from '@/utils/constants/messages';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
-import { z } from '@hono/zod-openapi';
 import { subdistricts } from 'db/schema/subdistricts';
 import { createSelectSchema } from 'drizzle-zod';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
+import { z } from 'zod';
 
 const SubdistrictSchema = createSelectSchema(subdistricts)
   .omit({ districtCode: true })
@@ -26,5 +27,5 @@ export const SubdistrictFilterSchema = z
 const SubdistrictListSchema = z.array(SubdistrictSchema)
 export const SubdistrictResponseListSchema = ApiResponseListSchema(SubdistrictListSchema, messages.successList('subdistricts'))
 
-export type Subdistrict = z.infer<typeof SubdistrictSchema>
-export type SubdistrictFilter = z.infer<typeof SubdistrictFilterSchema>
+export type Subdistrict = SchemaType<typeof SubdistrictSchema>
+export type SubdistrictFilter = SchemaType<typeof SubdistrictFilterSchema>

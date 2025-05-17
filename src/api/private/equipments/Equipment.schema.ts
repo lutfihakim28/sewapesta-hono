@@ -14,6 +14,7 @@ import { UserExtendedSchema } from '../users/User.schema';
 import { EquipmentStatusEnum } from '@/utils/enums/EquipmentStatusEnum';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 export type EquipmentColumn = keyof typeof equipments.$inferSelect;
 
@@ -44,7 +45,7 @@ const EquipmentListItemSchema = EquipmentSchema.extend({
 
 export const EquipmentListSchema = z.array(EquipmentListItemSchema).openapi('EquipmentList')
 
-export type EquipmentListColumn = keyof Pick<z.infer<typeof EquipmentListItemSchema>, 'id' |
+export type EquipmentListColumn = keyof Pick<SchemaType<typeof EquipmentListItemSchema>, 'id' |
   'number' |
   'registerDate' |
   'lastMaintenanceDate' |
@@ -59,18 +60,19 @@ export const sortableEquipmentColumns: EquipmentListColumn[] = [
   'owner',
 ]
 
-export const EquipmentFilterSchema = z.object({
-  itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-  ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-  status: z.nativeEnum(EquipmentStatusEnum, {
-    invalid_type_error: validationMessages.enum('Status', EquipmentStatusEnum)
-  }).optional(),
-  number: new StringSchema('Number').getSchema().optional(),
-  categoryId: new StringSchema('Category ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-})
+export const EquipmentFilterSchema = SearchSchema
   .merge(SearchSchema)
   .merge(PaginationSchema)
   .merge(SortSchema(sortableEquipmentColumns))
+  .extend({
+    itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    status: z.nativeEnum(EquipmentStatusEnum, {
+      invalid_type_error: validationMessages.enum('Status', EquipmentStatusEnum)
+    }).optional(),
+    number: new StringSchema('Number').getSchema().optional(),
+    categoryId: new StringSchema('Category ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+  })
   .openapi('EquipmentFilter')
 
 export const EquipmentRequestSchema = createInsertSchema(equipments, {
@@ -84,7 +86,7 @@ export const EquipmentRequestSchema = createInsertSchema(equipments, {
 export const EquipmentResponseListSchema = ApiResponseListSchema(EquipmentListSchema, messages.successList('equipment items'))
 export const EquipmentResponseDataSchema = ApiResponseDataSchema(EquipmentSchema, messages.successDetail('equipment item'))
 
-export type Equipment = z.infer<typeof EquipmentSchema>
-export type EquipmentFilter = z.infer<typeof EquipmentFilterSchema>
-export type EquipmentRequest = z.infer<typeof EquipmentRequestSchema>
-export type EquipmentList = z.infer<typeof EquipmentListSchema>
+export type Equipment = SchemaType<typeof EquipmentSchema>
+export type EquipmentFilter = SchemaType<typeof EquipmentFilterSchema>
+export type EquipmentRequest = SchemaType<typeof EquipmentRequestSchema>
+export type EquipmentList = SchemaType<typeof EquipmentListSchema>

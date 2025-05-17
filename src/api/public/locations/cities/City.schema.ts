@@ -2,11 +2,12 @@ import { messages } from '@/utils/constants/messages';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
-import { z } from '@hono/zod-openapi';
 import { cities } from 'db/schema/cities';
 import { createSelectSchema } from 'drizzle-zod';
 // import { ProvinceSchema } from '../provinces/Province.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
+import { SchemaType } from '@/utils/types/Schema.type';
+import { z } from 'zod';
 
 const CitySchema = createSelectSchema(cities)
   .omit({ provinceCode: true })
@@ -24,5 +25,5 @@ export const CityFilterSchema = z
 const CityListSchema = z.array(CitySchema)
 export const CityResponseListSchema = ApiResponseListSchema(CityListSchema, messages.successList('cities'))
 
-export type City = z.infer<typeof CitySchema>
-export type CityFilter = z.infer<typeof CityFilterSchema>
+export type City = SchemaType<typeof CitySchema>
+export type CityFilter = SchemaType<typeof CityFilterSchema>

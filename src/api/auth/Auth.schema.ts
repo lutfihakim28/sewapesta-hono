@@ -3,14 +3,15 @@ import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { ObjectSchema } from '@/utils/schemas/Object.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
-import { z } from '@hono/zod-openapi';
+import { SchemaType } from '@/utils/types/Schema.type';
 
 /**======================
  **      LOGIN
  *========================**/
 
-export const LoginRequestSchema = z.object({
+export const LoginRequestSchema = new ObjectSchema({
   username: new StringSchema('Username').getSchema().openapi({
     example: 'superadmin',
   }),
@@ -19,19 +20,21 @@ export const LoginRequestSchema = z.object({
     .openapi({
       example: 'password',
     }),
-}).openapi('Login');
-export const LoginDataSchema = z.object({
+}).getSchema().openapi('Login');
+
+export const LoginDataSchema = new ObjectSchema({
   token: new StringSchema('Token')
     .getSchema()
     .openapi({
       example: 'eyJH*************',
     }),
   user: UserSchema
-})
+}).getSchema()
+
 export const LoginResponseSchema = ApiResponseDataSchema(LoginDataSchema, messages.successLogin).openapi('LoginResponse');
 
-export type LoginRequest = z.infer<typeof LoginRequestSchema>
-export type LoginData = z.infer<typeof LoginDataSchema>
+export type LoginRequest = SchemaType<typeof LoginRequestSchema>
+export type LoginData = SchemaType<typeof LoginDataSchema>
 
 /*==== END OF LOGIN ====*/
 
@@ -39,18 +42,18 @@ export type LoginData = z.infer<typeof LoginDataSchema>
  **      REFRESH
  *========================**/
 
-export const RefreshRequestSchema = z.object({
+export const RefreshRequestSchema = new ObjectSchema({
   userId: new NumberSchema('User ID').natural().getSchema().openapi({
     example: 1,
   }),
-})
+}).getSchema()
 
-export type RefreshRequest = z.infer<typeof RefreshRequestSchema>
+export type RefreshRequest = SchemaType<typeof RefreshRequestSchema>
 
 /*==== END OF REFRESH ====*/
 
-export const CheckUsernameSchema = z.object({
+export const CheckUsernameSchema = new ObjectSchema({
   username: new StringSchema('Username').getSchema()
-})
+}).getSchema()
 
-export type CheckUsername = z.infer<typeof CheckUsernameSchema>
+export type CheckUsername = SchemaType<typeof CheckUsernameSchema>

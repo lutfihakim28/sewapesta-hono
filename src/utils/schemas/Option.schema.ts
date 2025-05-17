@@ -1,15 +1,17 @@
 import { z } from '@hono/zod-openapi';
 import { StringSchema } from './String.schema';
 import { NumberSchema } from './Number.schema';
+import { ObjectSchema } from './Object.schema';
+import { SchemaType } from '../types/Schema.type';
 
-export const OptionSchema = z.object({
+export const OptionSchema = new ObjectSchema({
   value: z.union([new StringSchema('Value').getSchema(), new NumberSchema('Value').natural().getSchema()]),
   label: new StringSchema('Message').getSchema(),
-}).openapi('Option')
+}).getSchema().openapi('Option')
 
-export const OptionQuerySchema = z.object({
+export const OptionQuerySchema = new ObjectSchema({
   keyword: new StringSchema('Keyword').getSchema().optional()
-}).openapi('OptionQuery')
+}).getSchema().openapi('OptionQuery')
 
-export type Option = z.infer<typeof OptionSchema>
-export type OptionQuery = z.infer<typeof OptionQuerySchema>
+export type Option = SchemaType<typeof OptionSchema>
+export type OptionQuery = SchemaType<typeof OptionQuerySchema>

@@ -12,15 +12,17 @@ import { SearchSchema } from '@/utils/schemas/Search.schema'
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema'
 import { SortSchema } from '@/utils/schemas/Sort.schema'
 import { StringSchema } from '@/utils/schemas/String.schema'
+import { ObjectSchema } from '@/utils/schemas/Object.schema'
+import { SchemaType } from '@/utils/types/Schema.type'
 
 export type UserColumn = keyof typeof users.$inferSelect
 export type ProfileColumn = keyof typeof profiles.$inferSelect
 
 export const UserRoleSchema = z.nativeEnum(RoleEnum)
-export const UserRoleUpdateSchema = z.object({
+export const UserRoleUpdateSchema = new ObjectSchema({
   role: z.nativeEnum(RoleEnum),
   assigned: z.boolean(),
-})
+}).getSchema()
 
 export const ProfileSchema = createSelectSchema(profiles)
   .pick({
@@ -65,14 +67,14 @@ export const UserExtendedSchema = UserSchema
 
 const UserListSchema = z.array(UserExtendedSchema)
 
-export type UserListColumn = keyof Pick<z.infer<typeof UserExtendedSchema>, 'id' | 'name' | 'phone' | 'username'>
+export type UserListColumn = keyof Pick<SchemaType<typeof UserExtendedSchema>, 'id' | 'name' | 'phone' | 'username'>
 export const sortableUserColumns: UserListColumn[] = ['id', 'name', 'phone', 'username']
 
-export const UserFilterSchema = z.object({
-  role: UserRoleSchema.optional()
-})
-  .merge(SearchSchema)
+export const UserFilterSchema = SearchSchema
   .merge(PaginationSchema)
+  .extend({
+    role: UserRoleSchema.optional()
+  })
   .merge(SortSchema(sortableUserColumns)).openapi('UserFilter')
 
 
@@ -96,15 +98,15 @@ export const UserCreateSchema = createInsertSchema(users)
 
 export const UserResponseDataSchema = ApiResponseDataSchema(UserExtendedSchema, messages.successDetail('user'))
 
-export const UserChangePasswordSchema = z.object({
+export const UserChangePasswordSchema = new ObjectSchema({
   oldPassword: new StringSchema('Old Password').getSchema().optional(),
   newPassword: new StringSchema('Name').min(8).getSchema()
-}).openapi('UserChangePassword')
+}).getSchema().openapi('UserChangePassword')
 
-export type User = z.infer<typeof UserSchema>
-export type UserExtended = z.infer<typeof UserExtendedSchema>
-export type UserCreate = z.infer<typeof UserCreateSchema>
-export type ProfileRequest = z.infer<typeof ProfileRequestSchema>
-export type UserChangePassword = z.infer<typeof UserChangePasswordSchema>
-export type UserFilter = z.infer<typeof UserFilterSchema>
-export type UserRoleUpdate = z.infer<typeof UserRoleUpdateSchema>
+export type User = SchemaType<typeof UserSchema>
+export type UserExtended = SchemaType<typeof UserExtendedSchema>
+export type UserCreate = SchemaType<typeof UserCreateSchema>
+export type ProfileRequest = SchemaType<typeof ProfileRequestSchema>
+export type UserChangePassword = SchemaType<typeof UserChangePasswordSchema>
+export type UserFilter = SchemaType<typeof UserFilterSchema>
+export type UserRoleUpdate = SchemaType<typeof UserRoleUpdateSchema>
