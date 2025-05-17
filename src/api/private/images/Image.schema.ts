@@ -8,6 +8,7 @@ import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { ObjectSchema } from '@/utils/schemas/Object.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { z } from 'zod';
+import { EnumSchema } from '@/utils/schemas/Enum.schema';
 
 const MAX_FILE_SIZE = 10000000;
 const accept = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];
@@ -41,10 +42,7 @@ const ImageFilterSchema = createSelectSchema(images).pick({
 })
 
 const ImageSaveSchema = new ObjectSchema({
-  reference: z.nativeEnum(ImageReferenceEnum, {
-    required_error: validationMessages.required('Image reference'),
-    invalid_type_error: validationMessages.enum('Image reference', ImageReferenceEnum),
-  }),
+  reference: new EnumSchema('Reference', ImageReferenceEnum).getSchema(),
   referenceId: new NumberSchema('Reference ID').natural().getSchema(),
 }).getSchema().openapi('ImageSave')
 

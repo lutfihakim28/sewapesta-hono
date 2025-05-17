@@ -4,7 +4,6 @@ import { UnitSchema } from '../units/Unit.schema';
 import { CategorySchema } from '../categories/Category.schema';
 import { z } from 'zod';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
-import { validationMessages } from '@/utils/constants/validation-message';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
@@ -13,6 +12,7 @@ import { messages } from '@/utils/constants/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
+import { EnumSchema } from '@/utils/schemas/Enum.schema';
 
 export type ItemColumn = keyof typeof items.$inferSelect;
 
@@ -36,9 +36,7 @@ export const ItemFilterSchema = SearchSchema
   .merge(SortSchema(sortableItemColumns))
   .merge(PaginationSchema)
   .extend({
-    type: z.nativeEnum(ItemTypeEnum, {
-      invalid_type_error: validationMessages.enum('Type', ItemTypeEnum)
-    }).optional(),
+    type: new EnumSchema('Type', ItemTypeEnum).getSchema().optional(),
     categoryId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
   })
   .openapi('ItemFilter')
@@ -50,10 +48,7 @@ export const ItemRequestSchema = createInsertSchema(items, {
   categoryId: new NumberSchema('Category ID').natural().getSchema(),
   name: new StringSchema('Name').getSchema(),
   unitId: new NumberSchema('Unit ID').natural().getSchema(),
-  type: z.nativeEnum(ItemTypeEnum, {
-    invalid_type_error: validationMessages.enum('Type', ItemTypeEnum),
-    required_error: validationMessages.required('Type')
-  })
+  type: new EnumSchema('Type', ItemTypeEnum).getSchema()
 }).pick({
   name: true,
   type: true,

@@ -1,7 +1,6 @@
 import { equipments } from 'db/schema/equipments';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { validationMessages } from '@/utils/constants/validation-message';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
@@ -15,6 +14,7 @@ import { EquipmentStatusEnum } from '@/utils/enums/EquipmentStatusEnum';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
+import { EnumSchema } from '@/utils/schemas/Enum.schema';
 
 export type EquipmentColumn = keyof typeof equipments.$inferSelect;
 
@@ -67,9 +67,7 @@ export const EquipmentFilterSchema = SearchSchema
   .extend({
     itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
     ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    status: z.nativeEnum(EquipmentStatusEnum, {
-      invalid_type_error: validationMessages.enum('Status', EquipmentStatusEnum)
-    }).optional(),
+    status: new EnumSchema('Status', EquipmentStatusEnum).getSchema().optional(),
     number: new StringSchema('Number').getSchema().optional(),
     categoryId: new StringSchema('Category ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
   })

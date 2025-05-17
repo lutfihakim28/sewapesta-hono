@@ -17,11 +17,6 @@ export class StringSchema {
     return this.#schema;
   }
 
-  optional() {
-    this.#schema.optional();
-    return this;
-  }
-
   numeric(option?: Partial<{ min: number, subset: 'whole' | 'natural' | 'integer' }>) {
     this.#schema
       .regex(/^\d+(\.\d+)?$/, {

@@ -14,13 +14,14 @@ import { SortSchema } from '@/utils/schemas/Sort.schema'
 import { StringSchema } from '@/utils/schemas/String.schema'
 import { ObjectSchema } from '@/utils/schemas/Object.schema'
 import { SchemaType } from '@/utils/types/Schema.type'
+import { EnumSchema } from '@/utils/schemas/Enum.schema'
 
 export type UserColumn = keyof typeof users.$inferSelect
 export type ProfileColumn = keyof typeof profiles.$inferSelect
 
-export const UserRoleSchema = z.nativeEnum(RoleEnum)
+export const UserRoleSchema = new EnumSchema('User role', RoleEnum).getSchema()
 export const UserRoleUpdateSchema = new ObjectSchema({
-  role: z.nativeEnum(RoleEnum),
+  role: new EnumSchema('Role', RoleEnum).getSchema(),
   assigned: z.boolean(),
 }).getSchema()
 
@@ -87,10 +88,7 @@ export const UserCreateSchema = createInsertSchema(users)
   })
   .extend({
     profile: ProfileRequestSchema,
-    roles: z.array(z.nativeEnum(RoleEnum, {
-      invalid_type_error: validationMessages.enum('Role', RoleEnum),
-      required_error: validationMessages.required('Role')
-    }), {
+    roles: z.array(new EnumSchema('Role', RoleEnum).getSchema(), {
       invalid_type_error: validationMessages.array('Roles'),
       required_error: validationMessages.required('Roles')
     }).nonempty('Roles can not be empty.')

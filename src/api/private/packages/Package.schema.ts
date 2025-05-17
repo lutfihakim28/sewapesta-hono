@@ -13,6 +13,7 @@ import { ProductSchema } from '../products/Product.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
+import { EnumSchema } from '@/utils/schemas/Enum.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -54,9 +55,7 @@ export const PackageFilterSchema = SearchSchema
   .extend({
     ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
     productId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    term: z.nativeEnum(PackageTermEnum, {
-      invalid_type_error: validationMessages.enum('Term', PackageTermEnum)
-    }).optional()
+    term: new EnumSchema('Term', PackageTermEnum).getSchema().optional()
   })
   .openapi('PackageFilter')
 
@@ -71,10 +70,7 @@ export const PackageRequestSchema = createInsertSchema(packages, {
   ownerRatio: new NumberSchema('Owner ID').nonnegative().getSchema(),
   price: new NumberSchema('Owner ID').whole().getSchema(),
   productId: new NumberSchema('Product ID').natural().getSchema(),
-  term: z.nativeEnum(PackageTermEnum, {
-    invalid_type_error: validationMessages.enum('Term', PackageTermEnum),
-    required_error: validationMessages.required('Term')
-  }),
+  term: new EnumSchema('Term', PackageTermEnum).getSchema(),
 }).pick({
   includeEmployee: true,
   name: true,
