@@ -9,6 +9,7 @@ import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { z } from 'zod';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
@@ -31,7 +32,7 @@ export const ProductFilterSchema = SearchSchema
   .merge(SortSchema(sortableProductColumn))
   .openapi('ProductFilter')
 
-const ProductListSchema = z.array(ProductSchema)
+const ProductListSchema = new ArraySchema('Product list', ProductSchema).getSchema()
 
 export const ProductResponseListSchema = ApiResponseListSchema(ProductListSchema, messages.successList('products'))
 

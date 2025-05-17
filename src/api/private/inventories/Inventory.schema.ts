@@ -14,6 +14,7 @@ import { messages } from '@/utils/constants/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 export type InventoryColumn = keyof typeof inventories.$inferSelect;
 
@@ -46,7 +47,7 @@ export const sortableInventoryColumns: InventoryListColumn[] = [
   'owner'
 ]
 
-export const InventoryListSchema = z.array(InventoryListItemSchema).openapi('InventoryList')
+export const InventoryListSchema = new ArraySchema('Inventory list', InventoryListItemSchema).getSchema().openapi('InventoryList')
 
 export const InventoryFilterSchema = SearchSchema
   .merge(PaginationSchema)

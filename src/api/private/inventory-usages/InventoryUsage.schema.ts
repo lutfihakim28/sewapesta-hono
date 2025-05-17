@@ -13,6 +13,7 @@ import { validationMessages } from '@/utils/constants/validation-message';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 export type inventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
 
@@ -32,7 +33,7 @@ const InventoryUsageListItemSchema = InventoryUsageSchema.extend({
   owner: UserExtendedSchema.pick({ id: true, name: true }),
 })
 
-const InventoryUsageListSchema = z.array(InventoryUsageListItemSchema).openapi('InventoryUsageList')
+const InventoryUsageListSchema = new ArraySchema('Inventory usage list', InventoryUsageListItemSchema).getSchema().openapi('InventoryUsageList')
 export const InventoryUsageFilterSchema = PaginationSchema
   .merge(SearchSchema)
   .merge(DateRangeSchema)

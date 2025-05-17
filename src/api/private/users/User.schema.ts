@@ -16,6 +16,7 @@ import { ObjectSchema } from '@/utils/schemas/Object.schema'
 import { SchemaType } from '@/utils/types/Schema.type'
 import { EnumSchema } from '@/utils/schemas/Enum.schema'
 import { BooleanSchema } from '@/utils/schemas/Boolean.schema'
+import { ArraySchema } from '@/utils/schemas/Array.schema'
 
 export type UserColumn = keyof typeof users.$inferSelect
 export type ProfileColumn = keyof typeof profiles.$inferSelect
@@ -59,7 +60,7 @@ export const UserSchema = createSelectSchema(users)
     username: true,
   })
   .extend({
-    roles: z.array(UserRoleSchema)
+    roles: new ArraySchema('Roles', UserRoleSchema).getSchema()
   })
   .openapi('User')
 
@@ -67,7 +68,7 @@ export const UserExtendedSchema = UserSchema
   .merge(ProfileExtendedSchema)
   .openapi('UserExtended')
 
-const UserListSchema = z.array(UserExtendedSchema)
+const UserListSchema = new ArraySchema('User list', UserExtendedSchema).getSchema()
 
 export type UserListColumn = keyof Pick<SchemaType<typeof UserExtendedSchema>, 'id' | 'name' | 'phone' | 'username'>
 export const sortableUserColumns: UserListColumn[] = ['id', 'name', 'phone', 'username']
@@ -89,10 +90,7 @@ export const UserCreateSchema = createInsertSchema(users)
   })
   .extend({
     profile: ProfileRequestSchema,
-    roles: z.array(new EnumSchema('Role', RoleEnum).getSchema(), {
-      invalid_type_error: validationMessages.array('Roles'),
-      required_error: validationMessages.required('Roles')
-    }).nonempty('Roles can not be empty.')
+    roles: new ArraySchema('Roles', new EnumSchema('Role', RoleEnum).getSchema()).nonempty().getSchema()
   }).openapi('UserCreate')
 
 export const UserResponseDataSchema = ApiResponseDataSchema(UserExtendedSchema, messages.successDetail('user'))

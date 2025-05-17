@@ -15,6 +15,7 @@ import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
 import { BooleanSchema } from '@/utils/schemas/Boolean.schema';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -48,7 +49,7 @@ export const sortablePackageColumns: PackageListColumn[] = [
   'id', 'name', 'owner', 'price', 'product'
 ]
 
-export const PackageListSchema = z.array(PackageListItemSchema).openapi('PackageList')
+export const PackageListSchema = new ArraySchema('Package list', PackageListItemSchema).getSchema().openapi('PackageList')
 
 export const PackageFilterSchema = SearchSchema
   .merge(SortSchema(sortablePackageColumns))

@@ -8,6 +8,7 @@ import { validationMessages } from '@/utils/constants/validation-message';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { z } from 'zod';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 const SubdistrictSchema = createSelectSchema(subdistricts)
   .omit({ districtCode: true })
@@ -24,7 +25,7 @@ export const SubdistrictFilterSchema = z
   .merge(SearchSchema)
   .merge(PaginationSchema)
   .openapi('SubdistrictFilter')
-const SubdistrictListSchema = z.array(SubdistrictSchema)
+const SubdistrictListSchema = new ArraySchema('Subdistrict list', SubdistrictSchema).getSchema()
 export const SubdistrictResponseListSchema = ApiResponseListSchema(SubdistrictListSchema, messages.successList('subdistricts'))
 
 export type Subdistrict = SchemaType<typeof SubdistrictSchema>

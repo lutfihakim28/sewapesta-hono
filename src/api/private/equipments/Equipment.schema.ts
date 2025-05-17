@@ -15,6 +15,7 @@ import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 export type EquipmentColumn = keyof typeof equipments.$inferSelect;
 
@@ -43,7 +44,7 @@ const EquipmentListItemSchema = EquipmentSchema.extend({
   })
 })
 
-export const EquipmentListSchema = z.array(EquipmentListItemSchema).openapi('EquipmentList')
+export const EquipmentListSchema = new ArraySchema('Equipment list', EquipmentListItemSchema).getSchema().openapi('EquipmentList')
 
 export type EquipmentListColumn = keyof Pick<SchemaType<typeof EquipmentListItemSchema>, 'id' |
   'number' |

@@ -7,6 +7,7 @@ import { createSelectSchema } from 'drizzle-zod';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { z } from 'zod';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 const DistrictSchema = createSelectSchema(districts)
   .omit({ cityCode: true })
@@ -23,7 +24,7 @@ export const DistrictFilterSchema = z
   .merge(SearchSchema)
   .merge(PaginationSchema)
   .openapi('DistrictFilter')
-const DistrictListSchema = z.array(DistrictSchema);
+const DistrictListSchema = new ArraySchema('District list', DistrictSchema).getSchema();
 export const DistrictResponseListSchema = ApiResponseListSchema(DistrictListSchema, messages.successList('districts'))
 
 export type District = SchemaType<typeof DistrictSchema>

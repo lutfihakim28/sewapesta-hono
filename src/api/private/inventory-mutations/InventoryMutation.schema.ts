@@ -12,6 +12,7 @@ import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 export type InventoryMutaionColumn = keyof typeof inventoryMutations.$inferSelect
 
@@ -27,7 +28,7 @@ export const InventoryMutationSchema = createSelectSchema(inventoryMutations)
   })
   .openapi('InventoryMutation')
 
-export const InventoryMutationListSchema = z.array(InventoryMutationSchema.extend({
+export const InventoryMutationListSchema = new ArraySchema('Inventory mutation list', InventoryMutationSchema.extend({
   item: ItemSchema.pick({
     id: true,
     name: true,
@@ -36,7 +37,7 @@ export const InventoryMutationListSchema = z.array(InventoryMutationSchema.exten
     id: true,
     name: true,
   })
-})).openapi('InventoryMutationList')
+})).getSchema().openapi('InventoryMutationList')
 
 export const InventoryMutationFilterSchema = SearchSchema
   .merge(PaginationSchema)

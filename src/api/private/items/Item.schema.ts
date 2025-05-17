@@ -13,6 +13,7 @@ import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
+import { ArraySchema } from '@/utils/schemas/Array.schema';
 
 export type ItemColumn = keyof typeof items.$inferSelect;
 
@@ -41,7 +42,7 @@ export const ItemFilterSchema = SearchSchema
   })
   .openapi('ItemFilter')
 
-export const ItemResponseListSchema = ApiResponseListSchema(z.array(ItemSchema), messages.successList('items')).openapi('ItemResponseList')
+export const ItemResponseListSchema = ApiResponseListSchema(new ArraySchema('Item list', ItemSchema).getSchema(), messages.successList('items')).openapi('ItemResponseList')
 export const ItemResponseDataSchema = ApiResponseDataSchema(ItemSchema, messages.successDetail('item')).openapi('ItemResponseData')
 
 export const ItemRequestSchema = createInsertSchema(items, {
