@@ -27,7 +27,7 @@ export const InventoryUsageDetailRoute = createRoute({
     params: ParamIdSchema,
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: InventoryUsageResponseDataSchema, description: 'Get detail ivnentory usage' },
+    successResponse: { schema: InventoryUsageResponseDataSchema, description: 'Get detail inventory usage' },
     codes: [401, 403, 404],
   }),
 })

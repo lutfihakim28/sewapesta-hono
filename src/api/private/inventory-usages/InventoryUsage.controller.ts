@@ -13,7 +13,7 @@ InventoryUsageController.openapi(InventoryUsageListRoute, async (context) => {
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('inventory item usages')],
+    messages: [messages.successList('inventory usages')],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,
@@ -29,7 +29,7 @@ InventoryUsageController.openapi(InventoryUsageDetailRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successDetail('inventory item usage')],
+    messages: [messages.successDetail('inventory usage')],
     data: inventoryUsage
   }), 200)
 })
@@ -41,7 +41,7 @@ InventoryUsageController.openapi(InventoryUsageCreateRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successCreate(`Inventory item usage with ID ${inventoryUsage.id}`)],
+    messages: [messages.successCreate(`Inventory usage with ID ${inventoryUsage.id}`)],
     data: inventoryUsage
   }), 200)
 })
@@ -54,7 +54,7 @@ InventoryUsageController.openapi(InventoryUsageUpdateRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successUpdate(`Inventory item usage with ID ${inventoryUsage.id}`)],
+    messages: [messages.successUpdate(`Inventory usage with ID ${inventoryUsage.id}`)],
     data: inventoryUsage
   }), 200)
 })
@@ -66,7 +66,7 @@ InventoryUsageController.openapi(InventoryUsageDeleteRoute, async (context) => {
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete(`Inventory item usage with ID ${param.id}`)],
+    messages: [messages.successDelete(`Inventory usage with ID ${param.id}`)],
   }), 200)
 })
 

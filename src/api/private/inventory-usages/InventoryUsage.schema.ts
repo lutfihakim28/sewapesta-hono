@@ -2,20 +2,17 @@ import { inventoryUsages } from 'db/schema/inventory-usages';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { ItemSchema } from '../items/Item.schema';
 import { UserExtendedSchema } from '../users/User.schema';
-import { z } from 'zod';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { DateRangeSchema } from '@/utils/schemas/DateRange.schema';
-import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { messages } from '@/utils/constants/messages';
-import { validationMessages } from '@/utils/constants/validation-message';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 
-export type inventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
+export type InventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
 
 export const InventoryUsageSchema = createSelectSchema(inventoryUsages).pick({
   description: true,
