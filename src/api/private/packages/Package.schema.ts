@@ -7,7 +7,6 @@ import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { packages } from 'db/schema/packages';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 import { UserExtendedSchema } from '../users/User.schema';
 import { ProductSchema } from '../products/Product.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
@@ -65,9 +64,9 @@ export const PackageRequestSchema = createInsertSchema(packages, {
   includeEmployee: new BooleanSchema('Include employee').getSchema(),
   name: new StringSchema('Name').getSchema(),
   ownerId: new NumberSchema('Owner ID').natural().getSchema(),
-  ownerPrice: new NumberSchema('Owner ID').whole().getSchema(),
-  ownerRatio: new NumberSchema('Owner ID').nonnegative().getSchema(),
-  price: new NumberSchema('Owner ID').whole().getSchema(),
+  ownerPrice: new NumberSchema('Owner price').whole().getSchema(),
+  ownerRatio: new NumberSchema('Owner ratio').nonnegative().getSchema(),
+  price: new NumberSchema('Price').whole().getSchema(),
   productId: new NumberSchema('Product ID').natural().getSchema(),
   term: new EnumSchema('Term', PackageTermEnum).getSchema(),
 }).pick({

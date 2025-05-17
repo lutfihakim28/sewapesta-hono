@@ -13,7 +13,7 @@ InventoryMutationController.openapi(InventoryMutationListRoute, async (context) 
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('inventory item mutations')],
+    messages: [messages.successList('inventory mutations')],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,
@@ -29,7 +29,7 @@ InventoryMutationController.openapi(InventoryMutationDetailRoute, async (context
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successDetail('inventory item mutation')],
+    messages: [messages.successDetail('inventory mutation')],
     data: inventoryMutation
   }), 200)
 })
@@ -41,7 +41,7 @@ InventoryMutationController.openapi(InventoryMutationCreateRoute, async (context
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successCreate(`Inventory item mutation with ID ${inventoryMutation.id}`)],
+    messages: [messages.successCreate(`Inventory mutation with ID ${inventoryMutation.id}`)],
     data: inventoryMutation
   }), 200)
 })
@@ -54,7 +54,7 @@ InventoryMutationController.openapi(InventoryMutationUpdateRoute, async (context
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successUpdate(`Inventory item mutation with ID ${inventoryMutation.id}`)],
+    messages: [messages.successUpdate(`Inventory mutation with ID ${inventoryMutation.id}`)],
     data: inventoryMutation
   }), 200)
 })
@@ -66,7 +66,7 @@ InventoryMutationController.openapi(InventoryMutationDeleteRoute, async (context
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete(`Inventory item mutation with ID ${param.id}`)],
+    messages: [messages.successDelete(`Inventory mutation with ID ${param.id}`)],
   }), 200)
 })
 

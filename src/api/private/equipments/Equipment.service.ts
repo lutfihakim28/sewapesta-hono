@@ -127,7 +127,7 @@ export class EquipmentService {
       .limit(1)
 
     if (!equipment) {
-      throw new NotFoundException(messages.errorNotFound(`Equipment item with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Equipment with ID ${id}`))
     }
 
     return equipment;
@@ -174,7 +174,7 @@ export class EquipmentService {
       .returning(equipmentColumns)
 
     if (!updatedEquipment) {
-      throw new NotFoundException(messages.errorNotFound(`Equipment item with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Equipment with ID ${id}`))
     }
 
     return updatedEquipment;
@@ -192,8 +192,24 @@ export class EquipmentService {
       .returning({ id: equipments.id })
 
     if (!deletedEquipment) {
-      throw new NotFoundException(messages.errorNotFound(`Equipment item with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Equipment with ID ${id}`))
     }
+  }
+
+  static async check(id: number): Promise<Equipment> {
+    const [inventory] = await db
+      .select(equipmentColumns)
+      .from(equipments)
+      .where(and(
+        isNull(equipments.deletedAt),
+        eq(equipments.id, id)
+      ))
+
+    if (!inventory) {
+      throw new NotFoundException(messages.errorConstraint(`Equipment with ID ${id}`))
+    }
+
+    return inventory;
   }
 
   private constructor() { }

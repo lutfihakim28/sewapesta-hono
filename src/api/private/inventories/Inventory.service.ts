@@ -50,6 +50,7 @@ export class InventoryService {
       }
       orders.push(desc(inventories[col as InventoryColumn]))
     })
+
     const conditions: ReturnType<typeof and>[] = [
       isNull(inventories.deletedAt)
     ];
@@ -123,7 +124,7 @@ export class InventoryService {
       .limit(1)
 
     if (!inventory) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Inventory with ID ${id}`))
     }
 
     return inventory;
@@ -160,7 +161,7 @@ export class InventoryService {
       .returning(inventoryColumns)
 
     if (!updatedInventory) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Inventory with ID ${id}`))
     }
 
     return updatedInventory;
@@ -179,7 +180,7 @@ export class InventoryService {
       .returning(inventoryColumns)
 
     if (!deletedInventory) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Inventory with ID ${id}`))
     }
   }
 
@@ -193,7 +194,7 @@ export class InventoryService {
       ))
 
     if (!inventory) {
-      throw new NotFoundException(messages.errorConstraint(`invnetory item with ID ${id}`))
+      throw new NotFoundException(messages.errorConstraint(`Invnetory with ID ${id}`))
     }
 
     return inventory;

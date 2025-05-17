@@ -89,7 +89,7 @@ export class InventoryUsageService {
       .limit(1);
 
     if (!inventoryUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item usage with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
     }
 
     return inventoryUsage;
@@ -125,7 +125,7 @@ export class InventoryUsageService {
       .returning(inventoryUsageColumns)
 
     if (!updatedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item usage with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
     }
 
     return updatedUsage;
@@ -144,7 +144,7 @@ export class InventoryUsageService {
       .returning(inventoryUsageColumns)
 
     if (!deletedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item usage with ID ${id}`))
+      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
     }
   }
 

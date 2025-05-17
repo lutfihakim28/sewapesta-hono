@@ -31,6 +31,7 @@ import InventoryMutationController from '@/api/private/inventory-mutations/Inven
 import { Scalar } from '@scalar/hono-api-reference'
 import InventoryUsageController from '@/api/private/inventory-usages/InventoryUsage.controller'
 import InventoryDamageReportController from '@/api/private/inventory-damage-reports/InventoryDamageReport.controller'
+import PackageItemController from '@/api/private/package-items/PackageItem.controller'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -81,6 +82,7 @@ app.use('/static/*', serveStatic({ root: './' }))
 
 app.use('/api/private/products/*', adminMiddleware)
 app.use('/api/private/packages/*', adminMiddleware)
+app.use('/api/private/package-items/*', adminMiddleware)
 app.use('/api/private/items/*', adminMiddleware)
 app.use('/api/private/equipments/*', adminMiddleware)
 app.use('/api/private/inventories/*', adminMiddleware)
@@ -111,6 +113,7 @@ app.route('/api/private/categories', CategoryController)
 app.route('/api/private/units', UnitController)
 app.route('/api/private/products', ProductController)
 app.route('/api/private/packages', PackageController)
+app.route('/api/private/package-items', PackageItemController)
 app.route('/api/private/items', ItemController)
 app.route('/api/private/equipments', EquipmentController)
 app.route('/api/private/inventories', InventoryController)
