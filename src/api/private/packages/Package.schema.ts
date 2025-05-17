@@ -14,6 +14,7 @@ import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
+import { BooleanSchema } from '@/utils/schemas/Boolean.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -60,10 +61,7 @@ export const PackageFilterSchema = SearchSchema
   .openapi('PackageFilter')
 
 export const PackageRequestSchema = createInsertSchema(packages, {
-  includeEmployee: z.boolean({
-    invalid_type_error: validationMessages.boolean('Include employee'),
-    required_error: validationMessages.required('Include employee')
-  }),
+  includeEmployee: new BooleanSchema('Include employee').getSchema(),
   name: new StringSchema('Name').getSchema(),
   ownerId: new NumberSchema('Owner ID').natural().getSchema(),
   ownerPrice: new NumberSchema('Owner ID').whole().getSchema(),

@@ -15,6 +15,7 @@ import { StringSchema } from '@/utils/schemas/String.schema'
 import { ObjectSchema } from '@/utils/schemas/Object.schema'
 import { SchemaType } from '@/utils/types/Schema.type'
 import { EnumSchema } from '@/utils/schemas/Enum.schema'
+import { BooleanSchema } from '@/utils/schemas/Boolean.schema'
 
 export type UserColumn = keyof typeof users.$inferSelect
 export type ProfileColumn = keyof typeof profiles.$inferSelect
@@ -22,7 +23,7 @@ export type ProfileColumn = keyof typeof profiles.$inferSelect
 export const UserRoleSchema = new EnumSchema('User role', RoleEnum).getSchema()
 export const UserRoleUpdateSchema = new ObjectSchema({
   role: new EnumSchema('Role', RoleEnum).getSchema(),
-  assigned: z.boolean(),
+  assigned: new BooleanSchema('Assigned').getSchema(),
 }).getSchema()
 
 export const ProfileSchema = createSelectSchema(profiles)
