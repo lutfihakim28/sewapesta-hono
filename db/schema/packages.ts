@@ -1,19 +1,19 @@
-import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, pgTable, text, serial, boolean, bigint, decimal } from 'drizzle-orm/pg-core';
 import { timestamps } from './timestamps.helper';
 import { products } from './products';
 import { users } from './users';
 import { PackageTermEnum } from '@/utils/enums/PackageTermEnum';
 
-export const packages = sqliteTable('packages', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const packages = pgTable('packages', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   ownerId: integer('owner_id').references(() => users.id).notNull(),
   productId: integer('product_id').references(() => products.id),
-  price: integer('price').notNull(),
-  ownerPrice: integer('owner_price'), // exac amount. e.g. 200.000
-  ownerRatio: real('owner_ratio'), // ratio from price. e.g. 50% => 0.5
+  price: bigint('price', { mode: 'number' }).notNull(),
+  ownerPrice: bigint('owner_price', { mode: 'number' }).notNull(), // exac amount. e.g. 200.000
+  ownerRatio: decimal('owner_ratio', { precision: 5, scale: 2 }), // ratio from price. e.g. 50% => 0.5
   term: text('term', { enum: [PackageTermEnum.Price, PackageTermEnum.Ratio] }).notNull(),
-  includeEmployee: integer('include_employee', { mode: 'boolean' }), // if true, employees who responsible for send/retrieve this item are handled by the owner
+  includeEmployee: boolean('include_employee'), // if true, employees who responsible for send/retrieve this item are handled by the owner
   ...timestamps,
 }, (table) => ([
   index('package_owner_index').on(table.ownerId),

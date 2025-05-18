@@ -1,16 +1,17 @@
-import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, primaryKey, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 
-export const usersRoles = sqliteTable('users_roles', {
+export const usersRoles = pgTable('users_roles', {
   userId: integer('user_id').references(() => users.id).notNull(),
-  role: text('role', {
+  role: varchar('role', {
     enum: [
       RoleEnum.Admin,
       RoleEnum.Employee,
       RoleEnum.Owner,
       RoleEnum.SuperAdmin,
-    ]
+    ],
+    length: 10
   }).notNull(),
 }, (table) => ([
   primaryKey({ columns: [table.userId, table.role] })

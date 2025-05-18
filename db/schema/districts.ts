@@ -1,8 +1,8 @@
 import { cities } from 'db/schema/cities';
-import { index, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { char, index, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 
-export const districts = sqliteTable('districts', {
-  code: text('code').primaryKey(),
-  name: text('name').notNull(),
-  cityCode: text('city_code').references(() => cities.code).notNull()
+export const districts = pgTable('districts', {
+  code: char('code', { length: 8 }).primaryKey(),
+  name: varchar('name', { length: 50 }).notNull(),
+  cityCode: char('city_code', { length: 5 }).references(() => cities.code).notNull()
 }, (table) => [index('district_city_index').on(table.cityCode)])

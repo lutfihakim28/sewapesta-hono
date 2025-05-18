@@ -1,4 +1,4 @@
-import { integer } from "drizzle-orm/sqlite-core";
+import { integer } from "drizzle-orm/pg-core";
 import { AppDate } from '@/utils/libs/AppDate';
 
 export const timestamps = {

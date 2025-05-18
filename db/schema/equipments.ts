@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { char, index, integer, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { timestamps } from './timestamps.helper';
 import { users } from './users';
 import { items } from './items';
@@ -6,12 +6,12 @@ import { EquipmentStatusEnum } from '@/utils/enums/EquipmentStatusEnum';
 import { AppDate } from '@/utils/libs/AppDate';
 // import { categories } from './categories';
 
-export const equipments = sqliteTable('equipments', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  number: text('number').unique().notNull(),
+export const equipments = pgTable('equipments', {
+  id: serial('id').primaryKey(),
+  number: char('number', { length: 8 }).unique().notNull(),
   itemId: integer('item_id').references(() => items.id).notNull(),
   ownerId: integer('owner_id').references(() => users.id).notNull(),
-  status: text('status', {
+  status: varchar('status', {
     enum: [
       EquipmentStatusEnum.Available,
       EquipmentStatusEnum.Damaged,
@@ -21,6 +21,7 @@ export const equipments = sqliteTable('equipments', {
       EquipmentStatusEnum.Reserved,
       EquipmentStatusEnum.Returned,
     ],
+    length: 11
   }).notNull().default(EquipmentStatusEnum.Available),
   registerDate: integer('register_date').notNull().$defaultFn(() => new AppDate().unix()),
   lastMaintenanceDate: integer('last_maintenance_date').notNull().$defaultFn(() => new AppDate().unix()),

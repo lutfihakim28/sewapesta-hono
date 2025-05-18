@@ -1,18 +1,19 @@
 import { StockMutationTypeEnum } from '@/utils/enums/StockMutationType.Enum';
 import { timestamps } from 'db/schema/timestamps.helper';
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { inventories } from './inventories';
 import { items } from './items';
 import { AppDate } from '@/utils/libs/AppDate';
 
-export const inventoryMutations = sqliteTable('inventory_mutations', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  type: text('type', {
+export const inventoryMutations = pgTable('inventory_mutations', {
+  id: serial('id').primaryKey(),
+  type: varchar('type', {
     enum: [
       StockMutationTypeEnum.Addition,
       StockMutationTypeEnum.Reduction,
       StockMutationTypeEnum.Adjustment,
     ],
+    length: 10
   }).notNull().default(StockMutationTypeEnum.Addition),
   itemId: integer('item_id').references(() => items.id).notNull(),
   inventoryId: integer('inventory_id').references(() => inventories.id).notNull(),

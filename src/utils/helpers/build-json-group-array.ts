@@ -1,5 +1,5 @@
 import { sql, SQL } from 'drizzle-orm';
-import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
+import { SQLiteColumn } from 'drizzle-orm/pg-core';
 
 export function buildJsonGroupArray(fields: SQLiteColumn[], isPlainArray?: boolean): SQL<string> {
   return sql<string>`

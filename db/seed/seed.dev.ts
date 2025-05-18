@@ -1,4 +1,4 @@
-import { db } from 'db';
+import { client, db } from 'db';
 import { seedCities } from 'db/seed/cities.seed';
 import { seedDistricts } from 'db/seed/districts.seed';
 import { seedProvinces } from 'db/seed/provinces.seed';
@@ -33,12 +33,12 @@ const password = await Bun.password.hash('password');
 const [superadmin] = await db.insert(users).values({
   password: password,
   username: 'superadmin',
-}).returning()
+}).onConflictDoUpdate({ set: { username: 'superadmin' }, target: users.username }).returning()
 
 await db.insert(usersRoles).values({
   role: RoleEnum.SuperAdmin,
   userId: superadmin.id
-})
+}).onConflictDoNothing()
 
 await db.insert(profiles).values({
   name: 'Super Admin',
@@ -46,7 +46,9 @@ await db.insert(profiles).values({
   subdistrictCode: _subdistricts.code,
   userId: superadmin.id,
   address: 'RT 02 RW 01',
-})
+}).onConflictDoNothing()
+
+await client.end();
 
 // const unitsId = await seedUnits()
 // const categoriesId = await seedCategories()

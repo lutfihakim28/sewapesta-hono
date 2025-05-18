@@ -8,6 +8,7 @@ declare module "bun" {
     DB_DATABASE: string;
     DB_USER: string;
     DB_PASSWORD: string;
+    DB_URL: string;
   }
 }
 

@@ -1,9 +1,14 @@
 import { pinoLogger } from '@/utils/helpers/logger';
 import { Database } from 'bun:sqlite';
-import { drizzle } from 'drizzle-orm/bun-sqlite';
 
-const connection = new Database('sewapesta.db')
-export const db = drizzle(connection, {
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
+const connectionString = Bun.env.DB_URL
+
+// Disable prefetch as it is not supported for "Transaction" pool mode
+export const client = postgres(connectionString, { prepare: false })
+export const db = drizzle(client, {
   logger: {
     logQuery: (query, params) => {
       if (query.toLowerCase().includes('create table')) return;

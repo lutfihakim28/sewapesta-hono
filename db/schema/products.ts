@@ -1,8 +1,8 @@
 import { timestamps } from 'db/schema/timestamps.helper';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
-export const products = sqliteTable('products', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const products = pgTable('products', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   ...timestamps,
 })

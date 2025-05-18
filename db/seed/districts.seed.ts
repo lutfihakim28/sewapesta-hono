@@ -7,5 +7,9 @@ export async function seedDistricts() {
   const file = Bun.file('db/seed/data/kecamatan.json');
   const data: DistrictData[] = await file.json()
   const districtsData = DistrictDto.fromArray(data)
-  await db.insert(districts).values(districtsData)
+  const chunkSize = 5000; // Maximum call stack
+  for (let i = 0; i < districtsData.length; i += chunkSize) {
+    const chunk = districtsData.slice(i, i + chunkSize);
+    await db.insert(districts).values(chunk).onConflictDoNothing()
+  }
 }

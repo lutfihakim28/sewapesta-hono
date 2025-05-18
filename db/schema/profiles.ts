@@ -1,14 +1,14 @@
 import { subdistricts } from 'db/schema/subdistricts';
-import { index, integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { char, index, integer, numeric, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { timestamps } from './timestamps.helper';
 import { users } from './users';
 
-export const profiles = sqliteTable('profiles', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const profiles = pgTable('profiles', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  phone: numeric('phone').notNull(),
+  phone: varchar('phone', { length: 15 }).notNull(),
   address: text('address'),
-  subdistrictCode: text('subdistrict_code').references(() => subdistricts.code).notNull(),
+  subdistrictCode: char('subdistrict_code', { length: 13 }).references(() => subdistricts.code).notNull(),
   userId: integer('user_id').references(() => users.id).unique().notNull(),
   ...timestamps,
 }, (table) => ([

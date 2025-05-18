@@ -1,14 +1,14 @@
 import { ImageReferenceEnum } from '@/utils/enums/ImageReference.Enum';
-import { AppDate } from '@/utils/libs/AppDate';
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
+import { timestamps } from './timestamps.helper';
 
-export const images = sqliteTable('images', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const images = pgTable('images', {
+  id: serial('id').primaryKey(),
   path: text('path').notNull().unique(),
   url: text('url').notNull().unique(),
-  reference: text('reference', { enum: [ImageReferenceEnum.Profile, ImageReferenceEnum.Equipment, ImageReferenceEnum.Inventory] }).notNull(),
+  reference: varchar('reference', { enum: [ImageReferenceEnum.Profile, ImageReferenceEnum.Equipment, ImageReferenceEnum.Inventory], length: 9 }).notNull(),
   referenceId: integer('reference_id').notNull(),
-  createdAt: integer('created_at').notNull().$defaultFn(() => new AppDate().unix()),
+  ...timestamps,
 }, (table) => [
   index('image_reference_index').on(table.reference),
   index('image_reference_id_index').on(table.referenceId)

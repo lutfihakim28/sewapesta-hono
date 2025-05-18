@@ -1,10 +1,10 @@
-import { index, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+import { index, integer, pgTable, serial } from 'drizzle-orm/pg-core';
 import { items } from './items';
 import { inventories } from './inventories';
 import { timestamps } from './timestamps.helper';
 
-export const inventoryDamageReports = sqliteTable('inventory_damage_reports', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const inventoryDamageReports = pgTable('inventory_damage_reports', {
+  id: serial('id').primaryKey(),
   itemId: integer('item_id').references(() => items.id).notNull(),
   inventoryId: integer('inventory_id').references(() => inventories.id).notNull(),
   quantity: integer('quantity').notNull(),
