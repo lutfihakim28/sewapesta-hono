@@ -29,7 +29,7 @@ InventoryUsageController.openapi(InventoryUsageDetailRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successDetail('inventory usage')],
+    messages: [messages.successDetail('Inventory usage')],
     data: inventoryUsage
   }), 200)
 })

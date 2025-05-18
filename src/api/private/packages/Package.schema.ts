@@ -1,6 +1,5 @@
 import { messages } from '@/utils/constants/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
-import { PackageTermEnum } from '@/utils/enums/PackageTermEnum';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
@@ -20,32 +19,32 @@ export type PackageColumn = keyof typeof packages.$inferSelect;
 
 export const PackageSchema = createSelectSchema(packages).pick({
   id: true,
-  includeEmployee: true,
+  // includeEmployee: true,
   name: true,
-  ownerId: true,
-  ownerPrice: true,
-  ownerRatio: true,
+  // ownerId: true,
+  // ownerPrice: true,
+  // ownerRatio: true,
   price: true,
   productId: true,
-  term: true,
+  // term: true,
 }).openapi('Package')
 
 const PackageListItemSchema = PackageSchema.extend({
-  owner: UserExtendedSchema.pick({
-    id: true,
-    phone: true,
-    name: true,
-  }),
+  // owner: UserExtendedSchema.pick({
+  //   id: true,
+  //   phone: true,
+  //   name: true,
+  // }),
   product: ProductSchema.pick({
     id: true,
     name: true,
   }).nullable()
 })
 
-export type PackageListColumn = keyof Pick<SchemaType<typeof PackageListItemSchema>, 'id' | 'name' | 'owner' | 'price' | 'product'>
+export type PackageListColumn = keyof Pick<SchemaType<typeof PackageListItemSchema>, 'id' | 'name' | 'price' | 'product'>
 
 export const sortablePackageColumns: PackageListColumn[] = [
-  'id', 'name', 'owner', 'price', 'product'
+  'id', 'name', 'price', 'product'
 ]
 
 export const PackageListSchema = new ArraySchema('Package list', PackageListItemSchema).getSchema().openapi('PackageList')
@@ -54,30 +53,30 @@ export const PackageFilterSchema = SearchSchema
   .merge(SortSchema(sortablePackageColumns))
   .merge(PaginationSchema)
   .extend({
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    // ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
     productId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    term: new EnumSchema('Term', PackageTermEnum).getSchema().optional()
+    // term: new EnumSchema('Term', PackageTermEnum).getSchema().optional()
   })
   .openapi('PackageFilter')
 
 export const PackageRequestSchema = createInsertSchema(packages, {
-  includeEmployee: new BooleanSchema('Include employee').getSchema(),
+  // includeEmployee: new BooleanSchema('Include employee').getSchema(),
   name: new StringSchema('Name').getSchema(),
-  ownerId: new NumberSchema('Owner ID').natural().getSchema(),
-  ownerPrice: new NumberSchema('Owner price').whole().getSchema(),
-  ownerRatio: new NumberSchema('Owner ratio').nonnegative().getSchema(),
+  // ownerId: new NumberSchema('Owner ID').natural().getSchema(),
+  // ownerPrice: new NumberSchema('Owner price').whole().getSchema(),
+  // ownerRatio: new NumberSchema('Owner ratio').nonnegative().getSchema(),
   price: new NumberSchema('Price').whole().getSchema(),
   productId: new NumberSchema('Product ID').natural().getSchema(),
-  term: new EnumSchema('Term', PackageTermEnum).getSchema(),
+  // term: new EnumSchema('Term', PackageTermEnum).getSchema(),
 }).pick({
-  includeEmployee: true,
+  // includeEmployee: true,
   name: true,
-  ownerId: true,
-  ownerPrice: true,
-  ownerRatio: true,
+  // ownerId: true,
+  // ownerPrice: true,
+  // ownerRatio: true,
   price: true,
   productId: true,
-  term: true,
+  // term: true,
 }).openapi('PackageRequest')
 
 export const PackageResponseListSchema = ApiResponseListSchema(PackageListSchema, messages.successList('packages'))

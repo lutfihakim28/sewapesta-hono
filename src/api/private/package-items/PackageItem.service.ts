@@ -50,6 +50,10 @@ export class PackageItemService {
         orders.push(desc(profiles.name))
         return;
       }
+      if (col === 'package') {
+        orders.push(desc(packages.name))
+        return;
+      }
       orders.push(desc(packageItems[col as PackageItemColumn]))
     })
 
@@ -57,9 +61,9 @@ export class PackageItemService {
       isNull(packageItems.deletedAt),
     ];
 
-    if (query.ownerId) {
-      conditions.push(eq(users.id, +query.ownerId))
-    }
+    // if (query.ownerId) {
+    //   conditions.push(eq(users.id, +query.ownerId))
+    // }
 
     if (query.itemId) {
       conditions.push(eq(packageItems.itemId, +query.itemId))
@@ -91,14 +95,14 @@ export class PackageItemService {
       })
         .from(packageItems)
         .innerJoin(items, eq(items.id, packageItems.itemId))
-        .leftJoin(inventories, and(
-          eq(packageItems.reference, ItemTypeEnum.Inventory),
-          eq(inventories.id, packageItems.referenceId),
-        ))
-        .leftJoin(equipments, and(
-          eq(packageItems.reference, ItemTypeEnum.Equipment),
-          eq(equipments.id, packageItems.referenceId),
-        ))
+        // .leftJoin(inventories, and(
+        //   eq(packageItems.reference, ItemTypeEnum.Inventory),
+        //   eq(inventories.id, packageItems.referenceId),
+        // ))
+        // .leftJoin(equipments, and(
+        //   eq(packageItems.reference, ItemTypeEnum.Equipment),
+        //   eq(equipments.id, packageItems.referenceId),
+        // ))
         .innerJoin(users, or(
           eq(users.id, inventories.ownerId),
           eq(users.id, equipments.ownerId),
@@ -113,14 +117,14 @@ export class PackageItemService {
       })
         .from(packageItems)
         .innerJoin(items, eq(items.id, packageItems.itemId))
-        .leftJoin(inventories, and(
-          eq(packageItems.reference, ItemTypeEnum.Inventory),
-          eq(inventories.id, packageItems.referenceId),
-        ))
-        .leftJoin(equipments, and(
-          eq(packageItems.reference, ItemTypeEnum.Equipment),
-          eq(equipments.id, packageItems.referenceId),
-        ))
+        // .leftJoin(inventories, and(
+        //   eq(packageItems.reference, ItemTypeEnum.Inventory),
+        //   eq(inventories.id, packageItems.referenceId),
+        // ))
+        // .leftJoin(equipments, and(
+        //   eq(packageItems.reference, ItemTypeEnum.Equipment),
+        //   eq(equipments.id, packageItems.referenceId),
+        // ))
         .innerJoin(users, or(
           eq(users.id, inventories.ownerId),
           eq(users.id, equipments.ownerId),
@@ -152,46 +156,40 @@ export class PackageItemService {
   static async create(payload: PackageItemRequest): Promise<PackageItem> {
     let itemId: number = -1;
 
-    if (payload.reference === ItemTypeEnum.Inventory) {
-      const inventory = await InventoryService.check(payload.referenceId);
-      itemId = inventory.itemId
-    }
+    // if (payload.reference === ItemTypeEnum.Inventory) {
+    //   const inventory = await InventoryService.check(payload.referenceId);
+    //   itemId = inventory.itemId
+    // }
 
-    if (payload.reference === ItemTypeEnum.Equipment) {
-      const equipment = await EquipmentService.check(payload.referenceId);
-      itemId = equipment.itemId
-    }
+    // if (payload.reference === ItemTypeEnum.Equipment) {
+    //   const equipment = await EquipmentService.check(payload.referenceId);
+    //   itemId = equipment.itemId
+    // }
 
     const [newUsage] = await db
       .insert(packageItems)
-      .values({
-        ...payload,
-        itemId,
-      })
+      .values(payload)
       .returning(packageItemColumns)
 
     return newUsage;
   }
 
   static async update(id: number, payload: PackageItemRequest): Promise<PackageItem> {
-    let itemId: number = -1;
+    // let itemId: number = -1;
 
-    if (payload.reference === ItemTypeEnum.Inventory) {
-      const inventory = await InventoryService.check(payload.referenceId);
-      itemId = inventory.itemId
-    }
+    // if (payload.reference === ItemTypeEnum.Inventory) {
+    //   const inventory = await InventoryService.check(payload.referenceId);
+    //   itemId = inventory.itemId
+    // }
 
-    if (payload.reference === ItemTypeEnum.Equipment) {
-      const equipment = await EquipmentService.check(payload.referenceId);
-      itemId = equipment.itemId
-    }
+    // if (payload.reference === ItemTypeEnum.Equipment) {
+    //   const equipment = await EquipmentService.check(payload.referenceId);
+    //   itemId = equipment.itemId
+    // }
 
     const [updatedUsage] = await db
       .update(packageItems)
-      .set({
-        ...payload,
-        itemId,
-      })
+      .set(payload)
       .where(and(
         isNull(packageItems.deletedAt),
         eq(packageItems.id, id),

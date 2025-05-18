@@ -32,6 +32,7 @@ import { Scalar } from '@scalar/hono-api-reference'
 import InventoryUsageController from '@/api/private/inventory-usages/InventoryUsage.controller'
 import InventoryDamageReportController from '@/api/private/inventory-damage-reports/InventoryDamageReport.controller'
 import PackageItemController from '@/api/private/package-items/PackageItem.controller'
+import ItemRevenueTermController from '@/api/private/item-revenue-terms/ItemRevenueTerm.controller'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -89,7 +90,7 @@ app.use('/api/private/inventories/*', adminMiddleware)
 app.use('/api/private/inventory-mutations/*', adminMiddleware)
 app.use('/api/private/inventory-usages/*', adminMiddleware)
 app.use('/api/private/inventory-damage-reports/*', adminMiddleware)
-app.use('/api/private/items-owners/*', adminMiddleware)
+app.use('/api/private/items-revenue-terms/*', adminMiddleware)
 
 app.get('/api/private/users', adminMiddleware)
 app.post('/api/private/users', adminMiddleware)
@@ -120,6 +121,7 @@ app.route('/api/private/inventories', InventoryController)
 app.route('/api/private/inventory-mutations', InventoryMutationController)
 app.route('/api/private/inventory-usages', InventoryUsageController)
 app.route('/api/private/inventory-damage-reports', InventoryDamageReportController)
+app.route('/api/private/inventory-revenue-terms', ItemRevenueTermController)
 app.route('/api/private/images', ImageController)
 app.route('/api/private/users', UserController)
 

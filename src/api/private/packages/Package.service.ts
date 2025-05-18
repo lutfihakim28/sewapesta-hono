@@ -50,17 +50,17 @@ export class PackageService {
       isNull(packages.deletedAt),
     ];
 
-    if (query.ownerId) {
-      conditions.push(eq(packages.ownerId, +query.ownerId))
-    }
+    // if (query.ownerId) {
+    //   conditions.push(eq(packages.ownerId, +query.ownerId))
+    // }
 
     if (query.productId) {
       conditions.push(eq(packages.productId, +query.productId))
     }
 
-    if (query.term) {
-      conditions.push(eq(packages.term, query.term))
-    }
+    // if (query.term) {
+    //   conditions.push(eq(packages.term, query.term))
+    // }
 
     if (query.keyword) {
       conditions.push(or(
@@ -75,19 +75,19 @@ export class PackageService {
       db
         .select({
           ...packageColumns,
-          owner: {
-            id: users.id,
-            name: profiles.name,
-            phone: profiles.phone,
-          },
+          // owner: {
+          //   id: users.id,
+          //   name: profiles.name,
+          //   phone: profiles.phone,
+          // },
           product: {
             id: products.id,
             name: products.name
           }
         })
         .from(packages)
-        .innerJoin(users, eq(users.id, packages.ownerId))
-        .innerJoin(profiles, eq(profiles.userId, users.id))
+        // .innerJoin(users, eq(users.id, packages.ownerId))
+        // .innerJoin(profiles, eq(profiles.userId, users.id))
         .leftJoin(products, eq(products.id, packages.productId))
         .where(and(...conditions))
         .orderBy(...orders)
@@ -120,7 +120,7 @@ export class PackageService {
   }
 
   static async create(payload: PackageRequest): Promise<Package> {
-    await UserService.check(payload.ownerId, [RoleEnum.Owner])
+    // await UserService.check(payload.ownerId, [RoleEnum.Owner])
     if (payload.productId) {
       await ProductService.check(payload.productId)
     }
@@ -134,7 +134,7 @@ export class PackageService {
   }
 
   static async update(id: number, payload: PackageRequest): Promise<Package> {
-    await UserService.check(payload.ownerId, [RoleEnum.Owner])
+    // await UserService.check(payload.ownerId, [RoleEnum.Owner])
     if (payload.productId) {
       await ProductService.check(payload.productId)
     }
