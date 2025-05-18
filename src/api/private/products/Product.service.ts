@@ -103,7 +103,7 @@ export abstract class ProductService {
     const product = await this.get(id)
     await db
       .update(products)
-      .set({ deletedAt: new AppDate().unix })
+      .set({ deletedAt: new AppDate().unix() })
       .where(and(
         eq(products.id, product.id)
       ))

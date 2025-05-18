@@ -51,7 +51,7 @@ export class CategoryService {
     await db
       .update(categories)
       .set({
-        deletedAt: new AppDate().unix
+        deletedAt: new AppDate().unix()
       })
       .where(and(
         isNull(categories.deletedAt),

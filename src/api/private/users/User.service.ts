@@ -202,7 +202,7 @@ export class UserService {
       const [user] = await transaction
         .update(users)
         .set({
-          deletedAt: new AppDate().unix,
+          deletedAt: new AppDate().unix(),
         })
         .where(and(
           isNull(users.deletedAt),
@@ -217,7 +217,7 @@ export class UserService {
       await transaction
         .update(profiles)
         .set({
-          deletedAt: new AppDate().unix,
+          deletedAt: new AppDate().unix(),
         })
         .where(eq(profiles.userId, id))
     })

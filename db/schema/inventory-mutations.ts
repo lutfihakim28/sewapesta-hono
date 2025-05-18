@@ -18,7 +18,7 @@ export const inventoryMutations = sqliteTable('inventory_mutations', {
   inventoryId: integer('inventory_id').references(() => inventories.id).notNull(),
   quantity: integer('quantity').notNull(),
   description: text('description'),
-  mutateAt: integer('mutate_at').notNull().$defaultFn(() => new AppDate().unix),
+  mutateAt: integer('mutate_at').notNull().$defaultFn(() => new AppDate().unix()),
   ...timestamps,
 }, (table) => [
   index('mutation_type_index').on(table.type),

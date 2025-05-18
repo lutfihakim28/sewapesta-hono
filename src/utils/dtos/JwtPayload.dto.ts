@@ -11,7 +11,8 @@ export class JwtPayload {
     if (data.user) {
       this.user = data.user;
     }
-    this.exp = data.exp || new AppDate().add(1, 'day').unix
-    this.iat = data.iat || new AppDate().unix
+    const today = new AppDate()
+    this.iat = data.iat || today.unix() // must before exp, because of mutable today date after addition
+    this.exp = data.exp || today.add(1, 'day').unix()
   }
 }

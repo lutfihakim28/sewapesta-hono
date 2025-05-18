@@ -21,7 +21,7 @@ export class ImageService {
 
   static async upload(request: ImageRequest): Promise<ImageUpload> {
     const [fileName, ext] = request.image.name.split('.');
-    const name = `${fileName}_${new AppDate().unix}.${ext}`
+    const name = `${fileName}_${new AppDate().unix()}.${ext}`
     const path = `static/.temp/${name}`
     await Bun.write(path, request.image);
 

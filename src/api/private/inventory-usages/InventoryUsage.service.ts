@@ -135,7 +135,7 @@ export class InventoryUsageService {
     const [deletedUsage] = await db
       .update(inventoryUsages)
       .set({
-        deletedAt: new AppDate().unix
+        deletedAt: new AppDate().unix()
       })
       .where(and(
         isNull(inventories.deletedAt),

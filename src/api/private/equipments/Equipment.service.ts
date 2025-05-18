@@ -183,7 +183,7 @@ export class EquipmentService {
   static async delete(id: number) {
     const [deletedEquipment] = await db.update(equipments)
       .set({
-        deletedAt: new AppDate().unix,
+        deletedAt: new AppDate().unix(),
       })
       .where(and(
         isNull(equipments.deletedAt),

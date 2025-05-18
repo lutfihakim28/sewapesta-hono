@@ -1,6 +1,7 @@
 import 'dayjs/locale/en'
 import 'dayjs/locale/id'
 import dayjs, { Dayjs } from 'dayjs';
+import { pinoLogger } from '../helpers/logger';
 
 type DayjsLocale = 'en' | 'id'
 
@@ -18,7 +19,7 @@ export class AppDate {
     }
   }
 
-  get unix() {
+  unix() {
     return this.date.unix();
   }
 
@@ -38,7 +39,7 @@ export class AppDate {
    * @returns 
    */
   add(count: number, unit?: dayjs.ManipulateType) {
-    this.date.add(count, unit)
+    this.date = this.date.add(count, unit)
     return this;
   }
 }

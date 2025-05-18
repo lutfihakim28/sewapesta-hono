@@ -171,7 +171,7 @@ export class InventoryService {
     const [deletedInventory] = await db
       .update(inventories)
       .set({
-        deletedAt: new AppDate().unix,
+        deletedAt: new AppDate().unix(),
       })
       .where(and(
         isNull(inventories.deletedAt),

@@ -209,7 +209,7 @@ export class PackageItemService {
     const [deletedUsage] = await db
       .update(packageItems)
       .set({
-        deletedAt: new AppDate().unix
+        deletedAt: new AppDate().unix()
       })
       .where(and(
         isNull(packageItems.deletedAt),

@@ -95,7 +95,7 @@ export class InventoryMutationService {
       .values({
         ...payload,
         itemId: inventory.itemId,
-        mutateAt: new AppDate().unix,
+        mutateAt: new AppDate().unix(),
       })
       .returning(inventoryMutationColumns)
 
@@ -128,7 +128,7 @@ export class InventoryMutationService {
     const [deletedMutation] = await db
       .update(inventoryMutations)
       .set({
-        deletedAt: new AppDate().unix
+        deletedAt: new AppDate().unix()
       })
       .where(and(
         isNull(inventories.deletedAt),

@@ -139,7 +139,7 @@ export class ItemService {
     const [deletedItem] = await db
       .update(items)
       .set({
-        deletedAt: new AppDate().unix,
+        deletedAt: new AppDate().unix(),
       })
       .returning({
         id: items.id

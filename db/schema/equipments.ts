@@ -22,8 +22,8 @@ export const equipments = sqliteTable('equipments', {
       EquipmentStatusEnum.Returned,
     ],
   }).notNull().default(EquipmentStatusEnum.Available),
-  registerDate: integer('register_date').notNull().$defaultFn(() => new AppDate().unix),
-  lastMaintenanceDate: integer('last_maintenance_date').notNull().$defaultFn(() => new AppDate().unix),
+  registerDate: integer('register_date').notNull().$defaultFn(() => new AppDate().unix()),
+  lastMaintenanceDate: integer('last_maintenance_date').notNull().$defaultFn(() => new AppDate().unix()),
   ...timestamps,
 }, (table) => [
   index('equipment_item_status_index').on(table.status),
