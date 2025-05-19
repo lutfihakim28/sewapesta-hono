@@ -33,6 +33,7 @@ import InventoryUsageController from '@/api/private/inventory-usages/InventoryUs
 import InventoryDamageReportController from '@/api/private/inventory-damage-reports/InventoryDamageReport.controller'
 import PackageItemController from '@/api/private/package-items/PackageItem.controller'
 import ItemRevenueTermController from '@/api/private/item-revenue-terms/ItemRevenueTerm.controller'
+import OwnerRevenueTermController from '@/api/private/owner-revenue-terms/OwnerRevenueTerm.controller'
 // import { MysqlErrorKeys } from 'mysql-error-keys'
 
 const app = honoApp()
@@ -91,6 +92,7 @@ app.use('/api/private/inventory-mutations/*', adminMiddleware)
 app.use('/api/private/inventory-usages/*', adminMiddleware)
 app.use('/api/private/inventory-damage-reports/*', adminMiddleware)
 app.use('/api/private/items-revenue-terms/*', adminMiddleware)
+app.use('/api/private/owner-revenue-terms/*', adminMiddleware)
 
 app.get('/api/private/users', adminMiddleware)
 app.post('/api/private/users', adminMiddleware)
@@ -124,6 +126,7 @@ app.route('/api/private/inventory-damage-reports', InventoryDamageReportControll
 app.route('/api/private/inventory-revenue-terms', ItemRevenueTermController)
 app.route('/api/private/images', ImageController)
 app.route('/api/private/users', UserController)
+app.route('/api/private/owner-revenue-terms', OwnerRevenueTermController)
 
 // PUBLIC PATH
 app.route('/api/public/locations/provinces', ProvinceController)

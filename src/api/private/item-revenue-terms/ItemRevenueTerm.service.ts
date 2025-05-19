@@ -1,5 +1,5 @@
 import { ItemRevenueTerm, ItemRevenueTermColumn, ItemRevenueTermFilter, ItemRevenueTermList, ItemRevenueTermListColumn, ItemRevenueTermRequest, sortableItemRevenueTermColumns } from './ItemRevenueTerm.schema';
-import { and, asc, between, count, desc, eq, gte, isNull, like, lte, or, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
 import { users } from 'db/schema/users';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
@@ -9,7 +9,6 @@ import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { messages } from '@/utils/constants/messages';
-import { InventoryService } from '../inventories/Inventory.service';
 import { AppDate } from '@/utils/libs/AppDate';
 import { itemRevenueTerms } from 'db/schema/item-revenue-terms';
 import { ItemService } from '../items/Item.service';

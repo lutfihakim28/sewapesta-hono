@@ -20,12 +20,8 @@ export const ItemRevenueTermSchema = createSelectSchema(itemRevenueTerms).pick({
   id: true,
   ownerId: true,
   itemId: true,
-  employeeFixedPrice: true,
-  employeeRatioPrice: true,
-  employeePriceType: true,
-  ownerFixedPrice: true,
-  ownerRatioPrice: true,
-  ownerPriceType: true,
+  employeePrice: true,
+  ownerPrice: true,
 }).openapi('ItemRevenueTerm')
 
 const ItemRevenueTermListItemSchema = ItemRevenueTermSchema.extend({
@@ -38,20 +34,16 @@ export type ItemRevenueTermListColumn = keyof Pick<SchemaType<
   'id' |
   'item' |
   'owner' |
-  'employeeFixedPrice' |
-  'employeeRatioPrice' |
-  'ownerFixedPrice' |
-  'ownerRatioPrice'
+  'employeePrice' |
+  'ownerPrice'
 >
 
 export const sortableItemRevenueTermColumns: ItemRevenueTermListColumn[] = [
   'id',
   'item',
   'owner',
-  'employeeFixedPrice',
-  'employeeRatioPrice',
-  'ownerFixedPrice',
-  'ownerRatioPrice'
+  'employeePrice',
+  'ownerPrice',
 ]
 
 const ItemRevenueTermListSchema = new ArraySchema('Item revenue term list', ItemRevenueTermListItemSchema).getSchema().openapi('ItemRevenueTermList')
@@ -71,21 +63,13 @@ export const ItemRevenueTermResponseDataSchema = ApiResponseDataSchema(ItemReven
 export const ItemRevenueTermRequestSchema = createInsertSchema(itemRevenueTerms, {
   ownerId: new NumberSchema('Owner ID').natural().getSchema(),
   itemId: new NumberSchema('Item ID').natural().getSchema(),
-  employeeFixedPrice: new NumberSchema('Employee fixed price').natural().getSchema(),
-  employeeRatioPrice: new NumberSchema('Employee ratio price').positive().getSchema(),
-  employeePriceType: new EnumSchema('Employee price type', TermPriceTypeEnum).getSchema(),
-  ownerFixedPrice: new NumberSchema('Owner fixed price').natural().getSchema(),
-  ownerRatioPrice: new NumberSchema('Owner ratio price').positive().getSchema(),
-  ownerPriceType: new EnumSchema('Owner price type', TermPriceTypeEnum).getSchema(),
+  employeePrice: new NumberSchema('Employee price').natural().getSchema(),
+  ownerPrice: new NumberSchema('Owner price').natural().getSchema(),
 }).pick({
   ownerId: true,
   itemId: true,
-  employeeFixedPrice: true,
-  employeeRatioPrice: true,
-  employeePriceType: true,
-  ownerFixedPrice: true,
-  ownerRatioPrice: true,
-  ownerPriceType: true,
+  employeePrice: true,
+  ownerPrice: true,
 }).openapi('ItemRevenueTermRequest')
 
 export type ItemRevenueTerm = SchemaType<typeof ItemRevenueTermSchema>
