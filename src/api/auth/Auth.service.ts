@@ -50,7 +50,7 @@ export abstract class AuthService {
 
     return {
       token,
-      user
+      // user
     }
   }
 
@@ -77,7 +77,7 @@ export abstract class AuthService {
 
     return {
       token,
-      user: _user
+      // user: _user
     }
   }
 

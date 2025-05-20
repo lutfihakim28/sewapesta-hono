@@ -27,7 +27,7 @@ export const LoginDataSchema = new ObjectSchema({
     .openapi({
       example: 'eyJH*************',
     }),
-  user: UserSchema
+  // user: UserSchema
 }).getSchema()
 
 export const LoginResponseSchema = ApiResponseDataSchema(LoginDataSchema, messages.successLogin).openapi('LoginResponse');
