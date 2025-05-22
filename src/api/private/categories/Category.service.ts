@@ -9,14 +9,23 @@ import { categoryColumns } from './Category.column';
 import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 import { AppDate } from '@/utils/libs/AppDate';
+import { items } from 'db/schema/items';
 
 export class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
     const where = this.buildWhereClause(query);
     const result = await Promise.all([
-      db.select(categoryColumns)
+      db.select({
+        ...categoryColumns,
+        itemCount: count(items.id).mapWith(Number)
+      })
         .from(categories)
         .where(where)
+        .leftJoin(items, and(
+          isNull(items.deletedAt),
+          eq(items.categoryId, categories.id)
+        ))
+        .groupBy(categories.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       this.count(where)

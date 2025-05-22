@@ -23,7 +23,7 @@ export const ItemSchema = createSelectSchema(items).pick({
   type: true,
 }).extend({
   unit: UnitSchema,
-  category: CategorySchema,
+  category: CategorySchema.omit({ itemCount: true }),
 }).openapi('Item')
 
 export type ItemListColumn = keyof Pick<SchemaType<typeof ItemSchema>, 'id' | 'name' | 'type'>;

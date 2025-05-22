@@ -6,11 +6,15 @@ import { categories } from 'db/schema/categories';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 export const CategorySchema = createSelectSchema(categories)
   .pick({
     id: true,
     name: true,
+  })
+  .extend({
+    itemCount: new NumberSchema('Item count').getSchema()
   })
   .openapi('Category')
 
