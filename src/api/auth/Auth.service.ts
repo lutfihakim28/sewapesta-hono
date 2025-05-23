@@ -50,7 +50,6 @@ export abstract class AuthService {
 
     return {
       token,
-      // user
     }
   }
 
@@ -73,11 +72,8 @@ export abstract class AuthService {
         .where(eq(users.id, user.id))
     ])
 
-    const _user = await UserService.get(user.id)
-
     return {
       token,
-      // user: _user
     }
   }
 
