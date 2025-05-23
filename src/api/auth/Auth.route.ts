@@ -23,19 +23,10 @@ export const LoginRoute = createRoute({
 })
 
 export const RefreshRoute = createRoute({
-  method: 'put',
+  method: 'post',
   path: '/refresh',
   description: 'Refresh the expired user\'s token.',
   tags: ['Auth'],
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: RefreshRequestSchema
-        }
-      }
-    },
-  },
   responses: new OpenApiResponse({
     successResponse: { schema: LoginResponseSchema, description: 'Refresh success' },
     codes: [422],

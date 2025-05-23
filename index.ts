@@ -68,6 +68,13 @@ app.onError((error, context) => {
     }
   }
 
+  if (error.name === 'JwtTokenExpired') {
+    return context.json(new ApiResponse({
+      code: 401,
+      messages: ['JWT Token Expired']
+    }), 401)
+  }
+
   pinoLogger.error({ error: error.message, stack: error.stack, name: error.name }, 'Unhandled Error')
   return context.json(new ApiResponse({
     code: 500,
@@ -78,8 +85,8 @@ app.use('/api/*', cors({
   origin: ['http://localhost:5173', 'http://192.168.2.224:5173'],
   credentials: true,
 }))
-app.use('/api/private/*', jwt({ secret: Bun.env.JWT_SECRET }), authMiddleware)
-app.use('/api/auth/logout', jwt({ secret: Bun.env.JWT_SECRET }))
+app.use('/api/private/*', jwt({ secret: Bun.env.ACCESS_TOKEN_SECRET }), authMiddleware)
+// app.use('/api/auth/logout', jwt({ secret: Bun.env.ACCESS_TOKEN_SECRET }))
 app.use('/static/*', serveStatic({ root: './' }))
 
 app.use('/api/private/products/*', adminMiddleware)
