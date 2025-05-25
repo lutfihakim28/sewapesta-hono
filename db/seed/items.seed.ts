@@ -12,7 +12,7 @@ export async function seedItems({
   categoriesId,
 }: ItemSeedProp) {
   console.log('Seeding items...');
-  const itemNames = faker.helpers.uniqueArray(faker.definitions.commerce.product_name.product, 10)
+  const itemNames = faker.helpers.uniqueArray(faker.definitions.commerce.product_name.product, 100)
   return await db
     .insert(items)
     .values(itemNames.map((name) => ({

@@ -15,6 +15,6 @@ export class JwtPayload {
     }
     const today = new AppDate()
     this.iat = data.iat || today.unix() // must before exp, because of mutable today date after addition
-    this.exp = data.exp || today.add(expiredIn || 3, 'seconds').unix()
+    this.exp = data.exp || today.add(expiredIn || 60 * 15, 'seconds').unix()
   }
 }

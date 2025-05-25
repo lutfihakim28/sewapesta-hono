@@ -9,6 +9,9 @@ import { users } from 'db/schema/users';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { profiles } from 'db/schema/profiles';
 import { usersRoles } from 'db/schema/users-roles';
+import { seedUnits } from './units.seed';
+import { seedCategories } from './categories.seed';
+import { seedItems } from './items.seed';
 
 await seedProvinces()
 await seedCities()
@@ -48,9 +51,9 @@ await db.insert(profiles).values({
   address: 'RT 02 RW 01',
 })
 
-// const unitsId = await seedUnits()
-// const categoriesId = await seedCategories()
-// const items = await seedItems({ unitsId: unitsId, categoriesId: categoriesId })
+const unitsId = await seedUnits()
+const categoriesId = await seedCategories()
+await seedItems({ unitsId: unitsId, categoriesId: categoriesId })
 
 
 // await Promise.all(Array.from({ length: 3 }).map(async (_, index) => {

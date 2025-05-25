@@ -2,7 +2,7 @@ import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
 import { db } from 'db';
 import { users } from 'db/schema/users';
 import { and, eq, isNull } from 'drizzle-orm';
-import { decode, sign, verify } from 'hono/jwt';
+import { decode, sign } from 'hono/jwt';
 import { JWTPayload } from 'hono/utils/jwt/types';
 import { LoginData } from './Auth.schema';
 import { usersRoles } from 'db/schema/users-roles';
@@ -10,7 +10,6 @@ import { buildJsonGroupArray } from '@/utils/helpers/build-json-group-array';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { UserRoleSchema } from '../private/users/User.schema';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
-import { messages } from '@/utils/constants/messages';
 import { AppDate } from '@/utils/libs/AppDate';
 
 const accessTokenSecret = Bun.env.ACCESS_TOKEN_SECRET;
@@ -40,7 +39,7 @@ export abstract class AuthService {
       roles: (JSON.parse(_user.roles) as unknown[]).map((role) => UserRoleSchema.parse(role))
     }
 
-    const refreshPayload = new JwtPayload({ user }, 7); // exp in 7 days
+    const refreshPayload = new JwtPayload({ user }, 60 * 60 * 24 * 7); // exp in 7 days
     const refreshToken = await sign(refreshPayload, refreshTokenSecret)
 
     await db
@@ -95,7 +94,7 @@ export abstract class AuthService {
         username: user.username,
         roles: (JSON.parse(user.roles) as unknown[]).map((role) => UserRoleSchema.parse(role))
       }
-    }, 7);
+    }, 60 * 60 * 24 * 7);
     const newRefreshToken = await sign(refreshPayload, refreshTokenSecret)
 
     const [token, _] = await Promise.all([
