@@ -66,11 +66,11 @@ export const EquipmentFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .merge(SortSchema(sortableEquipmentColumns))
   .extend({
-    itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    itemId: new StringSchema('Item ID').neutralNumeric().getSchema().optional(),
+    ownerId: new StringSchema('Owner ID').neutralNumeric().getSchema().optional(),
     status: new EnumSchema('Status', EquipmentStatusEnum).getSchema().optional(),
     number: new StringSchema('Number').getSchema().optional(),
-    categoryId: new StringSchema('Category ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    categoryId: new StringSchema('Category ID').neutralNumeric().getSchema().optional(),
   })
   .openapi('EquipmentFilter')
 

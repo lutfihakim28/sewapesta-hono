@@ -53,9 +53,9 @@ export const InventoryFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .merge(SortSchema(sortableInventoryColumns))
   .extend({
-    itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    categoryId: new StringSchema('Category ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    itemId: new StringSchema('Item ID').neutralNumeric().getSchema().optional(),
+    ownerId: new StringSchema('Owner ID').neutralNumeric().getSchema().optional(),
+    categoryId: new StringSchema('Category ID').neutralNumeric().getSchema().optional(),
   })
   .openapi('InventoryFilter')
 

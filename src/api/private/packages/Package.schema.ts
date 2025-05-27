@@ -53,8 +53,8 @@ export const PackageFilterSchema = SearchSchema
   .merge(SortSchema(sortablePackageColumns))
   .merge(PaginationSchema)
   .extend({
-    // ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    productId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    // ownerId: new StringSchema('Owner ID').neutralNumeric().getSchema().optional(),
+    productId: new StringSchema('Product ID').neutralNumeric().getSchema().optional(),
     // term: new EnumSchema('Term', PackageTermEnum).getSchema().optional()
   })
   .openapi('PackageFilter')

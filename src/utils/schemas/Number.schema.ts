@@ -18,21 +18,21 @@ export class NumberSchema {
   }
 
   positive() {
-    this.#schema.positive({
+    this.#schema = this.#schema.positive({
       message: validationMessages.positiveNumber(this.#field)
     })
     return this;
   }
 
   nonnegative() {
-    this.#schema.positive({
+    this.#schema = this.#schema.positive({
       message: validationMessages.nonNegativeNumber(this.#field)
     })
     return this;
   }
 
   integer() {
-    this.#schema.int({
+    this.#schema = this.#schema.int({
       message: validationMessages.integer(this.#field)
     })
     return this;

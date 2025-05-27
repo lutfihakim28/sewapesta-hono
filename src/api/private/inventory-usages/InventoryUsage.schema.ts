@@ -35,8 +35,8 @@ export const InventoryUsageFilterSchema = PaginationSchema
   .merge(SearchSchema)
   .merge(DateRangeSchema)
   .extend({
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    ownerId: new StringSchema('Owner ID').neutralNumeric().getSchema().optional(),
+    itemId: new StringSchema('Item ID').neutralNumeric().getSchema().optional(),
   })
   .openapi('InventoryUsageFilter')
 

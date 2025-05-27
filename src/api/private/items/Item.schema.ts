@@ -38,7 +38,7 @@ export const ItemFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .extend({
     type: new EnumSchema('Type', ItemTypeEnum).getSchema().optional(),
-    categoryId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    categoryId: new StringSchema('Product ID').neutralNumeric().getSchema().optional(),
   })
   .openapi('ItemFilter')
 

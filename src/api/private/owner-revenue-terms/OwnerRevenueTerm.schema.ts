@@ -45,7 +45,7 @@ export const OwnerRevenueTermFilterSchema = PaginationSchema
   .merge(SearchSchema)
   .merge(SortSchema(sortableOwnerRevenueTermColumns))
   .extend({
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    ownerId: new StringSchema('Owner ID').neutralNumeric().getSchema().optional(),
   })
   .openapi('OwnerRevenueTermFilter')
 

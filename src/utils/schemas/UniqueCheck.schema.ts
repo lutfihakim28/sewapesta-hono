@@ -4,7 +4,7 @@ import { SchemaType } from '../types/Schema.type';
 
 export const UniqueCheckSchema = new ObjectSchema({
   unique: new StringSchema('Unique').getSchema(),
-  selectedId: new StringSchema('Selected ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional()
+  selectedId: new StringSchema('Selected ID').neutralNumeric().getSchema().optional()
 }).getSchema().openapi('UniqueCheck')
 
 export type UniqueCheck = SchemaType<typeof UniqueCheckSchema>

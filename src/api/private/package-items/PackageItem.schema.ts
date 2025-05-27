@@ -54,9 +54,9 @@ export const PackageItemFilterSchema = SearchSchema
   .merge(SortSchema(sortablePackageItemColumns))
   .merge(PaginationSchema)
   .extend({
-    itemId: new StringSchema('item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    // ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    productId: new StringSchema('Product ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    itemId: new StringSchema('item ID').neutralNumeric().getSchema().optional(),
+    // ownerId: new StringSchema('Owner ID').neutralNumeric().getSchema().optional(),
+    productId: new StringSchema('Product ID').neutralNumeric().getSchema().optional(),
     // reference: new EnumSchema('Reference', ItemTypeEnum).getSchema().optional()
   })
   .openapi('PackageItemFilter')

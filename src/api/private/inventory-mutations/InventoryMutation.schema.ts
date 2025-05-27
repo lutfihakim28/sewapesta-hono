@@ -42,8 +42,8 @@ export const InventoryMutationListSchema = new ArraySchema('Inventory mutation l
 export const InventoryMutationFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .extend({
-    ownerId: new StringSchema('Owner ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
-    itemId: new StringSchema('Item ID').numeric({ min: 1, subset: 'natural' }).getSchema().optional(),
+    ownerId: new StringSchema('Owner ID').neutralNumeric().getSchema().optional(),
+    itemId: new StringSchema('Item ID').neutralNumeric().getSchema().optional(),
   })
   .openapi('InventoryMutationFilter')
 
