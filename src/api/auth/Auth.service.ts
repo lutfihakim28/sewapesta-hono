@@ -11,6 +11,8 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { UserRoleSchema } from '../private/users/User.schema';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
 import { AppDate } from '@/utils/libs/AppDate';
+import { pinoLogger } from '@/utils/helpers/logger';
+import { messages } from '@/utils/constants/messages';
 
 const accessTokenSecret = Bun.env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = Bun.env.REFRESH_TOKEN_SECRET;
@@ -76,8 +78,10 @@ export abstract class AuthService {
         eq(users.refreshToken, refreshToken)
       ))
 
-    if (!user) {
-      return false;
+    pinoLogger.debug(user, 'USER')
+
+    if (!user || !user.id) {
+      throw new UnauthorizedException(messages.unauthorized);
     }
 
     const payload: JWTPayload = new JwtPayload({
