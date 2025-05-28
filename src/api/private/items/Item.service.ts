@@ -19,19 +19,25 @@ export class ItemService {
   static async list(query: ItemFilter): Promise<[Item[], number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortableItemColumns.includes(col as ItemListColumn)) return;
-      if (query.desc.includes(col as ItemListColumn)) return;
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-      orders.push(asc(items[col as ItemColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortableItemColumns.includes(col as ItemListColumn)) return;
+        if ((query[opposite] as ItemListColumn[]).includes(col as ItemListColumn)) return;
 
-    query.desc.forEach((col) => {
-      if (!sortableItemColumns.includes(col as ItemListColumn)) return;
-      if (query.asc.includes(col as ItemListColumn)) return;
+        const orderFn = isAsc ? asc : desc;
+        orders.push(orderFn(items[col as ItemColumn]));
+      });
+    };
 
-      orders.push(desc(items[col as ItemColumn]))
-    })
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(items.deletedAt)

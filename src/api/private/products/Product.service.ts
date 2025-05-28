@@ -13,17 +13,25 @@ export abstract class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortableProductColumn.includes(col as ProductListColumn)) return;
-      if (query.desc.includes(col as ProductListColumn)) return;
-      orders.push(asc(products[col as ProductColumn]))
-    })
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-    query.desc.forEach((col) => {
-      if (!sortableProductColumn.includes(col as ProductListColumn)) return;
-      if (query.asc.includes(col as ProductListColumn)) return;
-      orders.push(desc(products[col as ProductColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortableProductColumn.includes(col as ProductListColumn)) return;
+        if ((query[opposite] as ProductListColumn[]).includes(col as ProductListColumn)) return;
+
+        const orderFn = isAsc ? asc : desc;
+        orders.push(orderFn(products[col as ProductColumn]));
+      });
+    };
+
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(products.deletedAt),

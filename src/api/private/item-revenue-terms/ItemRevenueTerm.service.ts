@@ -18,35 +18,25 @@ export class ItemRevenueTermService {
   static async list(query: ItemRevenueTermFilter): Promise<[ItemRevenueTermList, number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortableItemRevenueTermColumns.includes(col as ItemRevenueTermListColumn)) return;
-      if (query.desc.includes(col as ItemRevenueTermListColumn)) return;
-      if (col === 'item') {
-        orders.push(asc(items.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(asc(profiles.name))
-        return;
-      }
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-      orders.push(asc(itemRevenueTerms[col as ItemRevenueTermColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortableItemRevenueTermColumns.includes(col as ItemRevenueTermListColumn)) return;
+        if ((query[opposite] as ItemRevenueTermListColumn[]).includes(col as ItemRevenueTermListColumn)) return;
 
-    query.desc.forEach((col) => {
-      if (!sortableItemRevenueTermColumns.includes(col as ItemRevenueTermListColumn)) return;
-      if (query.asc.includes(col as ItemRevenueTermListColumn)) return;
-      if (col === 'item') {
-        orders.push(desc(items.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(desc(profiles.name))
-        return;
-      }
+        const orderFn = isAsc ? asc : desc;
+        orders.push(orderFn(itemRevenueTerms[col as ItemRevenueTermColumn]));
+      });
+    };
 
-      orders.push(desc(itemRevenueTerms[col as ItemRevenueTermColumn]))
-    })
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(itemRevenueTerms.deletedAt),

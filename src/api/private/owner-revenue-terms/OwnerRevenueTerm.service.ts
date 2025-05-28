@@ -16,27 +16,25 @@ export class OwnerRevenueTermService {
   static async list(query: OwnerRevenueTermFilter): Promise<[OwnerRevenueTermList, number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortableOwnerRevenueTermColumns.includes(col as OwnerRevenueTermListColumn)) return;
-      if (query.desc.includes(col as OwnerRevenueTermListColumn)) return;
-      if (col === 'owner') {
-        orders.push(asc(profiles.name))
-        return;
-      }
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-      orders.push(asc(ownerRevenueTerms[col as OwnerRevenueTermColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortableOwnerRevenueTermColumns.includes(col as OwnerRevenueTermListColumn)) return;
+        if ((query[opposite] as OwnerRevenueTermListColumn[]).includes(col as OwnerRevenueTermListColumn)) return;
 
-    query.desc.forEach((col) => {
-      if (!sortableOwnerRevenueTermColumns.includes(col as OwnerRevenueTermListColumn)) return;
-      if (query.asc.includes(col as OwnerRevenueTermListColumn)) return;
-      if (col === 'owner') {
-        orders.push(desc(profiles.name))
-        return;
-      }
+        const orderFn = isAsc ? asc : desc;
+        orders.push(orderFn(ownerRevenueTerms[col as OwnerRevenueTermColumn]));
+      });
+    };
 
-      orders.push(desc(ownerRevenueTerms[col as OwnerRevenueTermColumn]))
-    })
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(ownerRevenueTerms.deletedAt),

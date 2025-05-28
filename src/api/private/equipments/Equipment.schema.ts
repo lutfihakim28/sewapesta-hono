@@ -35,7 +35,10 @@ const EquipmentListItemSchema = EquipmentSchema.extend({
     name: true,
     type: true
   }),
-  category: CategorySchema,
+  category: CategorySchema.pick({
+    id: true,
+    name: true,
+  }),
   unit: UnitSchema,
   owner: UserExtendedSchema.pick({
     id: true,

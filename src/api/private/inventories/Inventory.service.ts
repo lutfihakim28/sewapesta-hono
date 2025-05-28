@@ -23,33 +23,25 @@ export class InventoryService {
   static async list(query: InventoryFilter): Promise<[InventoryList, number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortableInventoryColumns.includes(col as InventoryListColumn)) return;
-      if (query.desc.includes(col as InventoryListColumn)) return;
-      if (col === 'item') {
-        orders.push(asc(items.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(asc(profiles.name))
-        return;
-      }
-      orders.push(asc(inventories[col as InventoryColumn]))
-    })
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-    query.desc.forEach((col) => {
-      if (!sortableInventoryColumns.includes(col as InventoryListColumn)) return;
-      if (query.asc.includes(col as InventoryListColumn)) return;
-      if (col === 'item') {
-        orders.push(desc(items.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(desc(profiles.name))
-        return;
-      }
-      orders.push(desc(inventories[col as InventoryColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortableInventoryColumns.includes(col as InventoryListColumn)) return;
+        if ((query[opposite] as InventoryListColumn[]).includes(col as InventoryListColumn)) return;
+
+        const orderFn = isAsc ? asc : desc;
+        orders.push(orderFn(inventories[col as InventoryColumn]));
+      });
+    };
+
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(inventories.deletedAt)

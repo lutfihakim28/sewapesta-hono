@@ -2,15 +2,12 @@ import { Package, PackageColumn, PackageFilter, PackageList, PackageListColumn, 
 import { packages } from 'db/schema/packages';
 import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
 import { db } from 'db';
-import { users } from 'db/schema/users';
 import { products } from 'db/schema/products';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { packageColumns } from './Package.column';
 import { profiles } from 'db/schema/profiles';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { messages } from '@/utils/constants/messages';
-import { UserService } from '../users/User.service';
-import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { ProductService } from '../products/Product.service';
 import { AppDate } from '@/utils/libs/AppDate';
 
@@ -18,33 +15,33 @@ export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortablePackageColumns.includes(col as PackageListColumn)) return;
-      if (query.desc.includes(col as PackageListColumn)) return;
-      if (col === 'product') {
-        orders.push(asc(products.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(asc(profiles.name))
-        return;
-      }
-      orders.push(asc(packages[col as PackageColumn]))
-    })
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-    query.desc.forEach((col) => {
-      if (!sortablePackageColumns.includes(col as PackageListColumn)) return;
-      if (query.asc.includes(col as PackageListColumn)) return;
-      if (col === 'product') {
-        orders.push(desc(products.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(desc(profiles.name))
-        return;
-      }
-      orders.push(desc(packages[col as PackageColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortablePackageColumns.includes(col as PackageListColumn)) return;
+        if ((query[opposite] as PackageListColumn[]).includes(col as PackageListColumn)) return;
+
+        const orderFn = isAsc ? asc : desc;
+        if (col === 'product') {
+          orders.push(orderFn(products.name))
+          return;
+        }
+        if (col === 'owner') {
+          orders.push(orderFn(profiles.name))
+          return;
+        }
+        orders.push(orderFn(packages[col as PackageColumn]));
+      });
+    };
+
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(packages.deletedAt),

@@ -21,25 +21,29 @@ export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortableUserColumns.includes(col as UserListColumn)) return;
-      if (query.desc.includes(col as UserListColumn)) return;
-      if (col === 'name' || col === 'phone') {
-        orders.push(asc(profiles[col as ProfileColumn]))
-        return;
-      }
-      orders.push(asc(users[col as UserColumn]))
-    })
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-    query.desc.forEach((col) => {
-      if (!sortableUserColumns.includes(col as UserListColumn)) return;
-      if (query.asc.includes(col as UserListColumn)) return;
-      if (col === 'name' || col === 'phone') {
-        orders.push(desc(profiles[col as ProfileColumn]))
-        return;
-      }
-      orders.push(desc(users[col as UserColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortableUserColumns.includes(col as UserListColumn)) return;
+        if ((query[opposite] as UserListColumn[]).includes(col as UserListColumn)) return;
+
+        const orderFn = isAsc ? asc : desc;
+        if (col === 'name' || col === 'phone') {
+          orders.push(orderFn(profiles[col as ProfileColumn]))
+          return;
+        }
+        orders.push(orderFn(users[col as UserColumn]));
+      });
+    };
+
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(users.deletedAt),

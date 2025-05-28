@@ -25,33 +25,25 @@ export class EquipmentService {
   static async list(query: EquipmentFilter): Promise<[EquipmentList, number]> {
     let orders: SQL<unknown>[] = [];
 
-    query.asc.forEach((col) => {
-      if (!sortableEquipmentColumns.includes(col as EquipmentListColumn)) return;
-      if (query.desc.includes(col as EquipmentListColumn)) return;
-      if (col === 'item') {
-        orders.push(asc(items.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(asc(profiles.name))
-        return;
-      }
-      orders.push(asc(equipments[col as EquipmentColumn]))
-    })
+    const pushOrders = (
+      cols: string | string[] | undefined,
+      direction: 'asc' | 'desc'
+    ) => {
+      const targetCols = Array.isArray(cols) ? cols : [cols];
+      const isAsc = direction === 'asc';
+      const opposite = isAsc ? 'desc' : 'asc';
 
-    query.desc.forEach((col) => {
-      if (!sortableEquipmentColumns.includes(col as EquipmentListColumn)) return;
-      if (query.asc.includes(col as EquipmentListColumn)) return;
-      if (col === 'item') {
-        orders.push(desc(items.name))
-        return;
-      }
-      if (col === 'owner') {
-        orders.push(desc(profiles.name))
-        return;
-      }
-      orders.push(desc(equipments[col as EquipmentColumn]))
-    })
+      targetCols.forEach((col) => {
+        if (!sortableEquipmentColumns.includes(col as EquipmentListColumn)) return;
+        if ((query[opposite] as EquipmentListColumn[]).includes(col as EquipmentListColumn)) return;
+
+        const orderFn = isAsc ? asc : desc;
+        orders.push(orderFn(equipments[col as EquipmentColumn]));
+      });
+    };
+
+    pushOrders(query.asc, 'asc');
+    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(equipments.deletedAt),
