@@ -1,7 +1,7 @@
 import { honoApp } from '@/utils/helpers/hono';
-import { CategoryCheckRoute, CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryUpdateRoute } from 'src/api/private/categories/Category.route';
+import { CategoryCheckRoute, CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryOptionRoute, CategoryUpdateRoute } from 'src/api/private/categories/Category.route';
 import { CategoryService } from './Category.service';
-import { ApiResponse, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
+import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { messages } from '@/utils/constants/messages';
 import { Meta } from '@/utils/dtos/Meta.dto';
 
@@ -20,6 +20,17 @@ CategoryController.openapi(CategoryListRoute, async (context) => {
       pageSize: query.pageSize!,
       total: totalData
     }),
+    data: categories
+  }), 200)
+})
+
+CategoryController.openapi(CategoryOptionRoute, async (context) => {
+
+  const categories = await CategoryService.options()
+
+  return context.json(new ApiResponseData({
+    code: 200,
+    messages: [messages.successList('category options')],
     data: categories
   }), 200)
 })

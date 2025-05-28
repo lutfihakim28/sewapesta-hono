@@ -10,6 +10,7 @@ import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 import { AppDate } from '@/utils/libs/AppDate';
 import { items } from 'db/schema/items';
+import { Option } from '@/utils/schemas/Option.schema';
 
 export class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
@@ -99,8 +100,20 @@ export class CategoryService {
       ))
 
     if (available.length) {
-      throw new BadRequestException(messages.uniqueConstraint(`Category\'s name (${query.unique})`))
+      throw new BadRequestException(messages.uniqueConstraint(`Category's name (${query.unique})`))
     }
+  }
+
+  static async options(): Promise<Option[]> {
+    const _categories = await db
+      .select({
+        label: categories.name,
+        value: categories.id
+      })
+      .from(categories)
+      .where(isNull(categories.deletedAt))
+
+    return _categories
   }
 
   private static async count(query?: SQL<unknown>) {

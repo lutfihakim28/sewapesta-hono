@@ -6,7 +6,7 @@ import { UnionSchema } from './Union.schema';
 
 export const OptionSchema = new ObjectSchema({
   value: new UnionSchema([new StringSchema('Value').getSchema(), new NumberSchema('Value').natural().getSchema()]).getSchema(),
-  label: new StringSchema('Message').getSchema(),
+  label: new StringSchema('Label').getSchema(),
 }).getSchema().openapi('Option')
 
 export const OptionQuerySchema = new ObjectSchema({

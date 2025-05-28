@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/utils/schemas/Success.schema'
 import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
-import { CategoryFilterSchema, CategoryRequestSchema, CategoryResponseSchema } from './Category.schema'
+import { CategoryFilterSchema, CategoryOptionResponseSchema, CategoryRequestSchema, CategoryResponseSchema } from './Category.schema'
 import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
 import { UniqueCheckSchema } from '@/utils/schemas/UniqueCheck.schema'
 
@@ -16,6 +16,16 @@ export const CategoryListRoute = createRoute({
   },
   responses: new OpenApiResponse({
     successResponse: { schema: CategoryResponseSchema, description: 'Retrieve list categories' },
+    codes: [401, 403],
+  }),
+})
+
+export const CategoryOptionRoute = createRoute({
+  method: 'get',
+  path: '/options',
+  tags: [tag],
+  responses: new OpenApiResponse({
+    successResponse: { schema: CategoryOptionResponseSchema, description: 'Retrieve list category options' },
     codes: [401, 403],
   }),
 })
