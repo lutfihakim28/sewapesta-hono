@@ -1,1 +1,1 @@
-export const dateFormat = 'DD MMMM YYYY HH:mm:ss'
+export const DATE_FORMAT = 'DD MMMM YYYY HH:mm:ss'

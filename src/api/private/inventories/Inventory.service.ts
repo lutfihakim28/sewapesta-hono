@@ -12,7 +12,7 @@ import { inventoryColumns } from './Inventory.column';
 import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ItemService } from '../items/Item.service';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { UserService } from '../users/User.service';

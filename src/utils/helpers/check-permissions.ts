@@ -1,4 +1,4 @@
-import { messages } from '../constants/messages';
+import { messages } from '../constants/locales/messages';
 import { JwtPayload } from '../dtos/JwtPayload.dto';
 import { RoleEnum } from '../enums/RoleEnum';
 import { ForbiddenException } from '../exceptions/ForbiddenException';

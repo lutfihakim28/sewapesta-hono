@@ -4,7 +4,7 @@ import { ItemService } from './Item.service';
 import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 
 const ItemController = honoApp()
 

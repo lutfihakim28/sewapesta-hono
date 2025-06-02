@@ -1,4 +1,4 @@
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { honoApp } from '@/utils/helpers/hono';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { SubdistrictRoute } from 'src/api/public/locations/subdistricts/Subdistrict.route';

@@ -7,7 +7,7 @@ import { countOffset } from '@/utils/helpers/count-offset';
 import { packageColumns } from './Package.column';
 import { profiles } from 'db/schema/profiles';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ProductService } from '../products/Product.service';
 import { AppDate } from '@/utils/libs/AppDate';
 

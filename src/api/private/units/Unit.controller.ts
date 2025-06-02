@@ -2,7 +2,7 @@ import { honoApp } from '@/utils/helpers/hono';
 import { UnitCheckRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from 'src/api/private/units/Unit.route';
 import { UnitService } from './Unit.service';
 import { ApiResponse, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { Meta } from '@/utils/dtos/Meta.dto';
 
 const UnitController = honoApp()

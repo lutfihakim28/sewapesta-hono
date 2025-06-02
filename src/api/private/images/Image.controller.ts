@@ -2,7 +2,7 @@ import { honoApp } from '@/utils/helpers/hono';
 import { ImageUploadRoute } from 'src/api/private/images/Image.route';
 import { ImageService } from './Image.service';
 import { ApiResponseData } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ImageRequest } from './Image.schema';
 
 const ImageController = honoApp()

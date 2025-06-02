@@ -1,4 +1,4 @@
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { countOffset } from '@/utils/helpers/count-offset';

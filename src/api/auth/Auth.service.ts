@@ -12,7 +12,7 @@ import { UserRoleSchema } from '../private/users/User.schema';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
 import { AppDate } from '@/utils/libs/AppDate';
 import { pinoLogger } from '@/utils/helpers/logger';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 
 const accessTokenSecret = Bun.env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = Bun.env.REFRESH_TOKEN_SECRET;

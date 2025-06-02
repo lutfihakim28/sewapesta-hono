@@ -1,7 +1,7 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { ProductCreateRoute, ProductDeleteRoute, ProductDetailRoute, ProductListRoute, ProductUpdateRoute } from 'src/api/private/products/Product.route';
 import { ProductService } from './Product.service';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 

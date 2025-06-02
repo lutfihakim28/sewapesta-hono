@@ -3,7 +3,7 @@ import { LoginRoute, LogoutRoute, RefreshRoute } from './Auth.route';
 import { UserService } from '../private/users/User.service';
 import { AuthService } from './Auth.service';
 import { ApiResponse, ApiResponseData } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';

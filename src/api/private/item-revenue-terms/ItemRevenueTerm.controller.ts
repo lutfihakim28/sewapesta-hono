@@ -1,6 +1,6 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { ItemRevenueTermService } from './ItemRevenueTerm.service';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { ItemRevenueTermCreateRoute, ItemRevenueTermDeleteRoute, ItemRevenueTermDetailRoute, ItemRevenueTermListRoute, ItemRevenueTermUpdateRoute } from './ItemRevenueTerm.route';

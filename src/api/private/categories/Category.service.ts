@@ -4,7 +4,7 @@ import { categories } from 'db/schema/categories';
 import { db } from 'db';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { categoryColumns } from './Category.column';
 import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';

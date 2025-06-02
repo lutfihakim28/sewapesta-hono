@@ -1,6 +1,6 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { OwnerRevenueTermService } from './OwnerRevenueTerm.service';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { OwnerRevenueTermCreateRoute, OwnerRevenueTermDeleteRoute, OwnerRevenueTermDetailRoute, OwnerRevenueTermListRoute, OwnerRevenueTermUpdateRoute } from './OwnerRevenueTerm.route';

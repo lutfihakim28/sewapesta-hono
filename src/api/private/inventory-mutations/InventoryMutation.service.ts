@@ -9,7 +9,7 @@ import { users } from 'db/schema/users';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { inventoryMutationColumns } from './InventoryMutation.column';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { InventoryService } from '../inventories/Inventory.service';
 import { AppDate } from '@/utils/libs/AppDate';
 

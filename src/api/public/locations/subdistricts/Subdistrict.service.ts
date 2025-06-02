@@ -4,7 +4,7 @@ import { countOffset } from '@/utils/helpers/count-offset';
 import { subdistricts } from 'db/schema/subdistricts';
 import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
 import { BadRequestException } from '@/utils/exceptions/BadRequestException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 
 export class SubdistrictService {
   static async list(query: SubdistrictFilter): Promise<Subdistrict[]> {

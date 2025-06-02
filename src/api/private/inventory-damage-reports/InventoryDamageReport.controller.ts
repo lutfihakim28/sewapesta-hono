@@ -1,19 +1,22 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { InventoryDamageReportService } from './InventoryDamageReport.service';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { InventoryDamageReportCreateRoute, InventoryDamageReportDeleteRoute, InventoryDamageReportDetailRoute, InventoryDamageReportListRoute, InventoryDamageReportUpdateRoute } from './InventoryDamageReport.route';
+import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
 
 const InventoryDamageReportController = honoApp()
 
 InventoryDamageReportController.openapi(InventoryDamageReportListRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const query = context.req.valid('query')
   const [inventoryDamageReports, totalData] = await InventoryDamageReportService.list(query);
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('inventory damage reports')],
+    messages: [
+    ],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,

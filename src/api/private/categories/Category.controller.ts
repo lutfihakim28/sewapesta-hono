@@ -2,7 +2,7 @@ import { honoApp } from '@/utils/helpers/hono';
 import { CategoryCheckRoute, CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryOptionRoute, CategoryUpdateRoute } from 'src/api/private/categories/Category.route';
 import { CategoryService } from './Category.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { Meta } from '@/utils/dtos/Meta.dto';
 
 const CategoryController = honoApp()

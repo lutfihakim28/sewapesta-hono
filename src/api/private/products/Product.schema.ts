@@ -1,4 +1,4 @@
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';

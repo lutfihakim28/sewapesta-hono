@@ -2,7 +2,7 @@ import { honoApp } from '@/utils/helpers/hono';
 import { UserChangePasswordRoute, UserCreateRoute, UserDeleteRoute, UserDetailRoute, UserListRoute, UserRoleUpdateRoute, UserUpdateRoute } from './User.route';
 import { UserService } from './User.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
 import { RoleEnum } from '@/utils/enums/RoleEnum';

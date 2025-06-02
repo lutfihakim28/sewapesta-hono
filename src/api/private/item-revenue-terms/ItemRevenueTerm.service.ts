@@ -8,7 +8,7 @@ import { itemRevenueTermColumns } from './ItemRevenueTerm.column';
 import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { AppDate } from '@/utils/libs/AppDate';
 import { itemRevenueTerms } from 'db/schema/item-revenue-terms';
 import { ItemService } from '../items/Item.service';

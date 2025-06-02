@@ -1,6 +1,6 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { PackageItemService } from './PackageItem.service';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { PackageItemListRoute, PackageItemCreateRoute, PackageItemDeleteRoute, PackageItemDetailRoute, PackageItemUpdateRoute } from './PackageItem.route';

@@ -3,7 +3,7 @@ import { db } from 'db';
 import { users } from 'db/schema/users';
 import { eq } from 'drizzle-orm';
 import { UnauthorizedException } from '../exceptions/UnauthorizedException';
-import { messages } from '../constants/messages';
+import { messages } from '../constants/locales/messages';
 
 export const authMiddleware = createMiddleware(async (context, next) => {
   const payload = context.get('jwtPayload')

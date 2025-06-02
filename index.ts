@@ -1,45 +1,51 @@
+import { adminMiddleware } from '@/utils/middlewares/admin.middleware'
+import { ApiResponse } from '@/utils/dtos/ApiResponse.dto'
+import { authMiddleware } from '@/utils/middlewares/auth.middleware'
 import { cors } from 'hono/cors'
 import { honoApp } from '@/utils/helpers/hono'
 import { HTTPException } from 'hono/http-exception'
 import { jwt, } from 'hono/jwt'
 import { JwtTokenExpired } from 'hono/utils/jwt/types'
+import { languageDetector } from 'hono/language'
 import { logger } from 'hono/logger'
 import { pinoLogger } from '@/utils/helpers/logger'
-import { messages } from '@/utils/constants/messages'
 import { prettyJSON } from 'hono/pretty-json'
+import { Scalar } from '@scalar/hono-api-reference'
 import { serveStatic } from 'hono/bun'
+import { superadminMiddleware } from '@/utils/middlewares/superadmin.middleware'
 import { swaggerUI } from '@hono/swagger-ui'
-import CityController from '@/api/public/locations/cities/City.controller'
-import DistrictController from '@/api/public/locations/districts/District.controller'
-import ProvinceController from '@/api/public/locations/provinces/Province.controller'
-import SubdistrictController from '@/api/public/locations/subdistricts/Subdistrict.controller'
-import { ApiResponse } from '@/utils/dtos/ApiResponse.dto'
-import { authMiddleware } from '@/utils/middlewares/auth.middleware'
 import AuthController from '@/api/auth/Auth.controller'
 import CategoryController from '@/api/private/categories/Category.controller'
-import ProductController from '@/api/private/products/Product.controller'
-import { adminMiddleware } from '@/utils/middlewares/admin.middleware'
-import { superadminMiddleware } from '@/utils/middlewares/superadmin.middleware'
-import UnitController from '@/api/private/units/Unit.controller'
-import ImageController from '@/api/private/images/Image.controller'
-import ItemController from '@/api/private/items/Item.controller'
-import UserController from '@/api/private/users/User.controller';
+import CityController from '@/api/public/locations/cities/City.controller'
+import DistrictController from '@/api/public/locations/districts/District.controller'
 import EquipmentController from '@/api/private/equipments/Equipment.controller'
-import PackageController from '@/api/private/packages/Package.controller'
+import ImageController from '@/api/private/images/Image.controller'
 import InventoryController from '@/api/private/inventories/Inventory.controller'
-import InventoryMutationController from '@/api/private/inventory-mutations/InventoryMutation.controller'
-import { Scalar } from '@scalar/hono-api-reference'
-import InventoryUsageController from '@/api/private/inventory-usages/InventoryUsage.controller'
 import InventoryDamageReportController from '@/api/private/inventory-damage-reports/InventoryDamageReport.controller'
-import PackageItemController from '@/api/private/package-items/PackageItem.controller'
+import InventoryMutationController from '@/api/private/inventory-mutations/InventoryMutation.controller'
+import InventoryUsageController from '@/api/private/inventory-usages/InventoryUsage.controller'
+import ItemController from '@/api/private/items/Item.controller'
 import ItemRevenueTermController from '@/api/private/item-revenue-terms/ItemRevenueTerm.controller'
 import OwnerRevenueTermController from '@/api/private/owner-revenue-terms/OwnerRevenueTerm.controller'
-// import { MysqlErrorKeys } from 'mysql-error-keys'
+import PackageController from '@/api/private/packages/Package.controller'
+import PackageItemController from '@/api/private/package-items/PackageItem.controller'
+import ProductController from '@/api/private/products/Product.controller'
+import ProvinceController from '@/api/public/locations/provinces/Province.controller'
+import SubdistrictController from '@/api/public/locations/subdistricts/Subdistrict.controller'
+import UnitController from '@/api/private/units/Unit.controller'
+import UserController from '@/api/private/users/User.controller';
+import { AcceptedLocale, tMessage } from '@/utils/constants/locales/locale'
 
 const app = honoApp()
 
-app.use(logger(), prettyJSON())
+const supportedLanguages: AcceptedLocale[] = ['en', 'id']
+
+app.use(logger(), prettyJSON(), languageDetector({
+  supportedLanguages,
+  fallbackLanguage: 'en',
+}))
 app.onError((error, context) => {
+  const lang = context.get('language') as AcceptedLocale
   if (error instanceof HTTPException) {
     if (error.status === 401 || error.status === 404) {
       pinoLogger.error(error, 'Error 401')
@@ -78,7 +84,7 @@ app.onError((error, context) => {
   pinoLogger.error({ error: error.message, stack: error.stack, name: error.name }, 'Unhandled Error')
   return context.json(new ApiResponse({
     code: 500,
-    messages: [messages.errorServer]
+    messages: []
   }), 500)
 })
 app.use('/api/*', cors({

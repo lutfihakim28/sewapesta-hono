@@ -7,7 +7,7 @@ import { ownerRevenueTermColumns } from './OwnerRevenueTerm.column';
 import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ownerRevenueTerms } from 'db/schema/owner-revenue-terms';
 import { UserService } from '../users/User.service';

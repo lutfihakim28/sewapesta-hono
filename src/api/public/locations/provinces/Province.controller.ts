@@ -1,4 +1,4 @@
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { honoApp } from '@/utils/helpers/hono';
 import { ProvinceRoute } from 'src/api/public/locations/provinces/Province.route';
 import { ProvinceService } from './Province.service';

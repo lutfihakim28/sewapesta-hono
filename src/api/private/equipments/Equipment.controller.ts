@@ -1,7 +1,7 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { EquipmentCreateRoute, EquipmentDeleteRoute, EquipmentDetailRoute, EquipmentListRoute, EquipmentUpdateRoute } from './Equipment.route';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { EquipmentService } from './Equipment.service';
 

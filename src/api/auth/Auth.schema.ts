@@ -1,5 +1,5 @@
 import { UserSchema } from '@/api/private/users/User.schema';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { ObjectSchema } from '@/utils/schemas/Object.schema';

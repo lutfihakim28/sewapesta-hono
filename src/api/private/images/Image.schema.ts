@@ -1,4 +1,4 @@
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { ImageReferenceEnum } from '@/utils/enums/ImageReference.Enum';
 import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';

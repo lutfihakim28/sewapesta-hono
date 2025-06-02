@@ -5,7 +5,7 @@ import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { DateRangeSchema } from '@/utils/schemas/DateRange.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';

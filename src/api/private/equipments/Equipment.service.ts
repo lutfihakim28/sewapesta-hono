@@ -9,7 +9,7 @@ import { countOffset } from '@/utils/helpers/count-offset';
 import { equipmentColumns } from './Equipment.column';
 import { itemColumns } from '../items/Item.column';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { UserService } from '../users/User.service';
 import { ItemService } from '../items/Item.service';
 import { generateNumber } from '@/utils/helpers/generate-number';

@@ -1,6 +1,6 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { InventoryService } from './Inventory.service';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { InventoryCreateRoute, InventoryDeleteRoute, InventoryDetailRoute, InventoryListRoute, InventoryUpdateRoute } from './Inventory.route';

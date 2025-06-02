@@ -5,7 +5,7 @@ import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { CategorySchema } from '../categories/Category.schema';
 import { UnitSchema } from '../units/Unit.schema';
 import { ItemSchema } from '../items/Item.schema';

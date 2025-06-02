@@ -4,7 +4,7 @@ import { and, asc, count, desc, eq, inArray, isNull, like, or, SQL } from 'drizz
 import { ProfileColumn, ProfileRequest, sortableUserColumns, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserListColumn, UserRoleSchema, UserRoleUpdate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
-import { messages } from '@/utils/constants/messages';
+import { messages } from '@/utils/constants/locales/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { profileColumns, userColumns } from './User.column';
