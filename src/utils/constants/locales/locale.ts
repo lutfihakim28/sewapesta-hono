@@ -1,3 +1,4 @@
+import { pinoLogger } from '@/utils/helpers/logger'
 import { dataEn, dataId } from './data'
 import { messageEn, messageId } from './messages'
 
@@ -65,11 +66,16 @@ export function tData<K extends keyof Data>({ key, lang, params, textCase, mode 
     message = data[key]
   }
 
-  if (typeof message === 'string') {
-    const [singular, plural] = message.replaceAll(' ', '').split('|')
+  if (typeof message === 'string' && message.includes('|')) {
+    const [singular, plural] = message.replaceAll(' | ', '|').split('|')
     if (mode === 'singular') return changeCase(singular, textCase);
     return changeCase(plural, textCase)
   }
+
+  if (typeof message === 'string') {
+    return changeCase(message, textCase)
+  }
+
   if (params) {
     return (message as (params: any) => string)(params)
   }
