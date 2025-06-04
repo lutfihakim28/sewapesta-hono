@@ -1,13 +1,13 @@
 import { HTTPException } from 'hono/http-exception';
 import { AcceptedLocale, DataKey, tData, tMessage } from '../constants/locales/locale';
 
-export class NotFoundException extends HTTPException {
+export class UniqueConstraintException extends HTTPException {
   constructor(
     public dataKey: DataKey,
-    public dataId?: number | string,
-    public dataCode?: string
+    public dataId?: number,
+    public dataName?: string
   ) {
-    super(404)
+    super(422)
   }
 
   writeMessage(lang: AcceptedLocale) {
@@ -25,20 +25,20 @@ export class NotFoundException extends HTTPException {
       })
     }
 
-    if (this.dataCode) {
+    if (this.dataName) {
       messageData = tData({
         lang,
-        key: 'withCode',
+        key: 'withName',
         params: {
           data,
-          value: this.dataCode
+          value: this.dataName
         }
       })
     }
 
     return tMessage({
       lang,
-      key: 'errorConstraint',
+      key: 'uniqueConstraint',
       textCase: 'sentence',
       params: {
         data: messageData

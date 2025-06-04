@@ -1,7 +1,15 @@
 import { HTTPException } from 'hono/http-exception';
+import { AcceptedLocale, MessageKey, tMessage } from '../constants/locales/locale';
 
 export class ForbiddenException extends HTTPException {
-  constructor(message: string) {
-    super(403, { message })
+  constructor(public messageKey: MessageKey) {
+    super(403)
+  }
+
+  writeMessage(lang: AcceptedLocale) {
+    return tMessage({
+      lang,
+      key: this.messageKey,
+    })
   }
 }

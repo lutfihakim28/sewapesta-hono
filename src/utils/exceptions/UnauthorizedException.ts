@@ -1,7 +1,15 @@
 import { HTTPException } from 'hono/http-exception';
+import { AcceptedLocale, MessageKey, tMessage } from '../constants/locales/locale';
 
 export class UnauthorizedException extends HTTPException {
-  constructor(message: string) {
-    super(401, { message })
+  constructor(public messageKey: MessageKey) {
+    super(403)
+  }
+
+  writeMessage(lang: AcceptedLocale) {
+    return tMessage({
+      lang,
+      key: this.messageKey,
+    })
   }
 }
