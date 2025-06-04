@@ -1,4 +1,8 @@
-import { messages } from '@/utils/constants/locales/messages';
+import { tMessage } from '../constants/locales/locale';
 import { ApiResponseSchema } from './ApiResponse.schema';
 
-export const UnauthorizedSchema = ApiResponseSchema(messages.unauthorized, 401).openapi('Unauthorized')
+export const UnauthorizedSchema = ApiResponseSchema(tMessage({
+  lang: 'en',
+  key: 'unauthorized',
+  textCase: 'sentence'
+}), 401).openapi('Unauthorized')
