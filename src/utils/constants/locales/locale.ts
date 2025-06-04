@@ -40,14 +40,12 @@ type TOption<K, P> = {
   params?: P
 }
 
-export function tMessage<K extends keyof Message>({ key, lang, params, textCase, mode = 'singular' }: TOption<K, ExtractParams<Message, K>>) {
+export function tMessage<K extends keyof Message>({ key, lang, params, textCase }: TOption<K, ExtractParams<Message, K>>) {
   const messages = locale.message[lang]
   const message = messages[key]
 
   if (typeof message === 'string') {
-    const [singular, plural] = message.replaceAll(' ', '').split('|')
-    if (mode === 'singular') return changeCase(singular, textCase);
-    return changeCase(plural, textCase)
+    return changeCase(message, textCase)
   }
   if (params) {
     return (message as (params: any) => string)(params)
@@ -57,7 +55,6 @@ export function tMessage<K extends keyof Message>({ key, lang, params, textCase,
 
 export function tData<K extends keyof Data>({ key, lang, params, textCase, mode = 'singular' }: TOption<K, ExtractParams<Data, K>>) {
   const data = locale.data[lang]
-  // const message = data[key]
 
   const descriptor = Object.getOwnPropertyDescriptor(data, key)
 

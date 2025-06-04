@@ -84,7 +84,7 @@ AuthController.openapi(LogoutRoute, async (context) => {
   return context.json(new ApiResponse({
     code: 200,
     messages: [
-      tMessage({ key: 'successLogin', lang })
+      tMessage({ key: 'successLogout', lang })
     ]
   }))
 })
