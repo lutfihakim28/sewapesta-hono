@@ -8,11 +8,11 @@ import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/locales/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
+import { tMessage, tData } from '@/utils/constants/locales/locale';
 
 export type InventoryColumn = keyof typeof inventories.$inferSelect;
 
@@ -70,8 +70,36 @@ export const InventoryRequestSchema = createInsertSchema(inventories, {
   })
   .openapi('InventoryRequest')
 
-export const InventoryResponseListSchema = ApiResponseListSchema(InventoryListSchema, messages.successList('inventory items'))
-export const InventoryResponseDataSchema = ApiResponseDataSchema(InventorySchema, messages.successDetail('inventory item'))
+export const InventoryResponseListSchema = ApiResponseListSchema(InventoryListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'inventory',
+      mode: 'plural'
+    })
+  }
+}))
+export const InventoryResponseDataSchema = ApiResponseDataSchema(InventorySchema, tMessage({
+  lang: 'en',
+  key: 'errorNotFound',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'withId',
+      params: {
+        data: tData({
+          lang: 'en',
+          key: 'inventory',
+        }),
+        value: 1
+      }
+    })
+  }
+}))
 
 export type Inventory = SchemaType<typeof InventorySchema>
 export type InventoryList = SchemaType<typeof InventoryListSchema>

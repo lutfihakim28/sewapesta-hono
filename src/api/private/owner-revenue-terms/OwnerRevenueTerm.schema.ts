@@ -3,13 +3,13 @@ import { UserExtendedSchema } from '../users/User.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/locales/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { ownerRevenueTerms } from 'db/schema/owner-revenue-terms';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
+import { tMessage, tData } from '@/utils/constants/locales/locale';
 
 export type OwnerRevenueTermColumn = keyof typeof ownerRevenueTerms.$inferSelect;
 
@@ -49,8 +49,29 @@ export const OwnerRevenueTermFilterSchema = PaginationSchema
   })
   .openapi('OwnerRevenueTermFilter')
 
-export const OwnerRevenueTermResponseListSchema = ApiResponseListSchema(OwnerRevenueTermListSchema, messages.successList('inventory usages'))
-export const OwnerRevenueTermResponseDataSchema = ApiResponseDataSchema(OwnerRevenueTermSchema, messages.successDetail('inventory usages'))
+export const OwnerRevenueTermResponseListSchema = ApiResponseListSchema(OwnerRevenueTermListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'ownerRevenueTerm',
+      mode: 'plural'
+    })
+  }
+}))
+export const OwnerRevenueTermResponseDataSchema = ApiResponseDataSchema(OwnerRevenueTermSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'ownerRevenueTerm',
+    })
+  }
+}))
 
 export const OwnerRevenueTermRequestSchema = createInsertSchema(ownerRevenueTerms, {
   ownerId: new NumberSchema('Owner ID').natural().getSchema(),

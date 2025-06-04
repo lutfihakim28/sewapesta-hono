@@ -9,7 +9,6 @@ import { inventoryUsageColumns } from './InventoryUsage.column';
 import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { InventoryService } from '../inventories/Inventory.service';
 import { AppDate } from '@/utils/libs/AppDate';
 
@@ -88,10 +87,6 @@ export class InventoryUsageService {
       ))
       .limit(1);
 
-    if (!inventoryUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
-    }
-
     return inventoryUsage;
   }
 
@@ -125,7 +120,7 @@ export class InventoryUsageService {
       .returning(inventoryUsageColumns)
 
     if (!updatedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
+      throw new NotFoundException('inventoryUsage', id)
     }
 
     return updatedUsage;
@@ -144,7 +139,7 @@ export class InventoryUsageService {
       .returning(inventoryUsageColumns)
 
     if (!deletedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
+      throw new NotFoundException('inventoryUsage', id)
     }
   }
 

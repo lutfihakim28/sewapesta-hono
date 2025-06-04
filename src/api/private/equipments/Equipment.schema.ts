@@ -1,11 +1,9 @@
 import { equipments } from 'db/schema/equipments';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/locales/messages';
 import { CategorySchema } from '../categories/Category.schema';
 import { UnitSchema } from '../units/Unit.schema';
 import { ItemSchema } from '../items/Item.schema';
@@ -16,6 +14,7 @@ import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
+import { tMessage, tData } from '@/utils/constants/locales/locale';
 
 export type EquipmentColumn = keyof typeof equipments.$inferSelect;
 
@@ -85,8 +84,29 @@ export const EquipmentRequestSchema = createInsertSchema(equipments, {
   itemId: true,
 }).openapi('EquipmentRequest')
 
-export const EquipmentResponseListSchema = ApiResponseListSchema(EquipmentListSchema, messages.successList('equipment items'))
-export const EquipmentResponseDataSchema = ApiResponseDataSchema(EquipmentSchema, messages.successDetail('equipment item'))
+export const EquipmentResponseListSchema = ApiResponseListSchema(EquipmentListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'equipment',
+      mode: 'plural'
+    })
+  }
+}))
+export const EquipmentResponseDataSchema = ApiResponseDataSchema(EquipmentSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'equipment'
+    })
+  }
+}))
 
 export type Equipment = SchemaType<typeof EquipmentSchema>
 export type EquipmentFilter = SchemaType<typeof EquipmentFilterSchema>

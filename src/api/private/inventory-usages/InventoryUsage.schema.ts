@@ -6,11 +6,11 @@ import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { DateRangeSchema } from '@/utils/schemas/DateRange.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/locales/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
+import { tData, tMessage } from '@/utils/constants/locales/locale';
 
 export type InventoryUsageColumn = keyof typeof inventoryUsages.$inferSelect;
 
@@ -40,8 +40,29 @@ export const InventoryUsageFilterSchema = PaginationSchema
   })
   .openapi('InventoryUsageFilter')
 
-export const InventoryUsageResponseListSchema = ApiResponseListSchema(InventoryUsageListSchema, messages.successList('inventory usages'))
-export const InventoryUsageResponseDataSchema = ApiResponseDataSchema(InventoryUsageSchema, messages.successDetail('inventory usages'))
+export const InventoryUsageResponseListSchema = ApiResponseListSchema(InventoryUsageListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'inventoryUsage',
+      mode: 'plural'
+    })
+  }
+}))
+export const InventoryUsageResponseDataSchema = ApiResponseDataSchema(InventoryUsageSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'inventoryUsage',
+    })
+  }
+}))
 
 export const InventoryUsageRequestSchema = createInsertSchema(inventoryUsages, {
   description: new StringSchema('Description').getSchema().optional(),

@@ -4,7 +4,6 @@ import { and, asc, count, desc, eq, inArray, isNull, like, or, SQL } from 'drizz
 import { ProfileColumn, ProfileRequest, sortableUserColumns, User, UserChangePassword, UserColumn, UserCreate, UserExtended, UserFilter, UserListColumn, UserRoleSchema, UserRoleUpdate } from './User.schema';
 import { profiles } from 'db/schema/profiles';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
-import { messages } from '@/utils/constants/locales/messages';
 import { LoginRequest } from '@/api/auth/Auth.schema';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { profileColumns, userColumns } from './User.column';
@@ -16,6 +15,8 @@ import { validationMessages } from '@/utils/constants/validation-message';
 import { usersRoles } from 'db/schema/users-roles';
 import { buildJsonGroupArray } from '@/utils/helpers/build-json-group-array';
 import { AppDate } from '@/utils/libs/AppDate';
+import { ConstraintException } from '@/utils/exceptions/ConstraintException';
+import { ForbiddenException } from '@/utils/exceptions/ForbiddenException';
 
 export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
@@ -192,7 +193,7 @@ export class UserService {
         .returning({ id: profiles.id })
 
       if (!profile) {
-        throw new NotFoundException(messages.errorNotFound(`User with ID ${id}`))
+        throw new NotFoundException('user', id)
       }
 
       return await this.get(id)
@@ -215,7 +216,7 @@ export class UserService {
         .returning({ id: users.id })
 
       if (!user) {
-        throw new NotFoundException(messages.errorNotFound(`User with ID ${id}`));
+        throw new NotFoundException('user', id);
       }
 
       await transaction
@@ -241,7 +242,7 @@ export class UserService {
       .limit(1)
 
     if (!user) {
-      throw new NotFoundException(messages.errorNotFound(`User with ID ${id}`));
+      throw new NotFoundException('user', id);
     }
 
     let isMatch = false;
@@ -255,7 +256,7 @@ export class UserService {
     }
 
     if (!isMatch) {
-      throw new BadRequestException('Your password is not match.')
+      throw new ForbiddenException('incorrectPassword')
     }
 
     const newPassword = await Bun.password.hash(payload.newPassword)
@@ -276,7 +277,7 @@ export class UserService {
   static async changeRole(userId: number, payload: UserRoleUpdate): Promise<void> {
     if (!payload.assigned) {
       if (payload.role === RoleEnum.SuperAdmin) {
-        throw new BadRequestException(`Super Admin role from user with ID ${userId} can not be removed.`)
+        throw new ForbiddenException('roleRemoval')
       }
       await db
         .delete(usersRoles)
@@ -287,7 +288,7 @@ export class UserService {
       return
     }
     if (payload.role === RoleEnum.SuperAdmin) {
-      throw new BadRequestException(`Super Admin role can not be assigned into user with ID ${userId}.`)
+      throw new ForbiddenException('roleAssignment')
     }
     await db
       .insert(usersRoles)
@@ -306,13 +307,13 @@ export class UserService {
       .limit(1)
 
     if (!user) {
-      throw new UnauthorizedException(messages.invalidCredential)
+      throw new UnauthorizedException('invalidCredential')
     }
 
     const isMatch = await Bun.password.verify(loginRequest.password, user.password);
 
     if (!isMatch) {
-      throw new UnauthorizedException(messages.invalidCredential)
+      throw new UnauthorizedException('invalidCredential')
     }
 
     return user.id
@@ -344,7 +345,7 @@ export class UserService {
       .limit(1)
 
     if (!user) {
-      throw new NotFoundException(messages.errorConstraint('User'))
+      throw new ConstraintException('user', id)
     }
   }
 

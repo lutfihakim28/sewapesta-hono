@@ -1,5 +1,3 @@
-import { messages } from '@/utils/constants/locales/messages';
-import { validationMessages } from '@/utils/constants/validation-message';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
@@ -8,8 +6,8 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
-import { z } from 'zod';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
+import { tData, tMessage } from '@/utils/constants/locales/locale';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
@@ -34,7 +32,18 @@ export const ProductFilterSchema = SearchSchema
 
 const ProductListSchema = new ArraySchema('Product list', ProductSchema).getSchema()
 
-export const ProductResponseListSchema = ApiResponseListSchema(ProductListSchema, messages.successList('products'))
+export const ProductResponseListSchema = ApiResponseListSchema(ProductListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'product',
+      mode: 'plural'
+    })
+  }
+}))
 
 export const ProductRequestSchema = createInsertSchema(products, {
   name: new StringSchema('Name').getSchema(),
@@ -42,7 +51,14 @@ export const ProductRequestSchema = createInsertSchema(products, {
   name: true,
 }).openapi('ProductRequest')
 
-export const ProductResponseDataSchema = ApiResponseDataSchema(ProductSchema, messages.successDetail('product'))
+export const ProductResponseDataSchema = ApiResponseDataSchema(ProductSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({ lang: 'en', key: 'product' })
+  }
+}))
 
 export type Product = SchemaType<typeof ProductSchema>
 export type ProductFilter = SchemaType<typeof ProductFilterSchema>

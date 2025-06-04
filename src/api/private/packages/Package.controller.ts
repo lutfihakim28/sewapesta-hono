@@ -1,19 +1,34 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { PackageService } from './Package.service';
-import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { PackageCreateRoute, PackageDeleteRoute, PackageDetailRoute, PackageListRoute, PackageUpdateRoute } from './Package.route';
+import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 
 const PackageController = honoApp()
 
 PackageController.openapi(PackageListRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const query = context.req.valid('query')
   const [products, totalData] = await PackageService.list(query);
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('packages')],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successList',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'package',
+            mode: 'plural'
+          })
+        }
+      })
+    ],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,
@@ -24,29 +39,64 @@ PackageController.openapi(PackageListRoute, async (context) => {
 })
 
 PackageController.openapi(PackageDetailRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
   const _package = await PackageService.get(+param.id)
 
+  if (!_package) {
+    throw new NotFoundException('package', param.id)
+  }
+
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successDetail('package')],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successDetail',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'package',
+          })
+        }
+      })
+    ],
     data: _package
   }), 200)
 })
 
 PackageController.openapi(PackageCreateRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const payload = context.req.valid('json')
 
   const _package = await PackageService.create(payload)
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successCreate(`Package with name ${_package.name}`)],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successCreate',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withName',
+            params: {
+              data: tData({ lang, key: 'package' }),
+              value: _package.name
+            }
+          })
+        }
+      })
+    ],
     data: _package
   }), 200)
 })
 
 PackageController.openapi(PackageUpdateRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
 
@@ -54,19 +104,52 @@ PackageController.openapi(PackageUpdateRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successUpdate(`Package with ID ${_package.id}`)],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successUpdate',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withId',
+            params: {
+              data: tData({ lang, key: 'package' }),
+              value: _package.id
+            }
+          })
+        }
+      })
+    ],
     data: _package
   }), 200)
 })
 
 PackageController.openapi(PackageDeleteRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
 
   await PackageService.delete(+param.id)
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete(`Package with ID ${param.id}`)],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successDelete',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withId',
+            params: {
+              data: tData({ lang, key: 'package' }),
+              value: param.id
+            }
+          })
+        }
+      })
+    ],
   }), 200)
 })
 

@@ -6,6 +6,9 @@ export type AcceptedLocale = 'en' | 'id'
 type Data = typeof dataEn
 type Message = typeof messageEn
 
+export type DataKey = keyof Data;
+export type MessageKey = keyof Message;
+
 const locale: {
   data: {
     [k in AcceptedLocale]: Data
@@ -27,7 +30,7 @@ const locale: {
 type ExtractParams<T, K extends keyof T> =
   T[K] extends (params: infer P) => any ? P : T[K] extends string ? undefined : never;
 
-type TextCase = 'lower' | 'upper' | 'capitalize' | 'leading';
+type TextCase = 'lower' | 'upper' | 'capitalize' | 'sentence';
 
 type TOption<K, P> = {
   key: K,
@@ -54,7 +57,16 @@ export function tMessage<K extends keyof Message>({ key, lang, params, textCase,
 
 export function tData<K extends keyof Data>({ key, lang, params, textCase, mode = 'singular' }: TOption<K, ExtractParams<Data, K>>) {
   const data = locale.data[lang]
-  const message = data[key]
+  // const message = data[key]
+
+  const descriptor = Object.getOwnPropertyDescriptor(data, key)
+
+  let message
+  if (descriptor && descriptor.get) {
+    message = descriptor.get.call(data)
+  } else {
+    message = data[key]
+  }
 
   if (typeof message === 'string') {
     const [singular, plural] = message.replaceAll(' ', '').split('|')
@@ -76,7 +88,7 @@ function changeCase(text: string, textCase?: TextCase) {
       .join(' ');
   }
 
-  if (textCase === 'leading') {
+  if (textCase === 'sentence') {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
 

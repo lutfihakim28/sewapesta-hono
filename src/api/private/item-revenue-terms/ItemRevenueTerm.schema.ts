@@ -4,15 +4,13 @@ import { UserExtendedSchema } from '../users/User.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/locales/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { itemRevenueTerms } from 'db/schema/item-revenue-terms';
-import { EnumSchema } from '@/utils/schemas/Enum.schema';
-import { TermPriceTypeEnum } from '@/utils/enums/TermPriceTypeEnum';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
+import { tData, tMessage } from '@/utils/constants/locales/locale';
 
 export type ItemRevenueTermColumn = keyof typeof itemRevenueTerms.$inferSelect;
 
@@ -57,8 +55,26 @@ export const ItemRevenueTermFilterSchema = PaginationSchema
   })
   .openapi('ItemRevenueTermFilter')
 
-export const ItemRevenueTermResponseListSchema = ApiResponseListSchema(ItemRevenueTermListSchema, messages.successList('inventory usages'))
-export const ItemRevenueTermResponseDataSchema = ApiResponseDataSchema(ItemRevenueTermSchema, messages.successDetail('inventory usages'))
+export const ItemRevenueTermResponseListSchema = ApiResponseListSchema(ItemRevenueTermListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'itemRevenueTerm',
+      mode: 'plural'
+    })
+  }
+}))
+export const ItemRevenueTermResponseDataSchema = ApiResponseDataSchema(ItemRevenueTermSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({ lang: 'en', key: 'itemRevenueTerm' })
+  }
+}))
 
 export const ItemRevenueTermRequestSchema = createInsertSchema(itemRevenueTerms, {
   ownerId: new NumberSchema('Owner ID').natural().getSchema(),

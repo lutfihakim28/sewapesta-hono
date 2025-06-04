@@ -3,16 +3,17 @@ import { LoginRoute, LogoutRoute, RefreshRoute } from './Auth.route';
 import { UserService } from '../private/users/User.service';
 import { AuthService } from './Auth.service';
 import { ApiResponse, ApiResponseData } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/locales/messages';
 import { JwtPayload } from '@/utils/dtos/JwtPayload.dto';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
 import { decode } from 'hono/jwt';
+import { AcceptedLocale, tMessage } from '@/utils/constants/locales/locale';
 
 const refreshCookieKey = 'refresh_token';
 const AuthController = honoApp()
 
 AuthController.openapi(LoginRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const loginRequest = context.req.valid('json');
 
   const userId = await UserService.checkCredentials(loginRequest);
@@ -29,22 +30,26 @@ AuthController.openapi(LoginRoute, async (context) => {
   return context.json(new ApiResponseData({
     code: 200,
     data: tokenData,
-    messages: [messages.successLogin]
+    messages: [tMessage({
+      key: 'successLogin',
+      lang,
+    })]
   }), 200)
 })
 
 AuthController.openapi(RefreshRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const refreshToken = getCookie(context, refreshCookieKey);
 
   if (!refreshToken) {
-    throw new UnauthorizedException(messages.unauthorized);
+    throw new UnauthorizedException('unauthorized');
   }
 
   const response = await AuthService.refresh(refreshToken)
 
   if (!response) {
     deleteCookie(context, refreshCookieKey)
-    throw new UnauthorizedException(messages.unauthorized);
+    throw new UnauthorizedException('unauthorized');
   }
 
   const [tokenData, newRefreshToken] = response;
@@ -60,11 +65,14 @@ AuthController.openapi(RefreshRoute, async (context) => {
   return context.json(new ApiResponseData({
     code: 200,
     data: tokenData,
-    messages: [messages.successRefresh]
+    messages: [
+      tMessage({ key: 'successRefresh', lang })
+    ]
   }), 200)
 })
 
 AuthController.openapi(LogoutRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale
   const refreshToken = getCookie(context, refreshCookieKey);
 
   if (refreshToken) {
@@ -75,7 +83,9 @@ AuthController.openapi(LogoutRoute, async (context) => {
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successLogout]
+    messages: [
+      tMessage({ key: 'successLogin', lang })
+    ]
   }))
 })
 

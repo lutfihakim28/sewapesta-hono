@@ -1,5 +1,3 @@
-import { messages } from '@/utils/constants/locales/messages';
-import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
@@ -8,6 +6,7 @@ import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
 import { productColumns } from './Product.column';
 import { Product, ProductColumn, ProductFilter, ProductListColumn, ProductRequest, sortableProductColumn } from './Product.schema';
 import { AppDate } from '@/utils/libs/AppDate';
+import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 
 export abstract class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
@@ -70,10 +69,6 @@ export abstract class ProductService {
       .where(and(...conditions))
       .limit(1)
 
-    if (!product) {
-      throw new NotFoundException(messages.errorNotFound(`Product with ID ${id}`));
-    }
-
     return product
   }
 
@@ -101,7 +96,7 @@ export abstract class ProductService {
       .returning(productColumns)
 
     if (!product) {
-      throw new NotFoundException(messages.errorNotFound(`Product with ID ${id}`));
+      throw new NotFoundException('product', id)
     }
 
     return product
@@ -132,7 +127,7 @@ export abstract class ProductService {
       .limit(1)
 
     if (!product) {
-      throw new BadRequestException(messages.errorConstraint('Product'))
+      throw new ConstraintException('product', id)
     }
 
     return product

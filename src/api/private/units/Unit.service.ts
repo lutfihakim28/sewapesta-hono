@@ -1,6 +1,3 @@
-import { messages } from '@/utils/constants/locales/messages';
-import { BadRequestException } from '@/utils/exceptions/BadRequestException';
-import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
@@ -9,6 +6,7 @@ import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { unitColumns } from './Unit.column';
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 import { AppDate } from '@/utils/libs/AppDate';
+import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 
 export class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
@@ -67,7 +65,7 @@ export class UnitService {
       ))
 
     if (!category) {
-      throw new NotFoundException(messages.errorConstraint('Unit'))
+      throw new ConstraintException('unit', id)
     }
   }
 
@@ -88,7 +86,7 @@ export class UnitService {
       ))
 
     if (available.length) {
-      throw new BadRequestException(messages.uniqueConstraint(`Unit\'s name "${query.unique}"`))
+      throw new ConstraintException('unit', undefined, query.unique)
     }
   }
 

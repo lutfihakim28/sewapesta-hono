@@ -7,9 +7,9 @@ import { countOffset } from '@/utils/helpers/count-offset';
 import { packageColumns } from './Package.column';
 import { profiles } from 'db/schema/profiles';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { ProductService } from '../products/Product.service';
 import { AppDate } from '@/utils/libs/AppDate';
+import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 
 export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
@@ -47,17 +47,9 @@ export class PackageService {
       isNull(packages.deletedAt),
     ];
 
-    // if (query.ownerId) {
-    //   conditions.push(eq(packages.ownerId, +query.ownerId))
-    // }
-
     if (query.productId) {
       conditions.push(eq(packages.productId, +query.productId))
     }
-
-    // if (query.term) {
-    //   conditions.push(eq(packages.term, query.term))
-    // }
 
     if (query.keyword) {
       conditions.push(or(
@@ -72,19 +64,12 @@ export class PackageService {
       db
         .select({
           ...packageColumns,
-          // owner: {
-          //   id: users.id,
-          //   name: profiles.name,
-          //   phone: profiles.phone,
-          // },
           product: {
             id: products.id,
             name: products.name
           }
         })
         .from(packages)
-        // .innerJoin(users, eq(users.id, packages.ownerId))
-        // .innerJoin(profiles, eq(profiles.userId, users.id))
         .leftJoin(products, eq(products.id, packages.productId))
         .where(and(...conditions))
         .orderBy(...orders)
@@ -109,15 +94,10 @@ export class PackageService {
       ))
       .limit(1);
 
-    if (!_package) {
-      throw new NotFoundException(messages.errorNotFound(`Package with ID ${id}`))
-    }
-
     return _package
   }
 
   static async create(payload: PackageRequest): Promise<Package> {
-    // await UserService.check(payload.ownerId, [RoleEnum.Owner])
     if (payload.productId) {
       await ProductService.check(payload.productId)
     }
@@ -131,7 +111,6 @@ export class PackageService {
   }
 
   static async update(id: number, payload: PackageRequest): Promise<Package> {
-    // await UserService.check(payload.ownerId, [RoleEnum.Owner])
     if (payload.productId) {
       await ProductService.check(payload.productId)
     }
@@ -146,7 +125,7 @@ export class PackageService {
       .returning(packageColumns);
 
     if (!updatedPackage) {
-      throw new NotFoundException(messages.errorNotFound(`Package with ID ${id}`))
+      throw new NotFoundException('package', id)
     }
 
     return updatedPackage;
@@ -165,7 +144,26 @@ export class PackageService {
       .returning(packageColumns);
 
     if (!deletedPackage) {
-      throw new NotFoundException(messages.errorNotFound(`Package with ID ${id}`))
+      throw new NotFoundException('package', id)
+    }
+  }
+
+  static async check(id: number) {
+    const conditions = [
+      isNull(packages.deletedAt),
+      eq(packages.id, id)
+    ]
+
+    const [_package] = await db
+      .select(packageColumns)
+      .from(packages)
+      .where(and(
+        ...conditions
+      ))
+      .limit(1)
+
+    if (!_package) {
+      throw new ConstraintException('package', id)
     }
   }
 

@@ -7,10 +7,10 @@ import { ownerRevenueTermColumns } from './OwnerRevenueTerm.column';
 import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ownerRevenueTerms } from 'db/schema/owner-revenue-terms';
 import { UserService } from '../users/User.service';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
 
 export class OwnerRevenueTermService {
   static async list(query: OwnerRevenueTermFilter): Promise<[OwnerRevenueTermList, number]> {
@@ -86,15 +86,11 @@ export class OwnerRevenueTermService {
       ))
       .limit(1);
 
-    if (!inventoryUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
-    }
-
     return inventoryUsage;
   }
 
   static async create(payload: OwnerRevenueTermRequest): Promise<OwnerRevenueTerm> {
-    await UserService.check(payload.ownerId);
+    await UserService.check(payload.ownerId, [RoleEnum.Owner]);
 
     const [newUsage] = await db
       .insert(ownerRevenueTerms)
@@ -105,7 +101,7 @@ export class OwnerRevenueTermService {
   }
 
   static async update(id: number, payload: OwnerRevenueTermRequest): Promise<OwnerRevenueTerm> {
-    await UserService.check(payload.ownerId);
+    await UserService.check(payload.ownerId, [RoleEnum.Owner]);
 
     const [updatedUsage] = await db
       .update(ownerRevenueTerms)
@@ -117,7 +113,7 @@ export class OwnerRevenueTermService {
       .returning(ownerRevenueTermColumns)
 
     if (!updatedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
+      throw new NotFoundException('ownerRevenueTerm', id)
     }
 
     return updatedUsage;
@@ -136,7 +132,7 @@ export class OwnerRevenueTermService {
       .returning(ownerRevenueTermColumns)
 
     if (!deletedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
+      throw new NotFoundException('ownerRevenueTerm', id)
     }
   }
 

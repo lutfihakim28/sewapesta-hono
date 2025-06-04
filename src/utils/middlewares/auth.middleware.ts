@@ -3,7 +3,6 @@ import { db } from 'db';
 import { users } from 'db/schema/users';
 import { eq } from 'drizzle-orm';
 import { UnauthorizedException } from '../exceptions/UnauthorizedException';
-import { messages } from '../constants/locales/messages';
 
 export const authMiddleware = createMiddleware(async (context, next) => {
   const payload = context.get('jwtPayload')
@@ -11,11 +10,11 @@ export const authMiddleware = createMiddleware(async (context, next) => {
   const [user] = await db.select().from(users).where(eq(users.id, payload.user.id))
 
   if (!user || !user.refreshToken) {
-    throw new UnauthorizedException(messages.unauthorized)
+    throw new UnauthorizedException('unauthorized')
   }
 
   if (user.deletedAt) {
-    throw new UnauthorizedException('Your account has been deleted by admin.')
+    throw new UnauthorizedException('deletedAccount')
   }
 
   await next()

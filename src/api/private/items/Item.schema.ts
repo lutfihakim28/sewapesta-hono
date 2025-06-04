@@ -2,18 +2,17 @@ import { items } from 'db/schema/items';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { UnitSchema } from '../units/Unit.schema';
 import { CategorySchema } from '../categories/Category.schema';
-import { z } from 'zod';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/locales/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
+import { tMessage, tData } from '@/utils/constants/locales/locale';
 
 export type ItemColumn = keyof typeof items.$inferSelect;
 
@@ -42,8 +41,29 @@ export const ItemFilterSchema = SearchSchema
   })
   .openapi('ItemFilter')
 
-export const ItemResponseListSchema = ApiResponseListSchema(new ArraySchema('Item list', ItemSchema).getSchema(), messages.successList('items')).openapi('ItemResponseList')
-export const ItemResponseDataSchema = ApiResponseDataSchema(ItemSchema, messages.successDetail('item')).openapi('ItemResponseData')
+export const ItemResponseListSchema = ApiResponseListSchema(new ArraySchema('Item list', ItemSchema).getSchema(), tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'item',
+      mode: 'plural'
+    })
+  }
+})).openapi('ItemResponseList')
+export const ItemResponseDataSchema = ApiResponseDataSchema(ItemSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'item',
+    })
+  }
+})).openapi('ItemResponseData')
 
 export const ItemRequestSchema = createInsertSchema(items, {
   categoryId: new NumberSchema('Category ID').natural().getSchema(),

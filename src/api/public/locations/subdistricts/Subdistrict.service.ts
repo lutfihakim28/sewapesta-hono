@@ -3,8 +3,7 @@ import { and, count, eq, like } from 'drizzle-orm';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { subdistricts } from 'db/schema/subdistricts';
 import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
-import { BadRequestException } from '@/utils/exceptions/BadRequestException';
-import { messages } from '@/utils/constants/locales/messages';
+import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 
 export class SubdistrictService {
   static async list(query: SubdistrictFilter): Promise<Subdistrict[]> {
@@ -32,7 +31,7 @@ export class SubdistrictService {
       .limit(1)
 
     if (!subdistrict) {
-      throw new BadRequestException(messages.errorConstraint('subdistrict'))
+      throw new NotFoundException('subdistrict')
     }
 
     return subdistrict

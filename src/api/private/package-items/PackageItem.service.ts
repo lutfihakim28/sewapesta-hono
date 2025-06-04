@@ -8,11 +8,13 @@ import { packageItemColumns } from './PackageItem.column';
 import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { AppDate } from '@/utils/libs/AppDate';
 import { packageItems } from 'db/schema/package-items';
 import { packages } from 'db/schema/packages';
 import { equipments } from 'db/schema/equipments';
+import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
+import { ItemService } from '../items/Item.service';
+import { PackageService } from '../packages/Package.service';
 
 export class PackageItemService {
   static async list(query: PackageItemFilter): Promise<[PackageItemList, number]> {
@@ -84,14 +86,6 @@ export class PackageItemService {
       })
         .from(packageItems)
         .innerJoin(items, eq(items.id, packageItems.itemId))
-        // .leftJoin(inventories, and(
-        //   eq(packageItems.reference, ItemTypeEnum.Inventory),
-        //   eq(inventories.id, packageItems.referenceId),
-        // ))
-        // .leftJoin(equipments, and(
-        //   eq(packageItems.reference, ItemTypeEnum.Equipment),
-        //   eq(equipments.id, packageItems.referenceId),
-        // ))
         .innerJoin(users, or(
           eq(users.id, inventories.ownerId),
           eq(users.id, equipments.ownerId),
@@ -106,14 +100,6 @@ export class PackageItemService {
       })
         .from(packageItems)
         .innerJoin(items, eq(items.id, packageItems.itemId))
-        // .leftJoin(inventories, and(
-        //   eq(packageItems.reference, ItemTypeEnum.Inventory),
-        //   eq(inventories.id, packageItems.referenceId),
-        // ))
-        // .leftJoin(equipments, and(
-        //   eq(packageItems.reference, ItemTypeEnum.Equipment),
-        //   eq(equipments.id, packageItems.referenceId),
-        // ))
         .innerJoin(users, or(
           eq(users.id, inventories.ownerId),
           eq(users.id, equipments.ownerId),
@@ -135,25 +121,12 @@ export class PackageItemService {
       ))
       .limit(1);
 
-    if (!inventoryUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Package item with ID ${id}`))
-    }
-
     return inventoryUsage;
   }
 
   static async create(payload: PackageItemRequest): Promise<PackageItem> {
-    let itemId: number = -1;
-
-    // if (payload.reference === ItemTypeEnum.Inventory) {
-    //   const inventory = await InventoryService.check(payload.referenceId);
-    //   itemId = inventory.itemId
-    // }
-
-    // if (payload.reference === ItemTypeEnum.Equipment) {
-    //   const equipment = await EquipmentService.check(payload.referenceId);
-    //   itemId = equipment.itemId
-    // }
+    await ItemService.check(payload.itemId)
+    await PackageService.check(payload.packageId)
 
     const [newUsage] = await db
       .insert(packageItems)
@@ -164,17 +137,8 @@ export class PackageItemService {
   }
 
   static async update(id: number, payload: PackageItemRequest): Promise<PackageItem> {
-    // let itemId: number = -1;
-
-    // if (payload.reference === ItemTypeEnum.Inventory) {
-    //   const inventory = await InventoryService.check(payload.referenceId);
-    //   itemId = inventory.itemId
-    // }
-
-    // if (payload.reference === ItemTypeEnum.Equipment) {
-    //   const equipment = await EquipmentService.check(payload.referenceId);
-    //   itemId = equipment.itemId
-    // }
+    await ItemService.check(payload.itemId)
+    await PackageService.check(payload.packageId)
 
     const [updatedUsage] = await db
       .update(packageItems)
@@ -186,7 +150,7 @@ export class PackageItemService {
       .returning(packageItemColumns)
 
     if (!updatedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Package item with ID ${id}`))
+      throw new NotFoundException('packageItem', id)
     }
 
     return updatedUsage;
@@ -205,7 +169,7 @@ export class PackageItemService {
       .returning(packageItemColumns)
 
     if (!deletedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Package item with ID ${id}`))
+      throw new NotFoundException('packageItem', id)
     }
   }
 

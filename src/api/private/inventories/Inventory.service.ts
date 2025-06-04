@@ -12,12 +12,13 @@ import { inventoryColumns } from './Inventory.column';
 import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { ItemService } from '../items/Item.service';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { AppDate } from '@/utils/libs/AppDate';
+import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
+import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 
 export class InventoryService {
   static async list(query: InventoryFilter): Promise<[InventoryList, number]> {
@@ -115,10 +116,6 @@ export class InventoryService {
       ))
       .limit(1)
 
-    if (!inventory) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory with ID ${id}`))
-    }
-
     return inventory;
   }
 
@@ -152,10 +149,6 @@ export class InventoryService {
       ))
       .returning(inventoryColumns)
 
-    if (!updatedInventory) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory with ID ${id}`))
-    }
-
     return updatedInventory;
   }
 
@@ -172,7 +165,7 @@ export class InventoryService {
       .returning(inventoryColumns)
 
     if (!deletedInventory) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory with ID ${id}`))
+      throw new NotFoundException('inventory', id)
     }
   }
 
@@ -186,7 +179,7 @@ export class InventoryService {
       ))
 
     if (!inventory) {
-      throw new NotFoundException(messages.errorConstraint(`Invnetory with ID ${id}`))
+      throw new ConstraintException('inventory', id)
     }
 
     return inventory;

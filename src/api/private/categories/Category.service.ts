@@ -3,14 +3,13 @@ import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
 import { countOffset } from '@/utils/helpers/count-offset';
-import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { categoryColumns } from './Category.column';
-import { BadRequestException } from '@/utils/exceptions/BadRequestException';
 import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 import { AppDate } from '@/utils/libs/AppDate';
 import { items } from 'db/schema/items';
 import { Option } from '@/utils/schemas/Option.schema';
+import { ConstraintException } from '@/utils/exceptions/ConstraintException';
+import { UniqueConstraintException } from '@/utils/exceptions/UniqueConstraintException';
 
 export class CategoryService {
   static async list(query: CategoryFilter): Promise<[Category[], number]> {
@@ -79,7 +78,7 @@ export class CategoryService {
       ))
 
     if (!category) {
-      throw new NotFoundException(messages.errorConstraint('Category'))
+      throw new ConstraintException('category', id)
     }
   }
 
@@ -100,7 +99,7 @@ export class CategoryService {
       ))
 
     if (available.length) {
-      throw new BadRequestException(messages.uniqueConstraint(`Category's name (${query.unique})`))
+      throw new UniqueConstraintException('category', undefined, query.unique)
     }
   }
 

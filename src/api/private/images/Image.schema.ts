@@ -1,4 +1,3 @@
-import { messages } from '@/utils/constants/locales/messages';
 import { validationMessages } from '@/utils/constants/validation-message';
 import { ImageReferenceEnum } from '@/utils/enums/ImageReference.Enum';
 import { ApiResponseDataSchema } from '@/utils/schemas/ApiResponse.schema';
@@ -9,6 +8,7 @@ import { ObjectSchema } from '@/utils/schemas/Object.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { z } from 'zod';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
+import { tMessage, tData } from '@/utils/constants/locales/locale';
 
 const MAX_FILE_SIZE = 10000000;
 const accept = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];
@@ -47,7 +47,14 @@ const ImageSaveSchema = new ObjectSchema({
 }).getSchema().openapi('ImageSave')
 
 const ImageUploadSchema = ImageSchema.pick({ path: true })
-export const ImageUploadResponse = ApiResponseDataSchema(ImageUploadSchema, messages.successUpload('Image'))
+export const ImageUploadResponse = ApiResponseDataSchema(ImageUploadSchema, tMessage({
+  lang: 'en',
+  key: 'successUpload',
+  textCase: 'sentence',
+  params: {
+    data: tData({ lang: 'en', key: 'image' })
+  }
+}))
 
 export type ImageSave = SchemaType<typeof ImageSaveSchema>
 

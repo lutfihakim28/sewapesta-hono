@@ -2,19 +2,33 @@ import { honoApp } from '@/utils/helpers/hono';
 import { UnitCheckRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from 'src/api/private/units/Unit.route';
 import { UnitService } from './Unit.service';
 import { ApiResponse, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
-import { messages } from '@/utils/constants/locales/messages';
 import { Meta } from '@/utils/dtos/Meta.dto';
+import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
 
 const UnitController = honoApp()
 
 UnitController.openapi(UnitListRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const query = context.req.valid('query')
 
   const [units, totalData] = await UnitService.list(query)
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('unit')],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successList',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'unit',
+            mode: 'plural'
+          })
+        }
+      })
+    ],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,
@@ -25,17 +39,38 @@ UnitController.openapi(UnitListRoute, async (context) => {
 })
 
 UnitController.openapi(UnitCreateRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const payload = context.req.valid('json');
 
   await UnitService.create(payload)
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successCreate(`Unit with name ${payload.name}`)],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successCreate',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withName',
+            params: {
+              data: tData({
+                lang,
+                key: 'unit',
+              }),
+              value: payload.name
+            }
+          })
+        }
+      })
+    ],
   }), 200)
 })
 
 UnitController.openapi(UnitUpdateRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
 
@@ -43,29 +78,78 @@ UnitController.openapi(UnitUpdateRoute, async (context) => {
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successUpdate(`Unit with ID ${param.id}`)],
+    messages: [
+      tMessage({
+        lang,
+        key:'successUpdate',
+        textCase:'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withId',
+            params: {
+              data: tData({ lang, key: 'unit' }),
+              value: param.id
+            }
+          })
+        }
+      })
+    ],
   }), 200)
 })
 
 UnitController.openapi(UnitDeleteRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
 
   await UnitService.delete(+param.id)
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete(`Unit with ID ${param.id}`)]
+    messages: [
+      tMessage({
+        lang,
+        key:'successDelete',
+        textCase:'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withId',
+            params: {
+              data: tData({ lang, key: 'unit' }),
+              value: param.id
+            }
+          })
+        }
+      })
+    ]
   }), 200)
 })
 
 UnitController.openapi(UnitCheckRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const query = context.req.valid('query')
 
   await UnitService.checkAvailability(query)
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: ['Unit\'s name is available.']
+    messages: [
+      tMessage({
+        lang,
+        key: 'available',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'dataName',
+            params: {
+              data: tData({ lang, key: 'unit' }),
+            }
+          })
+        }
+      })
+    ]
   }), 200)
 })
 

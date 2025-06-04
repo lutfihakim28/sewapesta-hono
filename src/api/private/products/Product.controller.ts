@@ -1,19 +1,33 @@
 import { honoApp } from '@/utils/helpers/hono';
 import { ProductCreateRoute, ProductDeleteRoute, ProductDetailRoute, ProductListRoute, ProductUpdateRoute } from 'src/api/private/products/Product.route';
 import { ProductService } from './Product.service';
-import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
+import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
 
 const ProductController = honoApp()
 
 ProductController.openapi(ProductListRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const query = context.req.valid('query')
   const [products, totalData] = await ProductService.list(query);
 
   return context.json(new ApiResponseList({
     code: 200,
-    messages: [messages.successList('products')],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successList',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'product',
+            mode: 'plural'
+          })
+        }
+      })
+    ],
     meta: new Meta({
       page: query.page!,
       pageSize: query.pageSize!,
@@ -24,29 +38,60 @@ ProductController.openapi(ProductListRoute, async (context) => {
 })
 
 ProductController.openapi(ProductDetailRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
   const product = await ProductService.get(+param.id)
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successDetail('product')],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successDetail',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'product',
+          })
+        }
+      })
+    ],
     data: product
   }), 200)
 })
 
 ProductController.openapi(ProductCreateRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const payload = context.req.valid('json')
 
   const product = await ProductService.create(payload)
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successCreate(`Product with name ${product.name}`)],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successCreate',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withName',
+            params: {
+              data: tData({ lang, key: 'product' }),
+              value: product.name
+            }
+          })
+        }
+      })
+    ],
     data: product
   }), 200)
 })
 
 ProductController.openapi(ProductUpdateRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
 
@@ -54,19 +99,48 @@ ProductController.openapi(ProductUpdateRoute, async (context) => {
 
   return context.json(new ApiResponseData({
     code: 200,
-    messages: [messages.successUpdate(`Product with ID ${product.id}`)],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successUpdate',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'withId',
+            params: {
+              data: tData({ lang, key: 'product' }),
+              value: product.id
+            }
+          })
+        }
+      })
+    ],
     data: product
   }), 200)
 })
 
 ProductController.openapi(ProductDeleteRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
   const param = context.req.valid('param')
 
   await ProductService.delete(+param.id)
 
   return context.json(new ApiResponse({
     code: 200,
-    messages: [messages.successDelete(`Product with ID ${param.id}`)],
+    messages: [
+      tMessage({
+        lang,
+        key: 'successDelete',
+        textCase: 'sentence',
+        params: {
+          data: tData({
+            lang,
+            key: 'product',
+          })
+        }
+      })
+    ],
   }), 200)
 })
 

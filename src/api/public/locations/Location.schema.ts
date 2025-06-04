@@ -1,7 +1,6 @@
 import { ObjectSchema } from '@/utils/schemas/Object.schema'
 import { StringSchema } from '@/utils/schemas/String.schema'
 import { SchemaType } from '@/utils/types/Schema.type'
-import { z } from 'zod'
 
 export const LocationSchema = new ObjectSchema({
   subdistrict: new StringSchema('Subdistrict').getSchema(),

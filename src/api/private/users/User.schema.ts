@@ -1,12 +1,8 @@
 import { users } from 'db/schema/users'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { z } from '@hono/zod-openapi'
-
 import { LocationSchema } from '@/api/public/locations/Location.schema'
 import { profiles } from 'db/schema/profiles'
-import { validationMessages } from '@/utils/constants/validation-message'
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema'
-import { messages } from '@/utils/constants/locales/messages'
 import { RoleEnum } from '@/utils/enums/RoleEnum'
 import { SearchSchema } from '@/utils/schemas/Search.schema'
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema'
@@ -17,6 +13,7 @@ import { SchemaType } from '@/utils/types/Schema.type'
 import { EnumSchema } from '@/utils/schemas/Enum.schema'
 import { BooleanSchema } from '@/utils/schemas/Boolean.schema'
 import { ArraySchema } from '@/utils/schemas/Array.schema'
+import { tData, tMessage } from '@/utils/constants/locales/locale'
 
 export type UserColumn = keyof typeof users.$inferSelect
 export type ProfileColumn = keyof typeof profiles.$inferSelect
@@ -81,7 +78,18 @@ export const UserFilterSchema = SearchSchema
   .merge(SortSchema(sortableUserColumns)).openapi('UserFilter')
 
 
-export const UserResponseListSchema = ApiResponseListSchema(UserListSchema, messages.successList('users'))
+export const UserResponseListSchema = ApiResponseListSchema(UserListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'user',
+      mode: 'plural'
+    })
+  }
+}))
 
 export const UserCreateSchema = createInsertSchema(users)
   .pick({
@@ -93,7 +101,17 @@ export const UserCreateSchema = createInsertSchema(users)
     roles: new ArraySchema('Roles', new EnumSchema('Role', RoleEnum).getSchema()).nonempty().getSchema()
   }).openapi('UserCreate')
 
-export const UserResponseDataSchema = ApiResponseDataSchema(UserExtendedSchema, messages.successDetail('user'))
+export const UserResponseDataSchema = ApiResponseDataSchema(UserExtendedSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'user',
+    })
+  }
+}))
 
 export const UserChangePasswordSchema = new ObjectSchema({
   oldPassword: new StringSchema('Old Password').getSchema().optional(),

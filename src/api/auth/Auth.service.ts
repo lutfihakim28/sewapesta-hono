@@ -11,8 +11,6 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { UserRoleSchema } from '../private/users/User.schema';
 import { UnauthorizedException } from '@/utils/exceptions/UnauthorizedException';
 import { AppDate } from '@/utils/libs/AppDate';
-import { pinoLogger } from '@/utils/helpers/logger';
-import { messages } from '@/utils/constants/locales/messages';
 
 const accessTokenSecret = Bun.env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = Bun.env.REFRESH_TOKEN_SECRET;
@@ -33,7 +31,7 @@ export abstract class AuthService {
       .limit(1)
 
     if (!_user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('user')
     }
 
     const user = {
@@ -61,10 +59,9 @@ export abstract class AuthService {
     const jwt = decode(refreshToken);
     const jwtPayload = new JwtPayload(jwt.payload)
 
-    // If refresh token expired
     if (jwtPayload.exp < new AppDate().unix()) {
       await db.update(users).set({ refreshToken: null }).where(eq(users.id, jwtPayload.user.id))
-      throw new UnauthorizedException('Your refresh token is expired. Please login again.');
+      throw new UnauthorizedException('expiredRefreshToken')
     }
 
     const [user] = await db.select({
@@ -78,10 +75,8 @@ export abstract class AuthService {
         eq(users.refreshToken, refreshToken)
       ))
 
-    pinoLogger.debug(user, 'USER')
-
     if (!user || !user.id) {
-      throw new UnauthorizedException(messages.unauthorized);
+      throw new NotFoundException('user')
     }
 
     const payload: JWTPayload = new JwtPayload({

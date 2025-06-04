@@ -9,7 +9,6 @@ import { inventoryDamageReportColumns } from './InventoryDamageReport.column';
 import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { InventoryService } from '../inventories/Inventory.service';
 import { AppDate } from '@/utils/libs/AppDate';
 
@@ -88,10 +87,6 @@ export class InventoryDamageReportService {
       ))
       .limit(1);
 
-    if (!inventoryDamageReport) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item usage with ID ${id}`))
-    }
-
     return inventoryDamageReport;
   }
 
@@ -125,7 +120,7 @@ export class InventoryDamageReportService {
       .returning(inventoryDamageReportColumns)
 
     if (!updatedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item usage with ID ${id}`))
+      throw new NotFoundException('inventoryDamageReport', id)
     }
 
     return updatedUsage;
@@ -144,7 +139,7 @@ export class InventoryDamageReportService {
       .returning(inventoryDamageReportColumns)
 
     if (!deletedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory item usage with ID ${id}`))
+      throw new NotFoundException('inventoryDamageReport', id)
     }
   }
 

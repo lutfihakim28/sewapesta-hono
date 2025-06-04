@@ -8,11 +8,11 @@ import { itemRevenueTermColumns } from './ItemRevenueTerm.column';
 import { inventories } from 'db/schema/inventories';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { AppDate } from '@/utils/libs/AppDate';
 import { itemRevenueTerms } from 'db/schema/item-revenue-terms';
 import { ItemService } from '../items/Item.service';
 import { UserService } from '../users/User.service';
+import { RoleEnum } from '@/utils/enums/RoleEnum';
 
 export class ItemRevenueTermService {
   static async list(query: ItemRevenueTermFilter): Promise<[ItemRevenueTermList, number]> {
@@ -101,16 +101,14 @@ export class ItemRevenueTermService {
       ))
       .limit(1);
 
-    if (!inventoryUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
-    }
-
     return inventoryUsage;
   }
 
   static async create(payload: ItemRevenueTermRequest): Promise<ItemRevenueTerm> {
-    await ItemService.check(payload.itemId);
-    await UserService.check(payload.ownerId);
+    await Promise.all([
+      ItemService.check(payload.itemId),
+      UserService.check(payload.ownerId, [RoleEnum.Owner]),
+    ])
 
     const [newUsage] = await db
       .insert(itemRevenueTerms)
@@ -121,8 +119,10 @@ export class ItemRevenueTermService {
   }
 
   static async update(id: number, payload: ItemRevenueTermRequest): Promise<ItemRevenueTerm> {
-    await ItemService.check(payload.itemId);
-    await UserService.check(payload.ownerId);
+    await Promise.all([
+      ItemService.check(payload.itemId),
+      UserService.check(payload.ownerId, [RoleEnum.Owner]),
+    ])
 
     const [updatedUsage] = await db
       .update(itemRevenueTerms)
@@ -134,7 +134,7 @@ export class ItemRevenueTermService {
       .returning(itemRevenueTermColumns)
 
     if (!updatedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
+      throw new NotFoundException('itemRevenueTerm', id)
     }
 
     return updatedUsage;
@@ -153,7 +153,7 @@ export class ItemRevenueTermService {
       .returning(itemRevenueTermColumns)
 
     if (!deletedUsage) {
-      throw new NotFoundException(messages.errorNotFound(`Inventory usage with ID ${id}`))
+      throw new NotFoundException('itemRevenueTerm', id)
     }
   }
 

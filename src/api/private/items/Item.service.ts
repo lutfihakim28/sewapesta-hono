@@ -9,11 +9,11 @@ import { countOffset } from '@/utils/helpers/count-offset';
 import { categoryColumns } from '../categories/Category.column';
 import { unitColumns } from '../units/Unit.column';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { CategoryService } from '../categories/Category.service';
 import { UnitService } from '../units/Unit.service';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { AppDate } from '@/utils/libs/AppDate';
+import { ItemTypeUnmatchException } from '@/utils/exceptions/ItemTypeUnmatchException';
 
 export class ItemService {
   static async list(query: ItemFilter): Promise<[Item[], number]> {
@@ -94,16 +94,14 @@ export class ItemService {
       ))
       .limit(1)
 
-    if (!item) {
-      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
-    }
-
     return item;
   }
 
   static async create(payload: ItemRequest): Promise<Item> {
-    await CategoryService.check(payload.categoryId);
-    await UnitService.check(payload.unitId);
+    await Promise.all([
+      CategoryService.check(payload.categoryId),
+      UnitService.check(payload.unitId),
+    ])
 
     const [newItem] = await db
       .insert(items)
@@ -118,8 +116,10 @@ export class ItemService {
   }
 
   static async update(id: number, payload: ItemRequest): Promise<Item> {
-    await CategoryService.check(payload.categoryId);
-    await UnitService.check(payload.unitId);
+    await Promise.all([
+      CategoryService.check(payload.categoryId),
+      UnitService.check(payload.unitId),
+    ])
 
     const [updatedItem] = await db
       .update(items)
@@ -133,7 +133,7 @@ export class ItemService {
       })
 
     if (!updatedItem) {
-      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
+      throw new NotFoundException('item', id)
     }
 
     const item = await this.get(updatedItem.id);
@@ -152,7 +152,7 @@ export class ItemService {
       })
 
     if (!deletedItem) {
-      throw new NotFoundException(messages.errorNotFound(`Item with ID ${id}`))
+      throw new NotFoundException('item', id)
     }
   }
 
@@ -174,11 +174,11 @@ export class ItemService {
       .limit(1)
 
     if (!item && !type) {
-      throw new NotFoundException(messages.errorConstraint(`item with ID ${id}`))
+      throw new NotFoundException('item', id)
     }
 
     if (!item && type) {
-      throw new NotFoundException(`Selected item with ID ${id} is not ${type} type.`)
+      throw new ItemTypeUnmatchException(id, type);
     }
   }
 

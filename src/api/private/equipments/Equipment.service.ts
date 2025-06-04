@@ -9,7 +9,6 @@ import { countOffset } from '@/utils/helpers/count-offset';
 import { equipmentColumns } from './Equipment.column';
 import { itemColumns } from '../items/Item.column';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
-import { messages } from '@/utils/constants/locales/messages';
 import { UserService } from '../users/User.service';
 import { ItemService } from '../items/Item.service';
 import { generateNumber } from '@/utils/helpers/generate-number';
@@ -20,6 +19,7 @@ import { unitColumns } from '../units/Unit.column';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { AppDate } from '@/utils/libs/AppDate';
+import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 
 export class EquipmentService {
   static async list(query: EquipmentFilter): Promise<[EquipmentList, number]> {
@@ -118,10 +118,6 @@ export class EquipmentService {
       ))
       .limit(1)
 
-    if (!equipment) {
-      throw new NotFoundException(messages.errorNotFound(`Equipment with ID ${id}`))
-    }
-
     return equipment;
   }
 
@@ -165,10 +161,6 @@ export class EquipmentService {
       ))
       .returning(equipmentColumns)
 
-    if (!updatedEquipment) {
-      throw new NotFoundException(messages.errorNotFound(`Equipment with ID ${id}`))
-    }
-
     return updatedEquipment;
   }
 
@@ -184,7 +176,7 @@ export class EquipmentService {
       .returning({ id: equipments.id })
 
     if (!deletedEquipment) {
-      throw new NotFoundException(messages.errorNotFound(`Equipment with ID ${id}`))
+      throw new NotFoundException('equipment', id)
     }
   }
 
@@ -198,7 +190,7 @@ export class EquipmentService {
       ))
 
     if (!inventory) {
-      throw new NotFoundException(messages.errorConstraint(`Equipment with ID ${id}`))
+      throw new ConstraintException('equipment', id)
     }
 
     return inventory;

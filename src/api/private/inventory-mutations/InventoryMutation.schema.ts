@@ -1,18 +1,17 @@
 import { inventoryMutations } from 'db/schema/inventory-mutations';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 import { ItemSchema } from '../items/Item.schema';
 import { UserExtendedSchema } from '../users/User.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { StockMutationTypeEnum } from '@/utils/enums/StockMutationType.Enum';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
-import { messages } from '@/utils/constants/locales/messages';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { EnumSchema } from '@/utils/schemas/Enum.schema';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
+import { tMessage, tData } from '@/utils/constants/locales/locale';
 
 export type InventoryMutaionColumn = keyof typeof inventoryMutations.$inferSelect
 
@@ -59,8 +58,29 @@ export const InventoryMutationRequestSchema = createInsertSchema(inventoryMutati
   type: true,
 }).openapi('InventoryMutationRequest')
 
-export const InventoryMutationResponseListSchema = ApiResponseListSchema(InventoryMutationListSchema, messages.successList('inventory item mutations'))
-export const InventoryMutationResponseDataSchema = ApiResponseDataSchema(InventoryMutationSchema, messages.successDetail('inventory item mutation'))
+export const InventoryMutationResponseListSchema = ApiResponseListSchema(InventoryMutationListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'inventoryMutation',
+      mode: 'plural'
+    })
+  }
+}))
+export const InventoryMutationResponseDataSchema = ApiResponseDataSchema(InventoryMutationSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'inventoryMutation',
+    })
+  }
+}))
 
 export type InventoryMutation = SchemaType<typeof InventoryMutationSchema>
 export type InventoryMutationList = SchemaType<typeof InventoryMutationListSchema>

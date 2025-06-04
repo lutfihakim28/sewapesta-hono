@@ -90,7 +90,7 @@ export class ImageService {
 
 
       if (!image) {
-        throw new NotFoundException('Image not found.')
+        throw new NotFoundException('image')
       }
 
       await unlink(image.path);

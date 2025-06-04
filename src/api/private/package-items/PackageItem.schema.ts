@@ -1,19 +1,16 @@
-import { messages } from '@/utils/constants/locales/messages';
 import { ApiResponseDataSchema, ApiResponseListSchema } from '@/utils/schemas/ApiResponse.schema';
 import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { packageItems } from 'db/schema/package-items';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { UserExtendedSchema } from '../users/User.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
-import { EnumSchema } from '@/utils/schemas/Enum.schema';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { PackageSchema } from '../packages/Package.schema';
 import { ItemSchema } from '../items/Item.schema';
-import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
+import { tMessage, tData } from '@/utils/constants/locales/locale';
 
 export type PackageItemColumn = keyof typeof packageItems.$inferSelect;
 
@@ -75,8 +72,29 @@ export const PackageItemRequestSchema = createInsertSchema(packageItems, {
   // referenceId: true,
 }).openapi('PackageItemRequest')
 
-export const PackageItemResponseListSchema = ApiResponseListSchema(PackageItemListSchema, messages.successList('packageItems'))
-export const PackageItemResponseDataSchema = ApiResponseDataSchema(PackageItemSchema, messages.successDetail('package'))
+export const PackageItemResponseListSchema = ApiResponseListSchema(PackageItemListSchema, tMessage({
+  lang: 'en',
+  key: 'successList',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'packageItem',
+      mode: 'plural'
+    })
+  }
+}))
+export const PackageItemResponseDataSchema = ApiResponseDataSchema(PackageItemSchema, tMessage({
+  lang: 'en',
+  key: 'successDetail',
+  textCase: 'sentence',
+  params: {
+    data: tData({
+      lang: 'en',
+      key: 'packageItem',
+    })
+  }
+}))
 
 export type PackageItem = SchemaType<typeof PackageItemSchema>
 export type PackageItemList = SchemaType<typeof PackageItemListSchema>
