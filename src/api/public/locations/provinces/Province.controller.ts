@@ -9,11 +9,7 @@ const ProvinceController = honoApp()
 
 ProvinceController.openapi(ProvinceRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;
-  const query = context.req.valid('query')
-  const [provinces, totalData] = await Promise.all([
-    ProvinceService.list(query),
-    ProvinceService.count(query)
-  ])
+  const provinces = await ProvinceService.list()
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -32,9 +28,9 @@ ProvinceController.openapi(ProvinceRoute, async (context) => {
       })
     ],
     meta: new Meta({
-      page: query.page!,
-      pageSize: query.pageSize!,
-      total: totalData
+      page: 1,
+      pageSize: provinces.length,
+      total: provinces.length
     }),
     data: provinces
   }), 200)

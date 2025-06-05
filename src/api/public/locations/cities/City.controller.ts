@@ -9,11 +9,7 @@ const CityController = honoApp()
 
 CityController.openapi(CityRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;
-  const query = context.req.valid('query')
-  const [cities, totalData] = await Promise.all([
-    CityService.list(query),
-    CityService.count(query)
-  ])
+  const cities = await CityService.list()
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -32,9 +28,9 @@ CityController.openapi(CityRoute, async (context) => {
       })
     ],
     meta: new Meta({
-      page: query.page!,
-      pageSize: query.pageSize!,
-      total: totalData
+      page: 1,
+      pageSize: cities.length,
+      total: cities.length
     }),
     data: cities
   }), 200)

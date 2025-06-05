@@ -9,11 +9,7 @@ const SubdistrictController = honoApp()
 
 SubdistrictController.openapi(SubdistrictRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;
-  const query = context.req.valid('query')
-  const [subdistricts, totalData] = await Promise.all([
-    SubdistrictService.list(query),
-    SubdistrictService.count(query)
-  ])
+  const subdistricts = await SubdistrictService.list();
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -32,9 +28,9 @@ SubdistrictController.openapi(SubdistrictRoute, async (context) => {
       })
     ],
     meta: new Meta({
-      page: query.page!,
-      pageSize: query.pageSize!,
-      total: totalData
+      page: 1,
+      pageSize: subdistricts.length,
+      total: subdistricts.length
     }),
     data: subdistricts
   }), 200)

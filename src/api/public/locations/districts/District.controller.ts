@@ -9,11 +9,7 @@ const DistrictController = honoApp()
 
 DistrictController.openapi(DistrictRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;
-  const query = context.req.valid('query')
-  const [districts, totalData] = await Promise.all([
-    DistrictService.list(query),
-    DistrictService.count(query)
-  ])
+  const districts = await DistrictService.list();
 
   return context.json(new ApiResponseList({
     code: 200,
@@ -32,9 +28,9 @@ DistrictController.openapi(DistrictRoute, async (context) => {
       })
     ],
     meta: new Meta({
-      page: query.page!,
-      pageSize: query.pageSize!,
-      total: totalData
+      page: 1,
+      pageSize: districts.length,
+      total: districts.length
     }),
     data: districts
   }), 200)
