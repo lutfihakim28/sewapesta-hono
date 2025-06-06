@@ -3,7 +3,7 @@ import { AcceptedLocale, MessageKey, tMessage } from '../constants/locales/local
 
 export class UnauthorizedException extends HTTPException {
   constructor(public messageKey: MessageKey) {
-    super(403)
+    super(401)
   }
 
   writeMessage(lang: AcceptedLocale) {

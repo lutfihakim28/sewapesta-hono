@@ -97,6 +97,7 @@ export class UserService {
         })
         .from(users)
         .innerJoin(profiles, eq(profiles.userId, users.id))
+        .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
         .where(and(...conditions))
     ])
 

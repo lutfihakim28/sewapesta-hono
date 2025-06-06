@@ -34,8 +34,6 @@ export const errorHandler: ErrorHandler = (error, context) => {
 };
 
 function handleHttpException(error: HTTPException, context: Context<any, any, {}>) {
-  // if (error instanceof Ba)
-
   if (error instanceof ConstraintException) {
     return handleConstrainException(error, context)
   }
@@ -80,7 +78,7 @@ function handleConstrainException(error: ConstraintException, context: Context<a
   return context.json(new ApiResponse({
     code: error.status,
     messages: [error.writeMessage(lang)]
-  }))
+  }), error.status)
 }
 
 function handleForbiddenException(error: ForbiddenException, context: Context<any, any, {}>) {
@@ -89,7 +87,7 @@ function handleForbiddenException(error: ForbiddenException, context: Context<an
   return context.json(new ApiResponse({
     code: error.status,
     messages: [error.writeMessage(lang)]
-  }))
+  }), error.status)
 }
 
 function handleItemTypeUnmatchException(error: ItemTypeUnmatchException, context: Context<any, any, {}>) {
@@ -97,7 +95,7 @@ function handleItemTypeUnmatchException(error: ItemTypeUnmatchException, context
   return context.json(new ApiResponse({
     code: error.status,
     messages: [error.writeMessage(lang)]
-  }))
+  }), error.status)
 }
 
 function handleNotFoundException(error: NotFoundException, context: Context<any, any, {}>) {
@@ -106,7 +104,7 @@ function handleNotFoundException(error: NotFoundException, context: Context<any,
   return context.json(new ApiResponse({
     code: error.status,
     messages: [error.writeMessage(lang)]
-  }))
+  }), error.status)
 }
 
 function handleUnauthorizedException(error: UnauthorizedException, context: Context<any, any, {}>) {
@@ -115,7 +113,7 @@ function handleUnauthorizedException(error: UnauthorizedException, context: Cont
   return context.json(new ApiResponse({
     code: error.status,
     messages: [error.writeMessage(lang)]
-  }))
+  }), error.status)
 }
 
 function handleUniqueConstraintException(error: UniqueConstraintException, context: Context<any, any, {}>) {
@@ -123,5 +121,5 @@ function handleUniqueConstraintException(error: UniqueConstraintException, conte
   return context.json(new ApiResponse({
     code: error.status,
     messages: [error.writeMessage(lang)]
-  }))
+  }), error.status)
 }
