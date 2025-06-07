@@ -9,7 +9,8 @@ const CityController = honoApp()
 
 CityController.openapi(CityRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;
-  const cities = await CityService.list()
+  const query = context.req.valid('query')
+  const cities = await CityService.list(query)
 
   return context.json(new ApiResponseList({
     code: 200,

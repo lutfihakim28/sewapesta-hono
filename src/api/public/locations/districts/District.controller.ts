@@ -9,7 +9,8 @@ const DistrictController = honoApp()
 
 DistrictController.openapi(DistrictRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;
-  const districts = await DistrictService.list();
+  const query = context.req.valid('query')
+  const districts = await DistrictService.list(query);
 
   return context.json(new ApiResponseList({
     code: 200,

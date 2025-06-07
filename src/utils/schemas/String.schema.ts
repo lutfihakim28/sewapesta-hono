@@ -76,14 +76,3 @@ export class StringSchema {
     return this;
   }
 }
-
-export function _StringSchema(field: string) {
-  return z.string({
-    invalid_type_error: validationMessages.string(field),
-    required_error: validationMessages.required(field)
-  })
-}
-
-type StringSchemaOption = {
-
-}

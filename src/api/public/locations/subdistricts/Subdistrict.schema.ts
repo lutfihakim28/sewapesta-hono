@@ -4,6 +4,8 @@ import { createSelectSchema } from 'drizzle-zod';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tMessage, tData } from '@/utils/constants/locales/locale';
+import { ObjectSchema } from '@/utils/schemas/Object.schema';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 const SubdistrictSchema = createSelectSchema(subdistricts)
   .openapi('SubdistrictBase');
@@ -22,4 +24,9 @@ export const SubdistrictResponseListSchema = ApiResponseListSchema(SubdistrictLi
   }
 }))
 
+export const SubdistrictFilterSchema = new ObjectSchema({
+  districtCode: new StringSchema('District code').districtCode().getSchema()
+}).getSchema().openapi('SubdistrictFilter')
+
 export type Subdistrict = SchemaType<typeof SubdistrictSchema>
+export type SubdistrictFilter = SchemaType<typeof SubdistrictFilterSchema>

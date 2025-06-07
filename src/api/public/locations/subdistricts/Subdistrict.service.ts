@@ -1,14 +1,15 @@
 import { db } from 'db';
 import { subdistricts } from 'db/schema/subdistricts';
-import { Subdistrict } from './Subdistrict.schema';
+import { Subdistrict, SubdistrictFilter } from './Subdistrict.schema';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { eq } from 'drizzle-orm';
 
 export class SubdistrictService {
-  static async list(): Promise<Subdistrict[]> {
+  static async list(query: SubdistrictFilter): Promise<Subdistrict[]> {
     const _subdistricts = await db
       .select()
       .from(subdistricts)
+      .where(eq(subdistricts.districtCode, query.districtCode))
 
     return _subdistricts
   }

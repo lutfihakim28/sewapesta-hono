@@ -4,6 +4,8 @@ import { createSelectSchema } from 'drizzle-zod';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tMessage, tData } from '@/utils/constants/locales/locale';
+import { ObjectSchema } from '@/utils/schemas/Object.schema';
+import { StringSchema } from '@/utils/schemas/String.schema';
 
 const DistrictSchema = createSelectSchema(districts)
   .openapi('District');
@@ -22,4 +24,9 @@ export const DistrictResponseListSchema = ApiResponseListSchema(DistrictListSche
   }
 }))
 
+export const DistrictFilterSchema = new ObjectSchema({
+  cityCode: new StringSchema('City code').cityCode().getSchema()
+}).getSchema().openapi('DistrictFilter')
+
 export type District = SchemaType<typeof DistrictSchema>
+export type DistrictFilter = SchemaType<typeof DistrictFilterSchema>
