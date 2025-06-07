@@ -1,4 +1,4 @@
-import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
+import { and, count, desc, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
@@ -25,6 +25,7 @@ export class CategoryService {
           isNull(items.deletedAt),
           eq(items.categoryId, categories.id)
         ))
+        .orderBy(desc(categories.id))
         .groupBy(categories.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),

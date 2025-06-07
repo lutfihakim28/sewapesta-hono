@@ -2,35 +2,15 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
 import { products } from 'db/schema/products';
-import { and, asc, count, desc, eq, isNull, like, SQL } from 'drizzle-orm';
+import { and, count, desc, eq, isNull, like } from 'drizzle-orm';
 import { productColumns } from './Product.column';
-import { Product, ProductColumn, ProductFilter, ProductListColumn, ProductRequest, sortableProductColumn } from './Product.schema';
+import { Product, ProductFilter, ProductRequest } from './Product.schema';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
+import { packages } from 'db/schema/packages';
 
 export abstract class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
-    let orders: SQL<unknown>[] = [];
-
-    const pushOrders = (
-      cols: string | string[] | undefined,
-      direction: 'asc' | 'desc'
-    ) => {
-      const targetCols = Array.isArray(cols) ? cols : [cols];
-      const isAsc = direction === 'asc';
-      const opposite = isAsc ? 'desc' : 'asc';
-
-      targetCols.forEach((col) => {
-        if (!sortableProductColumn.includes(col as ProductListColumn)) return;
-        if ((query[opposite] as ProductListColumn[]).includes(col as ProductListColumn)) return;
-
-        const orderFn = isAsc ? asc : desc;
-        orders.push(orderFn(products[col as ProductColumn]));
-      });
-    };
-
-    pushOrders(query.asc, 'asc');
-    pushOrders(query.desc, 'desc');
 
     const conditions: ReturnType<typeof and>[] = [
       isNull(products.deletedAt),
@@ -43,10 +23,17 @@ export abstract class ProductService {
     }
 
     const [_products, [meta]] = await Promise.all([
-      db.select(productColumns)
+      db.select({
+        ...productColumns,
+        packageCount: count(packages.id).mapWith(Number)
+      })
         .from(products)
+        .leftJoin(packages, and(
+          isNull(packages.deletedAt),
+          eq(packages.productId, products.id)
+        ))
         .where(and(...conditions))
-        .orderBy(...orders)
+        .orderBy(desc(products.id))
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db
@@ -64,8 +51,15 @@ export abstract class ProductService {
       isNull(products.deletedAt),
     ]
     const [product] = await db
-      .select(productColumns)
+      .select({
+        ...productColumns,
+        packageCount: count(packages.id).mapWith(Number)
+      })
       .from(products)
+      .leftJoin(packages, and(
+        isNull(packages.deletedAt),
+        eq(packages.productId, products.id)
+      ))
       .where(and(...conditions))
       .limit(1)
 
@@ -99,7 +93,7 @@ export abstract class ProductService {
       throw new NotFoundException('product', id)
     }
 
-    return product
+    return await this.get(id)
   }
 
   static async delete(id: number): Promise<void> {

@@ -3,11 +3,11 @@ import { PaginationSchema } from '@/utils/schemas/Pagination.schema';
 import { SearchSchema } from '@/utils/schemas/Search.schema';
 import { products } from 'db/schema/products';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { SortSchema } from '@/utils/schemas/Sort.schema';
 import { StringSchema } from '@/utils/schemas/String.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tData, tMessage } from '@/utils/constants/locales/locale';
+import { NumberSchema } from '@/utils/schemas/Number.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
@@ -16,18 +16,16 @@ export const ProductSchema = createSelectSchema(products)
     id: true,
     name: true,
   })
+  .extend({
+    packageCount: new NumberSchema('Total Package').whole().getSchema()
+  })
   .openapi('Product')
 
 export type ProductListColumn = keyof Pick<SchemaType<typeof ProductSchema>, 'id' |
   'name'>;
-export const sortableProductColumn: ProductListColumn[] = [
-  'id',
-  'name'
-]
 
 export const ProductFilterSchema = SearchSchema
   .merge(PaginationSchema)
-  .merge(SortSchema(sortableProductColumn))
   .openapi('ProductFilter')
 
 const ProductListSchema = new ArraySchema('Product list', ProductSchema).getSchema()

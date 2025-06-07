@@ -2,7 +2,7 @@ import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
 import { units } from 'db/schema/units';
-import { and, count, eq, isNull, like, not, SQL } from 'drizzle-orm';
+import { and, count, desc, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { unitColumns } from './Unit.column';
 import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
 import { AppDate } from '@/utils/libs/AppDate';
@@ -15,6 +15,7 @@ export class UnitService {
       db.select(unitColumns)
         .from(units)
         .where(where)
+        .orderBy(desc(units.id))
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       this.count(where)
