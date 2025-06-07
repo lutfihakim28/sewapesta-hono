@@ -8,6 +8,7 @@ import { Product, ProductFilter, ProductRequest } from './Product.schema';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { packages } from 'db/schema/packages';
+import { pinoLogger } from '@/utils/helpers/logger';
 
 export abstract class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
@@ -34,6 +35,7 @@ export abstract class ProductService {
         ))
         .where(and(...conditions))
         .orderBy(desc(products.id))
+        .groupBy(products.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db
@@ -41,6 +43,8 @@ export abstract class ProductService {
         .from(products)
         .where(and(...conditions))
     ])
+
+    pinoLogger.debug(_products, 'PRODUCT LIST')
 
     return [_products, meta.count]
   }
@@ -61,6 +65,7 @@ export abstract class ProductService {
         eq(packages.productId, products.id)
       ))
       .where(and(...conditions))
+      .groupBy(products.id)
       .limit(1)
 
     return product
