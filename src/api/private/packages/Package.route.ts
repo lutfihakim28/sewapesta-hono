@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/utils/schemas/Success.schema'
 import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
-import { PackageFilterSchema, PackageRequestSchema, PackageResponseDataSchema, PackageResponseListSchema } from './Package.schema'
+import { PackageFilterSchema, PackageOptionResponseSchema, PackageRequestSchema, PackageResponseDataSchema, PackageResponseListSchema } from './Package.schema'
 
 const tag = 'Package'
 
@@ -16,6 +16,16 @@ export const PackageListRoute = createRoute({
   responses: new OpenApiResponse({
     successResponse: { schema: PackageResponseListSchema, description: 'Get list packages' },
     codes: [401, 403, 422],
+  }),
+})
+
+export const PackageOptionRoute = createRoute({
+  method: 'get',
+  path: '/options',
+  tags: [tag],
+  responses: new OpenApiResponse({
+    successResponse: { schema: PackageOptionResponseSchema, description: 'Retrieve list category options' },
+    codes: [401, 403],
   }),
 })
 

@@ -25,6 +25,11 @@ export const dataEn = {
     const [__, options] = this.option.replaceAll(' ', '').split('|')
     return `${category} ${options}`
   },
+  get packageOptions() {
+    const [_package, _] = this.package.replaceAll(' ', '').split('|')
+    const [__, options] = this.option.replaceAll(' ', '').split('|')
+    return `${_package} ${options}`
+  },
   get inventoryDamageReport() {
     const [inventory, _] = this.inventory.replaceAll(' ', '').split('|')
     return `${inventory} damage report | ${inventory} damage reports`
@@ -78,6 +83,9 @@ export const dataId: typeof dataEn = {
   withUsername: (params: { data: string, value: string | number }) => `${params.data} dengan nama pengguna ${params.value}`,
   get categoryOptions() {
     return `${this.option} ${this.category}`
+  },
+  get packageOptions() {
+    return `${this.option} ${this.package}`
   },
   get inventoryDamageReport() {
     return `laporan ${this.inventory} rusak`

@@ -10,6 +10,7 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { ProductService } from '../products/Product.service';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
+import { Option } from '@/utils/schemas/Option.schema';
 
 export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
@@ -165,6 +166,16 @@ export class PackageService {
     if (!_package) {
       throw new ConstraintException('package', id)
     }
+  }
+
+  static async options(): Promise<Option[]> {
+    return await db
+      .select({
+        label: packages.name,
+        value: packages.id
+      })
+      .from(packages)
+      .where(isNull(packages.deletedAt))
   }
 
   private constructor() { }

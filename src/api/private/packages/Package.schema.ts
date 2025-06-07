@@ -10,6 +10,7 @@ import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tMessage, tData } from '@/utils/constants/locales/locale';
+import { OptionSchema } from '@/utils/schemas/Option.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -74,6 +75,15 @@ export const PackageResponseDataSchema = ApiResponseDataSchema(PackageSchema, tM
       lang: 'en',
       key: 'package',
     })
+  }
+}))
+
+export const PackageOptionResponseSchema = ApiResponseDataSchema(new ArraySchema('Category options', OptionSchema).getSchema(), tMessage({
+  key: 'successList',
+  lang: 'en',
+  textCase: 'sentence',
+  params: {
+    data: tData({ key: 'packageOptions', lang: 'en' })
   }
 }))
 

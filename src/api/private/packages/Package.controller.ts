@@ -2,7 +2,7 @@ import { honoApp } from '@/utils/helpers/hono';
 import { PackageService } from './Package.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
-import { PackageCreateRoute, PackageDeleteRoute, PackageDetailRoute, PackageListRoute, PackageUpdateRoute } from './Package.route';
+import { PackageCreateRoute, PackageDeleteRoute, PackageDetailRoute, PackageListRoute, PackageOptionRoute, PackageUpdateRoute } from './Package.route';
 import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 
@@ -35,6 +35,26 @@ PackageController.openapi(PackageListRoute, async (context) => {
       total: totalData
     }),
     data: products
+  }), 200)
+})
+
+PackageController.openapi(PackageOptionRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale
+  const categories = await PackageService.options()
+
+  return context.json(new ApiResponseData({
+    code: 200,
+    messages: [
+      tMessage({
+        key: 'successList',
+        lang,
+        textCase: 'sentence',
+        params: {
+          data: tData({ key: 'packageOptions', lang })
+        }
+      })
+    ],
+    data: categories
   }), 200)
 })
 
