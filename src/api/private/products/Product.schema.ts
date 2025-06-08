@@ -8,6 +8,7 @@ import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tData, tMessage } from '@/utils/constants/locales/locale';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
+import { OptionSchema } from '@/utils/schemas/Option.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
@@ -55,6 +56,15 @@ export const ProductResponseDataSchema = ApiResponseDataSchema(ProductSchema, tM
   textCase: 'sentence',
   params: {
     data: tData({ lang: 'en', key: 'product' })
+  }
+}))
+
+export const ProductOptionResponseSchema = ApiResponseDataSchema(new ArraySchema('Category options', OptionSchema).getSchema(), tMessage({
+  key: 'successList',
+  lang: 'en',
+  textCase: 'sentence',
+  params: {
+    data: tData({ key: 'productOptions', lang: 'en' })
   }
 }))
 

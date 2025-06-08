@@ -9,8 +9,9 @@ import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { packages } from 'db/schema/packages';
 import { pinoLogger } from '@/utils/helpers/logger';
+import { Option } from '@/utils/schemas/Option.schema';
 
-export abstract class ProductService {
+export class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
 
     const conditions: ReturnType<typeof and>[] = [
@@ -131,4 +132,16 @@ export abstract class ProductService {
 
     return product
   }
+
+  static async options(): Promise<Option[]> {
+    return await db
+      .select({
+        label: products.name,
+        value: products.id
+      })
+      .from(products)
+      .where(isNull(products.deletedAt))
+  }
+
+  private constructor() { }
 }

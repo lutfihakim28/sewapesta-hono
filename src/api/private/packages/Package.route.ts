@@ -24,7 +24,7 @@ export const PackageOptionRoute = createRoute({
   path: '/options',
   tags: [tag],
   responses: new OpenApiResponse({
-    successResponse: { schema: PackageOptionResponseSchema, description: 'Retrieve list category options' },
+    successResponse: { schema: PackageOptionResponseSchema, description: 'Retrieve list package options' },
     codes: [401, 403],
   }),
 })

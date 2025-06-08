@@ -30,6 +30,11 @@ export const dataEn = {
     const [__, options] = this.option.replaceAll(' ', '').split('|')
     return `${_package} ${options}`
   },
+  get productOptions() {
+    const [_product, _] = this.product.replaceAll(' ', '').split('|')
+    const [__, options] = this.option.replaceAll(' ', '').split('|')
+    return `${_product} ${options}`
+  },
   get inventoryDamageReport() {
     const [inventory, _] = this.inventory.replaceAll(' ', '').split('|')
     return `${inventory} damage report | ${inventory} damage reports`
@@ -86,6 +91,9 @@ export const dataId: typeof dataEn = {
   },
   get packageOptions() {
     return `${this.option} ${this.package}`
+  },
+  get productOptions() {
+    return `${this.option} ${this.product}`
   },
   get inventoryDamageReport() {
     return `laporan ${this.inventory} rusak`
