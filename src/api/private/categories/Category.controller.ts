@@ -58,13 +58,14 @@ CategoryController.openapi(CategoryCreateRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;
   const payload = context.req.valid('json');
 
-  await CategoryService.create(payload)
+  const category = await CategoryService.create(payload)
 
-  return context.json(new ApiResponse({
+  return context.json(new ApiResponseData({
     code: 200,
+    data: category,
     messages: [
       tMessage({
-        key: 'successList',
+        key: 'successCreate',
         lang,
         textCase: 'sentence',
         params: {

@@ -32,12 +32,24 @@ export const CategoryFilterSchema = SearchSchema
   .merge(PaginationSchema)
   .openapi('CategoryFilter')
 
-export const CategoryResponseSchema = ApiResponseListSchema(CategorySchema, tMessage({
+const CategoryListSchema = new ArraySchema('Categories', CategorySchema)
+  .getSchema()
+  .openapi('CategoryList')
+
+export const CategoryResponseListSchema = ApiResponseListSchema(CategoryListSchema, tMessage({
   lang: 'en',
   key: 'successList',
   textCase: 'sentence',
   params: {
     data: tData({ lang: 'en', key: 'category', mode: 'plural' })
+  }
+}))
+export const CategoryResponseSchema = ApiResponseDataSchema(CategorySchema, tMessage({
+  key: 'successCreate',
+  lang: 'en',
+  textCase: 'sentence',
+  params: {
+    data: tData({ key: 'category', lang: 'en' })
   }
 }))
 export const CategoryOptionResponseSchema = ApiResponseDataSchema(new ArraySchema('Category options', OptionSchema).getSchema(), tMessage({

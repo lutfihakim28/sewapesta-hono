@@ -45,11 +45,13 @@ export function tMessage<K extends keyof Message>({ key, lang, params, textCase 
   const messages = locale.message[lang]
   const message = messages[key]
 
+  pinoLogger.debug(message, 'MESSAGE')
+
   if (typeof message === 'string') {
     return changeCase(message, textCase)
   }
   if (params) {
-    return (message as (params: any) => string)(params)
+    return changeCase((message as (params: any) => string)(params), textCase)
   }
   return '';
 }
@@ -92,6 +94,7 @@ function changeCase(text: string, textCase?: TextCase) {
   }
 
   if (textCase === 'sentence') {
+    pinoLogger.debug(text.charAt(0).toUpperCase() + text.slice(1), 'SENTENCE')
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
 

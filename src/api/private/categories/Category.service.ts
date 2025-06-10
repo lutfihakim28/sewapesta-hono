@@ -1,4 +1,4 @@
-import { and, count, desc, eq, isNull, like, not, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
@@ -35,11 +35,17 @@ export class CategoryService {
     return result
   }
 
-  static async create(payload: CategoryRequest): Promise<void> {
+  static async create(payload: CategoryRequest): Promise<Category> {
     await this.checkAvailability({ unique: payload.name })
-    await db
+    const [category] = await db
       .insert(categories)
       .values(payload)
+      .returning(categoryColumns)
+
+    return {
+      ...category,
+      itemCount: 0
+    }
   }
 
   static async update(id: number, payload: CategoryRequest): Promise<void> {
@@ -112,6 +118,7 @@ export class CategoryService {
       })
       .from(categories)
       .where(isNull(categories.deletedAt))
+      .orderBy(asc(categories.name))
 
     return _categories
   }
