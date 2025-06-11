@@ -89,10 +89,11 @@ CategoryController.openapi(CategoryUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
 
-  await CategoryService.update(+param.id, payload);
+  const category = await CategoryService.update(+param.id, payload);
 
-  return context.json(new ApiResponse({
+  return context.json(new ApiResponseData({
     code: 200,
+    data: category,
     messages: [
       tMessage({
         key: 'successUpdate',

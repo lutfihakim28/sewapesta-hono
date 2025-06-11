@@ -35,6 +35,31 @@ export class CategoryService {
     return result
   }
 
+  static async get(id: number): Promise<Category> {
+    const [category] = await db.select({
+      ...categoryColumns,
+      itemCount: count(items.id).mapWith(Number)
+    })
+      .from(categories)
+      .where(and(
+        isNull(categories.deletedAt),
+        eq(categories.id, id)
+      ))
+      .leftJoin(items, and(
+        isNull(items.deletedAt),
+        eq(items.categoryId, categories.id)
+      ))
+      .orderBy(desc(categories.id))
+      .groupBy(categories.id)
+      .limit(1)
+
+    if (!category) {
+      throw new ConstraintException('category', id)
+    }
+
+    return category
+  }
+
   static async create(payload: CategoryRequest): Promise<Category> {
     await this.checkAvailability({ unique: payload.name })
     const [category] = await db
@@ -48,18 +73,21 @@ export class CategoryService {
     }
   }
 
-  static async update(id: number, payload: CategoryRequest): Promise<void> {
+  static async update(id: number, payload: CategoryRequest): Promise<Category> {
     await Promise.all([
       this.check(id),
       this.checkAvailability({ unique: payload.name, selectedId: id.toString() })
     ])
-    await db
+    const [category] = await db
       .update(categories)
       .set(payload)
       .where(and(
         isNull(categories.deletedAt),
         eq(categories.id, id)
       ))
+      .returning(categoryColumns)
+
+    return await this.get(category.id)
   }
 
   static async delete(id: number): Promise<void> {

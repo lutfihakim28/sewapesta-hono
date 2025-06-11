@@ -64,7 +64,7 @@ export const CategoryUpdateRoute = createRoute({
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: SuccessSchema, description: 'Category updated' },
+    successResponse: { schema: CategoryResponseSchema, description: 'Category updated' },
     codes: [401, 403, 404, 422],
   }),
 })
