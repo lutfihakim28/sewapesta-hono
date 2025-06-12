@@ -9,6 +9,7 @@ import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { OptionSchema } from '@/utils/schemas/Option.schema';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tData, tMessage } from '@/utils/constants/locales/locale';
+import { ObjectSchema } from '@/utils/schemas/Object.schema';
 
 export const CategorySchema = createSelectSchema(categories)
   .pick({
@@ -27,6 +28,9 @@ export const CategoryRequestSchema = createInsertSchema(categories, {
     name: true,
   })
   .openapi('CategoryRequest')
+export const CategoryCreateManySchema = new ObjectSchema({
+  names: new ArraySchema('Names', new StringSchema('Name').getSchema()).getSchema()
+}).getSchema().openapi('CategoryCreateMany')
 
 export const CategoryFilterSchema = SearchSchema
   .merge(PaginationSchema)
@@ -64,3 +68,4 @@ export const CategoryOptionResponseSchema = ApiResponseDataSchema(new ArraySchem
 export type Category = SchemaType<typeof CategorySchema>
 export type CategoryFilter = SchemaType<typeof CategoryFilterSchema>
 export type CategoryRequest = SchemaType<typeof CategoryRequestSchema>
+export type CategoryCreateMany = SchemaType<typeof CategoryCreateManySchema>

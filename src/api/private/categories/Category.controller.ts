@@ -1,5 +1,5 @@
 import { honoApp } from '@/utils/helpers/hono';
-import { CategoryCheckRoute, CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryOptionRoute, CategoryUpdateRoute } from 'src/api/private/categories/Category.route';
+import { CategoryCheckRoute, CategoryCreateManyRoute, CategoryCreateRoute, CategoryDeleteRoute, CategoryListRoute, CategoryOptionRoute, CategoryUpdateRoute } from 'src/api/private/categories/Category.route';
 import { CategoryService } from './Category.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
@@ -51,6 +51,32 @@ CategoryController.openapi(CategoryOptionRoute, async (context) => {
       })
     ],
     data: categories
+  }), 200)
+})
+
+CategoryController.openapi(CategoryCreateManyRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
+  const payload = context.req.valid('json');
+
+  const categories = await CategoryService.createMany(payload)
+
+  return context.json(new ApiResponse({
+    code: 200,
+    messages: categories.map((category) => tMessage({
+      key: 'successCreate',
+      lang,
+      textCase: 'sentence',
+      params: {
+        data: tData({
+          key: 'withName',
+          lang,
+          params: {
+            data: tData({ key: 'category', lang }),
+            value: category.name
+          }
+        })
+      }
+    })),
   }), 200)
 })
 

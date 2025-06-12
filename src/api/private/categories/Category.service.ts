@@ -1,5 +1,5 @@
 import { and, asc, count, desc, eq, isNull, like, not, SQL } from 'drizzle-orm';
-import { Category, CategoryFilter, CategoryRequest } from './Category.schema';
+import { Category, CategoryCreateMany, CategoryFilter, CategoryRequest } from './Category.schema';
 import { categories } from 'db/schema/categories';
 import { db } from 'db';
 import { countOffset } from '@/utils/helpers/count-offset';
@@ -58,6 +58,16 @@ export class CategoryService {
     }
 
     return category
+  }
+
+  static async createMany(payload: CategoryCreateMany) {
+    const _categories = await db
+      .insert(categories)
+      .values(payload.names.map(name => ({ name })))
+      .onConflictDoNothing()
+      .returning(categoryColumns)
+
+    return _categories
   }
 
   static async create(payload: CategoryRequest): Promise<Category> {
