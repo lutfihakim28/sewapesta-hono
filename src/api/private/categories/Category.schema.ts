@@ -56,6 +56,14 @@ export const CategoryResponseSchema = ApiResponseDataSchema(CategorySchema, tMes
     data: tData({ key: 'category', lang: 'en' })
   }
 }))
+export const CategoryCreateManyResponseSchema = ApiResponseDataSchema(CategoryListSchema, tMessage({
+  key: 'successCreate',
+  lang: 'en',
+  textCase: 'sentence',
+  params: {
+    data: tData({ key: 'category', lang: 'en' })
+  }
+}))
 export const CategoryOptionResponseSchema = ApiResponseDataSchema(new ArraySchema('Category options', OptionSchema).getSchema(), tMessage({
   key: 'successList',
   lang: 'en',

@@ -60,8 +60,9 @@ CategoryController.openapi(CategoryCreateManyRoute, async (context) => {
 
   const categories = await CategoryService.createMany(payload)
 
-  return context.json(new ApiResponse({
+  return context.json(new ApiResponseData({
     code: 200,
+    data: categories,
     messages: categories.map((category) => tMessage({
       key: 'successCreate',
       lang,

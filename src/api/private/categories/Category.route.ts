@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/utils/schemas/Success.schema'
 import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
-import { CategoryCreateManySchema, CategoryFilterSchema, CategoryOptionResponseSchema, CategoryRequestSchema, CategoryResponseListSchema, CategoryResponseSchema } from './Category.schema'
+import { CategoryCreateManyResponseSchema, CategoryCreateManySchema, CategoryFilterSchema, CategoryOptionResponseSchema, CategoryRequestSchema, CategoryResponseListSchema, CategoryResponseSchema } from './Category.schema'
 import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
 import { UniqueCheckSchema } from '@/utils/schemas/UniqueCheck.schema'
 
@@ -44,7 +44,7 @@ export const CategoryCreateManyRoute = createRoute({
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: SuccessSchema, description: 'Categories created' },
+    successResponse: { schema: CategoryCreateManyResponseSchema, description: 'Categories created' },
     codes: [401, 403, 422],
   }),
 })
