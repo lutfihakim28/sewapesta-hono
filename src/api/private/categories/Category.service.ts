@@ -67,7 +67,10 @@ export class CategoryService {
       .onConflictDoNothing()
       .returning(categoryColumns)
 
-    return _categories
+    return _categories.map((category) => ({
+      ...category,
+      itemCount: 0
+    }))
   }
 
   static async create(payload: CategoryRequest): Promise<Category> {
