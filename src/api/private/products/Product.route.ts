@@ -3,6 +3,7 @@ import { SuccessSchema } from '@/utils/schemas/Success.schema'
 import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
 import { ProductCreateManyResponseSchema, ProductCreateManySchema, ProductFilterSchema, ProductOptionResponseSchema, ProductRequestSchema, ProductResponseDataSchema, ProductResponseListSchema } from './Product.schema'
+import { UniqueCheckSchema } from '@/utils/schemas/UniqueCheck.schema'
 
 const tag = 'Product'
 
@@ -110,5 +111,18 @@ export const ProductDeleteRoute = createRoute({
   responses: new OpenApiResponse({
     successResponse: { schema: SuccessSchema, description: 'Product deleted' },
     codes: [401, 403, 404]
+  }),
+})
+
+export const ProductCheckRoute = createRoute({
+  method: 'get',
+  path: '/check-uniques',
+  tags: [tag],
+  request: {
+    query: UniqueCheckSchema,
+  },
+  responses: new OpenApiResponse({
+    successResponse: { schema: SuccessSchema, description: 'Product\'s name is available' },
+    codes: [401, 403, 404, 422],
   }),
 })

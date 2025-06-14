@@ -2,7 +2,7 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
 import { products } from 'db/schema/products';
-import { and, asc, count, desc, eq, isNull, like } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, not } from 'drizzle-orm';
 import { productColumns } from './Product.column';
 import { Product, ProductCreateMany, ProductFilter, ProductRequest } from './Product.schema';
 import { AppDate } from '@/utils/libs/AppDate';
@@ -10,6 +10,8 @@ import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { packages } from 'db/schema/packages';
 import { pinoLogger } from '@/utils/helpers/logger';
 import { Option } from '@/utils/schemas/Option.schema';
+import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
+import { UniqueConstraintException } from '@/utils/exceptions/UniqueConstraintException';
 
 export class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
@@ -144,6 +146,27 @@ export class ProductService {
     }
 
     return product
+  }
+
+  static async checkAvailability(query: UniqueCheck) {
+    const conditions = [
+      isNull(products.deletedAt),
+      eq(products.name, query.unique)
+    ]
+
+    if (query.selectedId) {
+      conditions.push(not(eq(products.id, +query.selectedId)))
+    }
+    const available = await db
+      .select()
+      .from(products)
+      .where(and(
+        ...conditions
+      ))
+
+    if (available.length) {
+      throw new UniqueConstraintException('product', undefined, query.unique)
+    }
   }
 
   static async options(): Promise<Option[]> {
