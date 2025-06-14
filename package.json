@@ -18,7 +18,7 @@
     "dev": "bun run --hot index.ts"
   },
   "dependencies": {
-    "@hono/swagger-ui": "^0.5.1",
+    "@hono/swagger-ui": "^0.5.2",
     "@hono/zod-openapi": "^0.12.2",
     "@scalar/hono-api-reference": "^0.8.10",
     "dayjs": "^1.11.13",
@@ -26,7 +26,7 @@
     "drizzle-zod": "^0.5.1",
     "hono": "^4.7.11",
     "pino": "^9.7.0",
-    "zod": "^3.25.56"
+    "zod": "^3.25.64"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
