@@ -121,10 +121,11 @@ UnitController.openapi(UnitUpdateRoute, async (context) => {
   const param = context.req.valid('param')
   const payload = context.req.valid('json')
 
-  await UnitService.update(+param.id, payload);
+  const unit = await UnitService.update(+param.id, payload);
 
-  return context.json(new ApiResponse({
+  return context.json(new ApiResponseData({
     code: 200,
+    data: unit,
     messages: [
       tMessage({
         lang,

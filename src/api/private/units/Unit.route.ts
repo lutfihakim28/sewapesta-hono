@@ -83,7 +83,7 @@ export const UnitUpdateRoute = createRoute({
     }
   },
   responses: new OpenApiResponse({
-    successResponse: { schema: SuccessSchema, description: 'Unit updated' },
+    successResponse: { schema: UnitResponseSchema, description: 'Unit updated' },
     codes: [401, 403, 404, 422],
   }),
 })

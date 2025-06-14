@@ -23,6 +23,23 @@ export class UnitService {
     ])
   }
 
+  static async get(id: number): Promise<Unit> {
+    const [unit] = await db.select(unitColumns)
+      .from(units)
+      .where(and(
+        isNull(units.deletedAt),
+        eq(units.id, id)
+      ))
+      .orderBy(desc(units.id))
+      .limit(1)
+
+    if (!unit) {
+      throw new ConstraintException('unit', id)
+    }
+
+    return unit
+  }
+
   static async create(payload: UnitRequest): Promise<void> {
     await this.checkAvailability({ unique: payload.name })
     await db
@@ -38,7 +55,7 @@ export class UnitService {
       .returning(unitColumns)
   }
 
-  static async update(id: number, payload: UnitRequest): Promise<void> {
+  static async update(id: number, payload: UnitRequest): Promise<Unit> {
     await Promise.all([
       this.check(id),
       this.checkAvailability({ unique: payload.name, selectedId: id.toString() })
@@ -50,6 +67,8 @@ export class UnitService {
         isNull(units.deletedAt),
         eq(units.id, id)
       ))
+
+    return await this.get(id)
   }
 
   static async delete(id: number): Promise<void> {
