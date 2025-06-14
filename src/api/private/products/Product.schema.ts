@@ -9,6 +9,7 @@ import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tData, tMessage } from '@/utils/constants/locales/locale';
 import { NumberSchema } from '@/utils/schemas/Number.schema';
 import { OptionSchema } from '@/utils/schemas/Option.schema';
+import { ObjectSchema } from '@/utils/schemas/Object.schema';
 
 export type ProductColumn = keyof typeof products.$inferSelect
 
@@ -68,6 +69,30 @@ export const ProductOptionResponseSchema = ApiResponseDataSchema(new ArraySchema
   }
 }))
 
+export const ProductCreateManySchema = new ObjectSchema({
+  names: new ArraySchema('Names', new StringSchema('Name').getSchema()).getSchema()
+}).getSchema().openapi('ProductCreateMany')
+
+
+export const ProductResponseSchema = ApiResponseDataSchema(ProductSchema, tMessage({
+  key: 'successCreate',
+  lang: 'en',
+  textCase: 'sentence',
+  params: {
+    data: tData({ key: 'product', lang: 'en' })
+  }
+}))
+
+export const ProductCreateManyResponseSchema = ApiResponseDataSchema(ProductListSchema, tMessage({
+  key: 'successCreate',
+  lang: 'en',
+  textCase: 'sentence',
+  params: {
+    data: tData({ key: 'product', lang: 'en' })
+  }
+}))
+
 export type Product = SchemaType<typeof ProductSchema>
 export type ProductFilter = SchemaType<typeof ProductFilterSchema>
 export type ProductRequest = SchemaType<typeof ProductRequestSchema>
+export type ProductCreateMany = SchemaType<typeof ProductCreateManySchema>

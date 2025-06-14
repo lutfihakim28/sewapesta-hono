@@ -2,9 +2,9 @@ import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
 import { products } from 'db/schema/products';
-import { and, count, desc, eq, isNull, like } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like } from 'drizzle-orm';
 import { productColumns } from './Product.column';
-import { Product, ProductFilter, ProductRequest } from './Product.schema';
+import { Product, ProductCreateMany, ProductFilter, ProductRequest } from './Product.schema';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { packages } from 'db/schema/packages';
@@ -83,6 +83,19 @@ export class ProductService {
     return await this.get(newProduct.id)
   }
 
+  static async createMany(payload: ProductCreateMany) {
+    const _products = await db
+      .insert(products)
+      .values(payload.names.map(name => ({ name })))
+      .onConflictDoNothing()
+      .returning(productColumns)
+
+    return _products.map((product) => ({
+      ...product,
+      packageCount: 0
+    }))
+  }
+
   static async update(id: number, payload: ProductRequest): Promise<Product> {
     const conditions = [
       eq(products.id, id),
@@ -141,6 +154,7 @@ export class ProductService {
       })
       .from(products)
       .where(isNull(products.deletedAt))
+      .orderBy(asc(products.name))
   }
 
   private constructor() { }

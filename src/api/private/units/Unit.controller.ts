@@ -1,7 +1,7 @@
 import { honoApp } from '@/utils/helpers/hono';
-import { UnitCheckRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitUpdateRoute } from 'src/api/private/units/Unit.route';
+import { UnitCheckRoute, UnitCreateManyRoute, UnitCreateRoute, UnitDeleteRoute, UnitListRoute, UnitOptionRoute, UnitUpdateRoute } from 'src/api/private/units/Unit.route';
 import { UnitService } from './Unit.service';
-import { ApiResponse, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
+import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
 import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
 
@@ -35,6 +35,53 @@ UnitController.openapi(UnitListRoute, async (context) => {
       total: totalData
     }),
     data: units
+  }), 200)
+})
+
+UnitController.openapi(UnitOptionRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale
+  const units = await UnitService.options()
+
+  return context.json(new ApiResponseData({
+    code: 200,
+    messages: [
+      tMessage({
+        key: 'successList',
+        lang,
+        textCase: 'sentence',
+        params: {
+          data: tData({ key: 'unitOptions', lang })
+        }
+      })
+    ],
+    data: units
+  }), 200)
+})
+
+UnitController.openapi(UnitCreateManyRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
+  const payload = context.req.valid('json');
+
+  const units = await UnitService.createMany(payload)
+
+  return context.json(new ApiResponseData({
+    code: 200,
+    data: units,
+    messages: units.map((unit) => tMessage({
+      key: 'successCreate',
+      lang,
+      textCase: 'sentence',
+      params: {
+        data: tData({
+          key: 'withName',
+          lang,
+          params: {
+            data: tData({ key: 'unit', lang }),
+            value: unit.name
+          }
+        })
+      }
+    })),
   }), 200)
 })
 
@@ -81,8 +128,8 @@ UnitController.openapi(UnitUpdateRoute, async (context) => {
     messages: [
       tMessage({
         lang,
-        key:'successUpdate',
-        textCase:'sentence',
+        key: 'successUpdate',
+        textCase: 'sentence',
         params: {
           data: tData({
             lang,
@@ -109,8 +156,8 @@ UnitController.openapi(UnitDeleteRoute, async (context) => {
     messages: [
       tMessage({
         lang,
-        key:'successDelete',
-        textCase:'sentence',
+        key: 'successDelete',
+        textCase: 'sentence',
         params: {
           data: tData({
             lang,

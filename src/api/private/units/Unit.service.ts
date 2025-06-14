@@ -2,11 +2,12 @@ import { UniqueCheck } from '@/utils/schemas/UniqueCheck.schema';
 import { countOffset } from '@/utils/helpers/count-offset';
 import { db } from 'db';
 import { units } from 'db/schema/units';
-import { and, count, desc, eq, isNull, like, not, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, not, SQL } from 'drizzle-orm';
 import { unitColumns } from './Unit.column';
-import { Unit, UnitFilter, UnitRequest } from './Unit.schema';
+import { Unit, UnitCreateMany, UnitFilter, UnitRequest } from './Unit.schema';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
+import { Option } from '@/utils/schemas/Option.schema';
 
 export class UnitService {
   static async list(query: UnitFilter): Promise<[Unit[], number]> {
@@ -27,6 +28,14 @@ export class UnitService {
     await db
       .insert(units)
       .values(payload)
+  }
+
+  static async createMany(payload: UnitCreateMany) {
+    return await db
+      .insert(units)
+      .values(payload.names.map(name => ({ name })))
+      .onConflictDoNothing()
+      .returning(unitColumns)
   }
 
   static async update(id: number, payload: UnitRequest): Promise<void> {
@@ -89,6 +98,17 @@ export class UnitService {
     if (available.length) {
       throw new ConstraintException('unit', undefined, query.unique)
     }
+  }
+
+  static async options(): Promise<Option[]> {
+    return await db
+      .select({
+        label: units.name,
+        value: units.id
+      })
+      .from(units)
+      .where(isNull(units.deletedAt))
+      .orderBy(asc(units.name))
   }
 
   private static async count(query?: SQL<unknown>) {

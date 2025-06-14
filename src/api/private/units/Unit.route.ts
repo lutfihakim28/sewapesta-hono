@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/utils/schemas/Success.schema'
 import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
-import { UnitFilterSchema, UnitRequestSchema, UnitResponseSchema } from './Unit.schema'
+import { UnitCreateManyResponseSchema, UnitCreateManySchema, UnitFilterSchema, UnitOptionResponseSchema, UnitRequestSchema, UnitResponseSchema } from './Unit.schema'
 import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
 import { UniqueCheckSchema } from '@/utils/schemas/UniqueCheck.schema'
 
@@ -17,6 +17,35 @@ export const UnitListRoute = createRoute({
   responses: new OpenApiResponse({
     successResponse: { schema: UnitResponseSchema, description: 'Retrieve list units' },
     codes: [401, 403],
+  }),
+})
+
+export const UnitOptionRoute = createRoute({
+  method: 'get',
+  path: '/options',
+  tags: [tag],
+  responses: new OpenApiResponse({
+    successResponse: { schema: UnitOptionResponseSchema, description: 'Retrieve list unit options' },
+    codes: [401, 403],
+  }),
+})
+
+export const UnitCreateManyRoute = createRoute({
+  method: 'post',
+  path: '/many',
+  tags: [tag],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: UnitCreateManySchema
+        }
+      },
+    }
+  },
+  responses: new OpenApiResponse({
+    successResponse: { schema: UnitCreateManyResponseSchema, description: 'Units created' },
+    codes: [401, 403, 422],
   }),
 })
 

@@ -1,5 +1,5 @@
 import { honoApp } from '@/utils/helpers/hono';
-import { ProductCreateRoute, ProductDeleteRoute, ProductDetailRoute, ProductListRoute, ProductOptionRoute, ProductUpdateRoute } from 'src/api/private/products/Product.route';
+import { ProductCreateManyRoute, ProductCreateRoute, ProductDeleteRoute, ProductDetailRoute, ProductListRoute, ProductOptionRoute, ProductUpdateRoute } from 'src/api/private/products/Product.route';
 import { ProductService } from './Product.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
@@ -54,6 +54,33 @@ ProductController.openapi(ProductOptionRoute, async (context) => {
       })
     ],
     data: categories
+  }), 200)
+})
+
+ProductController.openapi(ProductCreateManyRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
+  const payload = context.req.valid('json');
+
+  const products = await ProductService.createMany(payload)
+
+  return context.json(new ApiResponseData({
+    code: 200,
+    data: products,
+    messages: products.map((product) => tMessage({
+      key: 'successCreate',
+      lang,
+      textCase: 'sentence',
+      params: {
+        data: tData({
+          key: 'withName',
+          lang,
+          params: {
+            data: tData({ key: 'product', lang }),
+            value: product.name
+          }
+        })
+      }
+    })),
   }), 200)
 })
 

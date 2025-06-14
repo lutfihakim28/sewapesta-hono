@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/utils/schemas/Success.schema'
 import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
-import { ProductFilterSchema, ProductOptionResponseSchema, ProductRequestSchema, ProductResponseDataSchema, ProductResponseListSchema } from './Product.schema'
+import { ProductCreateManyResponseSchema, ProductCreateManySchema, ProductFilterSchema, ProductOptionResponseSchema, ProductRequestSchema, ProductResponseDataSchema, ProductResponseListSchema } from './Product.schema'
 
 const tag = 'Product'
 
@@ -26,6 +26,25 @@ export const ProductOptionRoute = createRoute({
   responses: new OpenApiResponse({
     successResponse: { schema: ProductOptionResponseSchema, description: 'Retrieve list product options' },
     codes: [401, 403],
+  }),
+})
+
+export const ProductCreateManyRoute = createRoute({
+  method: 'post',
+  path: '/many',
+  tags: [tag],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: ProductCreateManySchema
+        }
+      },
+    }
+  },
+  responses: new OpenApiResponse({
+    successResponse: { schema: ProductCreateManyResponseSchema, description: 'Products created' },
+    codes: [401, 403, 422],
   }),
 })
 
