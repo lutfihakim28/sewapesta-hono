@@ -1,6 +1,6 @@
-import { Package, PackageColumn, PackageFilter, PackageList, PackageListColumn, PackageRequest, sortablePackageColumns } from './Package.schema';
+import { Package, PackageColumn, PackageFilter, PackageList, PackageRequest } from './Package.schema';
 import { packages } from 'db/schema/packages';
-import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { db } from 'db';
 import { products } from 'db/schema/products';
 import { countOffset } from '@/utils/helpers/count-offset';
@@ -11,39 +11,10 @@ import { ProductService } from '../products/Product.service';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { Option } from '@/utils/schemas/Option.schema';
+import { SortByEnum } from '@/utils/enums/SortByEnum';
 
 export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
-    let orders: SQL<unknown>[] = [];
-
-    const pushOrders = (
-      cols: string | string[] | undefined,
-      direction: 'asc' | 'desc'
-    ) => {
-      const targetCols = Array.isArray(cols) ? cols : [cols];
-      const isAsc = direction === 'asc';
-      const opposite = isAsc ? 'desc' : 'asc';
-
-      targetCols.forEach((col) => {
-        if (!sortablePackageColumns.includes(col as PackageListColumn)) return;
-        if ((query[opposite] as PackageListColumn[]).includes(col as PackageListColumn)) return;
-
-        const orderFn = isAsc ? asc : desc;
-        if (col === 'product') {
-          orders.push(orderFn(products.name))
-          return;
-        }
-        if (col === 'owner') {
-          orders.push(orderFn(profiles.name))
-          return;
-        }
-        orders.push(orderFn(packages[col as PackageColumn]));
-      });
-    };
-
-    pushOrders(query.asc, 'asc');
-    pushOrders(query.desc, 'desc');
-
     const conditions: ReturnType<typeof and>[] = [
       isNull(packages.deletedAt),
     ];
@@ -61,19 +32,29 @@ export class PackageService {
       ))
     }
 
+    let listingQuery = db
+      .select({
+        ...packageColumns,
+        product: {
+          id: products.id,
+          name: products.name
+        }
+      })
+      .from(packages)
+      .leftJoin(products, eq(products.id, packages.productId))
+      .where(and(...conditions))
+      .$dynamic()
+
+    if (query.sort && query.sortBy) {
+      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+      const sort = query.sort as PackageColumn;
+      const order = orderFn(packages[sort]);
+
+      listingQuery = listingQuery.orderBy(order);
+    }
+
     const [_packages, [meta]] = await Promise.all([
-      db
-        .select({
-          ...packageColumns,
-          product: {
-            id: products.id,
-            name: products.name
-          }
-        })
-        .from(packages)
-        .leftJoin(products, eq(products.id, packages.productId))
-        .where(and(...conditions))
-        .orderBy(...orders)
+      listingQuery
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

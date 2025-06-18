@@ -17,35 +17,10 @@ import { buildJsonGroupArray } from '@/utils/helpers/build-json-group-array';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { ForbiddenException } from '@/utils/exceptions/ForbiddenException';
+import { SortByEnum } from '@/utils/enums/SortByEnum';
 
 export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
-    let orders: SQL<unknown>[] = [];
-
-    const pushOrders = (
-      cols: string | string[] | undefined,
-      direction: 'asc' | 'desc'
-    ) => {
-      const targetCols = Array.isArray(cols) ? cols : [cols];
-      const isAsc = direction === 'asc';
-      const opposite = isAsc ? 'desc' : 'asc';
-
-      targetCols.forEach((col) => {
-        if (!sortableUserColumns.includes(col as UserListColumn)) return;
-        if ((query[opposite] as UserListColumn[]).includes(col as UserListColumn)) return;
-
-        const orderFn = isAsc ? asc : desc;
-        if (col === 'name' || col === 'phone') {
-          orders.push(orderFn(profiles[col as ProfileColumn]))
-          return;
-        }
-        orders.push(orderFn(users[col as UserColumn]));
-      });
-    };
-
-    pushOrders(query.asc, 'asc');
-    pushOrders(query.desc, 'desc');
-
     const conditions: ReturnType<typeof and>[] = [
       isNull(users.deletedAt),
     ];
@@ -64,30 +39,40 @@ export class UserService {
       ))
     }
 
+    let listingQuery = db
+      .with(locationQuery)
+      .select({
+        ...userColumns,
+        ...profileColumns,
+        roles: buildJsonGroupArray([usersRoles.role], true),
+        location: {
+          subdistrictCode: locationQuery.subdistrictCode,
+          subdistrict: locationQuery.subdistrict,
+          districtCode: locationQuery.districtCode,
+          district: locationQuery.district,
+          cityCode: locationQuery.cityCode,
+          city: locationQuery.city,
+          provinceCode: locationQuery.provinceCode,
+          province: locationQuery.province,
+        }
+      })
+      .from(users)
+      .innerJoin(profiles, eq(profiles.userId, users.id))
+      .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
+      .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
+      .where(and(...conditions))
+      .$dynamic()
+
+    if (query.sort && query.sortBy) {
+      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+      const sort = query.sort as UserColumn;
+      const order = orderFn(users[sort]);
+
+      listingQuery = listingQuery.orderBy(order);
+    }
+
     const [_users, [meta]] = await Promise.all([
-      db
-        .with(locationQuery)
-        .select({
-          ...userColumns,
-          ...profileColumns,
-          roles: buildJsonGroupArray([usersRoles.role], true),
-          location: {
-            subdistrictCode: locationQuery.subdistrictCode,
-            subdistrict: locationQuery.subdistrict,
-            districtCode: locationQuery.districtCode,
-            district: locationQuery.district,
-            cityCode: locationQuery.cityCode,
-            city: locationQuery.city,
-            provinceCode: locationQuery.provinceCode,
-            province: locationQuery.province,
-          }
-        })
-        .from(users)
-        .innerJoin(profiles, eq(profiles.userId, users.id))
-        .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
-        .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
-        .where(and(...conditions))
-        .orderBy(...orders)
+      listingQuery
         .groupBy(users.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),

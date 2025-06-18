@@ -1,5 +1,5 @@
-import { ItemRevenueTerm, ItemRevenueTermColumn, ItemRevenueTermFilter, ItemRevenueTermList, ItemRevenueTermListColumn, ItemRevenueTermRequest, sortableItemRevenueTermColumns } from './ItemRevenueTerm.schema';
-import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
+import { ItemRevenueTerm, ItemRevenueTermColumn, ItemRevenueTermFilter, ItemRevenueTermList, ItemRevenueTermRequest } from './ItemRevenueTerm.schema';
+import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { users } from 'db/schema/users';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
@@ -13,31 +13,10 @@ import { itemRevenueTerms } from 'db/schema/item-revenue-terms';
 import { ItemService } from '../items/Item.service';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
+import { SortByEnum } from '@/utils/enums/SortByEnum';
 
 export class ItemRevenueTermService {
   static async list(query: ItemRevenueTermFilter): Promise<[ItemRevenueTermList, number]> {
-    let orders: SQL<unknown>[] = [];
-
-    const pushOrders = (
-      cols: string | string[] | undefined,
-      direction: 'asc' | 'desc'
-    ) => {
-      const targetCols = Array.isArray(cols) ? cols : [cols];
-      const isAsc = direction === 'asc';
-      const opposite = isAsc ? 'desc' : 'asc';
-
-      targetCols.forEach((col) => {
-        if (!sortableItemRevenueTermColumns.includes(col as ItemRevenueTermListColumn)) return;
-        if ((query[opposite] as ItemRevenueTermListColumn[]).includes(col as ItemRevenueTermListColumn)) return;
-
-        const orderFn = isAsc ? asc : desc;
-        orders.push(orderFn(itemRevenueTerms[col as ItemRevenueTermColumn]));
-      });
-    };
-
-    pushOrders(query.asc, 'asc');
-    pushOrders(query.desc, 'desc');
-
     const conditions: ReturnType<typeof and>[] = [
       isNull(itemRevenueTerms.deletedAt),
     ];
@@ -57,25 +36,35 @@ export class ItemRevenueTermService {
       ))
     }
 
+    let listingQuery = db.select({
+      ...itemRevenueTermColumns,
+      owner: {
+        id: users.id,
+        name: profiles.name,
+        phone: profiles.phone,
+      },
+      item: {
+        id: items.id,
+        name: items.name,
+      }
+    })
+      .from(itemRevenueTerms)
+      .innerJoin(items, eq(items.id, itemRevenueTerms.itemId))
+      .innerJoin(users, eq(users.id, inventories.ownerId))
+      .innerJoin(profiles, eq(profiles.userId, users.id))
+      .where(and(...conditions))
+      .$dynamic()
+
+    if (query.sort && query.sortBy) {
+      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+      const sort = query.sort as ItemRevenueTermColumn;
+      const order = orderFn(itemRevenueTerms[sort]);
+
+      listingQuery = listingQuery.orderBy(order);
+    }
+
     const [_itemRevenueTerms, [meta]] = await Promise.all([
-      db.select({
-        ...itemRevenueTermColumns,
-        owner: {
-          id: users.id,
-          name: profiles.name,
-          phone: profiles.phone,
-        },
-        item: {
-          id: items.id,
-          name: items.name,
-        }
-      })
-        .from(itemRevenueTerms)
-        .innerJoin(items, eq(items.id, itemRevenueTerms.itemId))
-        .innerJoin(users, eq(users.id, inventories.ownerId))
-        .innerJoin(profiles, eq(profiles.userId, users.id))
-        .where(and(...conditions))
-        .orderBy(...orders)
+      listingQuery
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

@@ -1,6 +1,6 @@
-import { Equipment, EquipmentListColumn, EquipmentFilter, EquipmentList, EquipmentRequest, sortableEquipmentColumns, EquipmentColumn } from './Equipment.schema';
+import { Equipment, EquipmentFilter, EquipmentList, EquipmentRequest, EquipmentColumn } from './Equipment.schema';
 import { equipments } from 'db/schema/equipments';
-import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
 import { db } from 'db';
@@ -20,31 +20,10 @@ import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
+import { SortByEnum } from '@/utils/enums/SortByEnum';
 
 export class EquipmentService {
   static async list(query: EquipmentFilter): Promise<[EquipmentList, number]> {
-    let orders: SQL<unknown>[] = [];
-
-    const pushOrders = (
-      cols: string | string[] | undefined,
-      direction: 'asc' | 'desc'
-    ) => {
-      const targetCols = Array.isArray(cols) ? cols : [cols];
-      const isAsc = direction === 'asc';
-      const opposite = isAsc ? 'desc' : 'asc';
-
-      targetCols.forEach((col) => {
-        if (!sortableEquipmentColumns.includes(col as EquipmentListColumn)) return;
-        if ((query[opposite] as EquipmentListColumn[]).includes(col as EquipmentListColumn)) return;
-
-        const orderFn = isAsc ? asc : desc;
-        orders.push(orderFn(equipments[col as EquipmentColumn]));
-      });
-    };
-
-    pushOrders(query.asc, 'asc');
-    pushOrders(query.desc, 'desc');
-
     const conditions: ReturnType<typeof and>[] = [
       isNull(equipments.deletedAt),
     ]
@@ -73,26 +52,36 @@ export class EquipmentService {
       ))
     }
 
+    let listingQuery = db.select({
+      ...equipmentColumns,
+      item: itemColumns,
+      category: categoryColumns,
+      unit: unitColumns,
+      owner: {
+        id: users.id,
+        name: profiles.name,
+        phone: profiles.phone
+      }
+    })
+      .from(equipments)
+      .innerJoin(items, eq(items.id, equipments.itemId))
+      .innerJoin(categories, eq(categories.id, items.categoryId))
+      .innerJoin(units, eq(units.id, items.unitId))
+      .innerJoin(users, eq(users.id, equipments.ownerId))
+      .innerJoin(profiles, eq(profiles.userId, users.id))
+      .where(and(...conditions))
+      .$dynamic()
+
+    if (query.sort && query.sortBy) {
+      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+      const sort = query.sort as EquipmentColumn;
+      const order = orderFn(equipments[sort]);
+
+      listingQuery = listingQuery.orderBy(order)
+    }
+
     const [_equipments, [meta]] = await Promise.all([
-      db.select({
-        ...equipmentColumns,
-        item: itemColumns,
-        category: categoryColumns,
-        unit: unitColumns,
-        owner: {
-          id: users.id,
-          name: profiles.name,
-          phone: profiles.phone
-        }
-      })
-        .from(equipments)
-        .innerJoin(items, eq(items.id, equipments.itemId))
-        .innerJoin(categories, eq(categories.id, items.categoryId))
-        .innerJoin(units, eq(units.id, items.unitId))
-        .innerJoin(users, eq(users.id, equipments.ownerId))
-        .innerJoin(profiles, eq(profiles.userId, users.id))
-        .where(and(...conditions))
-        .orderBy(...orders)
+      listingQuery
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

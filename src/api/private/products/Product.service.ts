@@ -15,7 +15,6 @@ import { UniqueConstraintException } from '@/utils/exceptions/UniqueConstraintEx
 
 export class ProductService {
   static async list(query: ProductFilter): Promise<[Product[], number]> {
-
     const conditions: ReturnType<typeof and>[] = [
       isNull(products.deletedAt),
     ]

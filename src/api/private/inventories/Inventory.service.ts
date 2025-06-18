@@ -1,6 +1,6 @@
-import { Inventory, InventoryColumn, InventoryFilter, InventoryList, InventoryListColumn, InventoryRequest, sortableInventoryColumns } from './Inventory.schema';
+import { Inventory, InventoryColumn, InventoryFilter, InventoryList, InventoryRequest } from './Inventory.schema';
 import { inventories } from 'db/schema/inventories';
-import { and, asc, count, desc, eq, isNull, like, or, SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull, like, or } from 'drizzle-orm';
 import { items } from 'db/schema/items';
 import { profiles } from 'db/schema/profiles';
 import { db } from 'db';
@@ -17,33 +17,11 @@ import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { AppDate } from '@/utils/libs/AppDate';
-import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
+import { SortByEnum } from '@/utils/enums/SortByEnum';
 
 export class InventoryService {
   static async list(query: InventoryFilter): Promise<[InventoryList, number]> {
-    let orders: SQL<unknown>[] = [];
-
-    const pushOrders = (
-      cols: string | string[] | undefined,
-      direction: 'asc' | 'desc'
-    ) => {
-      const targetCols = Array.isArray(cols) ? cols : [cols];
-      const isAsc = direction === 'asc';
-      const opposite = isAsc ? 'desc' : 'asc';
-
-      targetCols.forEach((col) => {
-        if (!sortableInventoryColumns.includes(col as InventoryListColumn)) return;
-        if ((query[opposite] as InventoryListColumn[]).includes(col as InventoryListColumn)) return;
-
-        const orderFn = isAsc ? asc : desc;
-        orders.push(orderFn(inventories[col as InventoryColumn]));
-      });
-    };
-
-    pushOrders(query.asc, 'asc');
-    pushOrders(query.desc, 'desc');
-
     const conditions: ReturnType<typeof and>[] = [
       isNull(inventories.deletedAt)
     ];
@@ -68,30 +46,40 @@ export class InventoryService {
       ))
     }
 
+    let listingQuery = db.select({
+      ...inventoryColumns,
+      item: {
+        id: items.id,
+        name: items.name,
+        type: items.type,
+      },
+      owner: {
+        id: users.id,
+        name: profiles.name,
+        phone: profiles.phone,
+      },
+      category: categoryColumns,
+      unit: unitColumns,
+    })
+      .from(inventories)
+      .innerJoin(items, eq(items.id, inventories.itemId))
+      .innerJoin(categories, eq(categories.id, items.categoryId))
+      .innerJoin(units, eq(units.id, items.unitId))
+      .innerJoin(users, eq(users.id, inventories.ownerId))
+      .innerJoin(profiles, eq(profiles.userId, users.id))
+      .where(and(...conditions))
+      .$dynamic()
+
+    if (query.sort && query.sortBy) {
+      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+      const sort = query.sort as InventoryColumn;
+      const order = orderFn(inventories[sort]);
+
+      listingQuery = listingQuery.orderBy(order)
+    }
+
     const [_inventories, [meta]] = await Promise.all([
-      db.select({
-        ...inventoryColumns,
-        item: {
-          id: items.id,
-          name: items.name,
-          type: items.type,
-        },
-        owner: {
-          id: users.id,
-          name: profiles.name,
-          phone: profiles.phone,
-        },
-        category: categoryColumns,
-        unit: unitColumns,
-      })
-        .from(inventories)
-        .innerJoin(items, eq(items.id, inventories.itemId))
-        .innerJoin(categories, eq(categories.id, items.categoryId))
-        .innerJoin(units, eq(units.id, items.unitId))
-        .innerJoin(users, eq(users.id, inventories.ownerId))
-        .innerJoin(profiles, eq(profiles.userId, users.id))
-        .where(and(...conditions))
-        .orderBy(...orders)
+      listingQuery
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({
