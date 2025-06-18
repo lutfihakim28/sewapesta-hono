@@ -11,7 +11,7 @@ import { ProductService } from '../products/Product.service';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { Option } from '@/utils/schemas/Option.schema';
-import { SortByEnum } from '@/utils/enums/SortByEnum';
+import { SortDirectionEnum } from '@/utils/enums/SortDirectionEnum';
 
 export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
@@ -45,8 +45,8 @@ export class PackageService {
       .where(and(...conditions))
       .$dynamic()
 
-    if (query.sort && query.sortBy) {
-      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+    if (query.sort && query.sortDirection) {
+      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
       const sort = query.sort as PackageColumn;
       const order = orderFn(packages[sort]);
 

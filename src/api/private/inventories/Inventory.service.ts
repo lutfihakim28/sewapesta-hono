@@ -18,7 +18,7 @@ import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
-import { SortByEnum } from '@/utils/enums/SortByEnum';
+import { SortDirectionEnum } from '@/utils/enums/SortDirectionEnum';
 
 export class InventoryService {
   static async list(query: InventoryFilter): Promise<[InventoryList, number]> {
@@ -70,8 +70,8 @@ export class InventoryService {
       .where(and(...conditions))
       .$dynamic()
 
-    if (query.sort && query.sortBy) {
-      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+    if (query.sort && query.sortDirection) {
+      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
       const sort = query.sort as InventoryColumn;
       const order = orderFn(inventories[sort]);
 

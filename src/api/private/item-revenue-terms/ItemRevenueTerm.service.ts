@@ -13,7 +13,7 @@ import { itemRevenueTerms } from 'db/schema/item-revenue-terms';
 import { ItemService } from '../items/Item.service';
 import { UserService } from '../users/User.service';
 import { RoleEnum } from '@/utils/enums/RoleEnum';
-import { SortByEnum } from '@/utils/enums/SortByEnum';
+import { SortDirectionEnum } from '@/utils/enums/SortDirectionEnum';
 
 export class ItemRevenueTermService {
   static async list(query: ItemRevenueTermFilter): Promise<[ItemRevenueTermList, number]> {
@@ -55,8 +55,8 @@ export class ItemRevenueTermService {
       .where(and(...conditions))
       .$dynamic()
 
-    if (query.sort && query.sortBy) {
-      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+    if (query.sort && query.sortDirection) {
+      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
       const sort = query.sort as ItemRevenueTermColumn;
       const order = orderFn(itemRevenueTerms[sort]);
 

@@ -14,7 +14,7 @@ import { UnitService } from '../units/Unit.service';
 import { ItemTypeEnum } from '@/utils/enums/ItemTypeEnum';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ItemTypeUnmatchException } from '@/utils/exceptions/ItemTypeUnmatchException';
-import { SortByEnum } from '@/utils/enums/SortByEnum';
+import { SortDirectionEnum } from '@/utils/enums/SortDirectionEnum';
 
 export class ItemService {
   static async list(query: ItemFilter): Promise<[Item[], number]> {
@@ -45,8 +45,8 @@ export class ItemService {
       .where(and(...conditions))
       .$dynamic()
 
-    if (query.sort && query.sortBy) {
-      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+    if (query.sort && query.sortDirection) {
+      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
       const sort = query.sort as ItemColumn;
       const order = orderFn(items[sort]);
 

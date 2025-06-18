@@ -1,6 +1,6 @@
 import { ObjectSchema } from './Object.schema';
 import { StringSchema } from './String.schema';
-import { SortByEnum } from '../enums/SortByEnum';
+import { SortDirectionEnum } from '../enums/SortDirectionEnum';
 import { EnumSchema } from './Enum.schema';
 
 export function SortSchema<T extends string>(columns: T[]) {
@@ -9,10 +9,10 @@ export function SortSchema<T extends string>(columns: T[]) {
       .getSchema()
       .optional()
       .openapi({ description: `Allowed columns are ${columns.join(', ')}`, example: columns[0] }),
-    sortBy: new EnumSchema('sortBy', SortByEnum)
+    sortDirection: new EnumSchema('sortDirection', SortDirectionEnum)
       .getSchema()
       .optional()
-      .openapi({ description: `Allowed sortBy are ${Object.values(SortByEnum).join(', ')}`, example: SortByEnum.Asc }),
+      .openapi({ description: `Allowed sortDirection are ${Object.values(SortDirectionEnum).join(', ')}`, example: SortDirectionEnum.Asc }),
   })
     .getSchema()
     .openapi('Sort')

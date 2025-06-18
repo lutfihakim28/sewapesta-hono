@@ -17,7 +17,7 @@ import { buildJsonGroupArray } from '@/utils/helpers/build-json-group-array';
 import { AppDate } from '@/utils/libs/AppDate';
 import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { ForbiddenException } from '@/utils/exceptions/ForbiddenException';
-import { SortByEnum } from '@/utils/enums/SortByEnum';
+import { SortDirectionEnum } from '@/utils/enums/SortDirectionEnum';
 
 export class UserService {
   static async list(query: UserFilter): Promise<[UserExtended[], number]> {
@@ -63,8 +63,8 @@ export class UserService {
       .where(and(...conditions))
       .$dynamic()
 
-    if (query.sort && query.sortBy) {
-      const orderFn = query.sortBy === SortByEnum.Desc ? desc : asc;
+    if (query.sort && query.sortDirection) {
+      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
       const sort = query.sort as UserColumn;
       const order = orderFn(users[sort]);
 
