@@ -130,6 +130,10 @@ export class ItemService {
       .set({
         deletedAt: new AppDate().unix(),
       })
+      .where(and(
+        isNull(items.deletedAt),
+        eq(items.id, id)
+      ))
       .returning({
         id: items.id
       })
