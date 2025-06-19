@@ -27,30 +27,25 @@ export class OwnerRevenueTermService {
       conditions.push(like(profiles.name, `%${query.keyword}%`))
     }
 
-    let listingQuery = db.select({
-      ...ownerRevenueTermColumns,
-      owner: {
-        id: users.id,
-        name: profiles.name,
-        phone: profiles.phone,
-      },
-    })
-      .from(ownerRevenueTerms)
-      .innerJoin(users, eq(users.id, inventories.ownerId))
-      .innerJoin(profiles, eq(profiles.userId, users.id))
-      .where(and(...conditions))
-      .$dynamic()
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as OwnerRevenueTermColumn || 'createdAt';
+    const order = orderFn(ownerRevenueTerms[sort]);
 
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as OwnerRevenueTermColumn;
-      const order = orderFn(ownerRevenueTerms[sort]);
-
-      listingQuery = listingQuery.orderBy(order);
-    }
 
     const [_ownerRevenueTerms, [meta]] = await Promise.all([
-      listingQuery
+      db.select({
+        ...ownerRevenueTermColumns,
+        owner: {
+          id: users.id,
+          name: profiles.name,
+          phone: profiles.phone,
+        },
+      })
+        .from(ownerRevenueTerms)
+        .innerJoin(users, eq(users.id, inventories.ownerId))
+        .innerJoin(profiles, eq(profiles.userId, users.id))
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

@@ -34,27 +34,21 @@ export class ItemService {
       conditions.push(like(items.name, `%${query.keyword}%`))
     }
 
-    let listingQuery = db.select({
-      ...itemColumns,
-      category: categoryColumns,
-      unit: unitColumns,
-    })
-      .from(items)
-      .innerJoin(categories, eq(categories.id, items.categoryId))
-      .innerJoin(units, eq(units.id, items.unitId))
-      .where(and(...conditions))
-      .$dynamic()
-
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as ItemColumn;
-      const order = orderFn(items[sort]);
-
-      listingQuery = listingQuery.orderBy(order);
-    }
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as ItemColumn || 'createdAt';
+    const order = orderFn(items[sort]);
 
     const [_items, [meta]] = await Promise.all([
-      listingQuery
+      db.select({
+        ...itemColumns,
+        category: categoryColumns,
+        unit: unitColumns,
+      })
+        .from(items)
+        .innerJoin(categories, eq(categories.id, items.categoryId))
+        .innerJoin(units, eq(units.id, items.unitId))
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

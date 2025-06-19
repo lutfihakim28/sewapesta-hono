@@ -32,29 +32,23 @@ export class PackageService {
       ))
     }
 
-    let listingQuery = db
-      .select({
-        ...packageColumns,
-        product: {
-          id: products.id,
-          name: products.name
-        }
-      })
-      .from(packages)
-      .leftJoin(products, eq(products.id, packages.productId))
-      .where(and(...conditions))
-      .$dynamic()
-
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as PackageColumn;
-      const order = orderFn(packages[sort]);
-
-      listingQuery = listingQuery.orderBy(order);
-    }
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as PackageColumn || 'createdAt';
+    const order = orderFn(packages[sort]);
 
     const [_packages, [meta]] = await Promise.all([
-      listingQuery
+      db
+        .select({
+          ...packageColumns,
+          product: {
+            id: products.id,
+            name: products.name
+          }
+        })
+        .from(packages)
+        .leftJoin(products, eq(products.id, packages.productId))
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

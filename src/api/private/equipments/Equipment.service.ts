@@ -52,36 +52,30 @@ export class EquipmentService {
       ))
     }
 
-    let listingQuery = db.select({
-      ...equipmentColumns,
-      item: itemColumns,
-      category: categoryColumns,
-      unit: unitColumns,
-      owner: {
-        id: users.id,
-        name: profiles.name,
-        phone: profiles.phone
-      }
-    })
-      .from(equipments)
-      .innerJoin(items, eq(items.id, equipments.itemId))
-      .innerJoin(categories, eq(categories.id, items.categoryId))
-      .innerJoin(units, eq(units.id, items.unitId))
-      .innerJoin(users, eq(users.id, equipments.ownerId))
-      .innerJoin(profiles, eq(profiles.userId, users.id))
-      .where(and(...conditions))
-      .$dynamic()
-
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as EquipmentColumn;
-      const order = orderFn(equipments[sort]);
-
-      listingQuery = listingQuery.orderBy(order)
-    }
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as EquipmentColumn || 'createdAt';
+    const order = orderFn(equipments[sort]);
 
     const [_equipments, [meta]] = await Promise.all([
-      listingQuery
+      db.select({
+        ...equipmentColumns,
+        item: itemColumns,
+        category: categoryColumns,
+        unit: unitColumns,
+        owner: {
+          id: users.id,
+          name: profiles.name,
+          phone: profiles.phone
+        }
+      })
+        .from(equipments)
+        .innerJoin(items, eq(items.id, equipments.itemId))
+        .innerJoin(categories, eq(categories.id, items.categoryId))
+        .innerJoin(units, eq(units.id, items.unitId))
+        .innerJoin(users, eq(users.id, equipments.ownerId))
+        .innerJoin(profiles, eq(profiles.userId, users.id))
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

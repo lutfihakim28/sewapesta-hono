@@ -46,40 +46,34 @@ export class InventoryService {
       ))
     }
 
-    let listingQuery = db.select({
-      ...inventoryColumns,
-      item: {
-        id: items.id,
-        name: items.name,
-        type: items.type,
-      },
-      owner: {
-        id: users.id,
-        name: profiles.name,
-        phone: profiles.phone,
-      },
-      category: categoryColumns,
-      unit: unitColumns,
-    })
-      .from(inventories)
-      .innerJoin(items, eq(items.id, inventories.itemId))
-      .innerJoin(categories, eq(categories.id, items.categoryId))
-      .innerJoin(units, eq(units.id, items.unitId))
-      .innerJoin(users, eq(users.id, inventories.ownerId))
-      .innerJoin(profiles, eq(profiles.userId, users.id))
-      .where(and(...conditions))
-      .$dynamic()
-
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as InventoryColumn;
-      const order = orderFn(inventories[sort]);
-
-      listingQuery = listingQuery.orderBy(order)
-    }
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as InventoryColumn || 'createdAt';
+    const order = orderFn(inventories[sort]);
 
     const [_inventories, [meta]] = await Promise.all([
-      listingQuery
+      db.select({
+        ...inventoryColumns,
+        item: {
+          id: items.id,
+          name: items.name,
+          type: items.type,
+        },
+        owner: {
+          id: users.id,
+          name: profiles.name,
+          phone: profiles.phone,
+        },
+        category: categoryColumns,
+        unit: unitColumns,
+      })
+        .from(inventories)
+        .innerJoin(items, eq(items.id, inventories.itemId))
+        .innerJoin(categories, eq(categories.id, items.categoryId))
+        .innerJoin(units, eq(units.id, items.unitId))
+        .innerJoin(users, eq(users.id, inventories.ownerId))
+        .innerJoin(profiles, eq(profiles.userId, users.id))
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

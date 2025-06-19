@@ -39,40 +39,34 @@ export class UserService {
       ))
     }
 
-    let listingQuery = db
-      .with(locationQuery)
-      .select({
-        ...userColumns,
-        ...profileColumns,
-        roles: buildJsonGroupArray([usersRoles.role], true),
-        location: {
-          subdistrictCode: locationQuery.subdistrictCode,
-          subdistrict: locationQuery.subdistrict,
-          districtCode: locationQuery.districtCode,
-          district: locationQuery.district,
-          cityCode: locationQuery.cityCode,
-          city: locationQuery.city,
-          provinceCode: locationQuery.provinceCode,
-          province: locationQuery.province,
-        }
-      })
-      .from(users)
-      .innerJoin(profiles, eq(profiles.userId, users.id))
-      .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
-      .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
-      .where(and(...conditions))
-      .$dynamic()
-
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as UserColumn;
-      const order = orderFn(users[sort]);
-
-      listingQuery = listingQuery.orderBy(order);
-    }
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as UserColumn || 'createdAt';
+    const order = orderFn(users[sort]);
 
     const [_users, [meta]] = await Promise.all([
-      listingQuery
+      db
+        .with(locationQuery)
+        .select({
+          ...userColumns,
+          ...profileColumns,
+          roles: buildJsonGroupArray([usersRoles.role], true),
+          location: {
+            subdistrictCode: locationQuery.subdistrictCode,
+            subdistrict: locationQuery.subdistrict,
+            districtCode: locationQuery.districtCode,
+            district: locationQuery.district,
+            cityCode: locationQuery.cityCode,
+            city: locationQuery.city,
+            provinceCode: locationQuery.provinceCode,
+            province: locationQuery.province,
+          }
+        })
+        .from(users)
+        .innerJoin(profiles, eq(profiles.userId, users.id))
+        .innerJoin(usersRoles, eq(usersRoles.userId, users.id))
+        .leftJoin(locationQuery, eq(locationQuery.subdistrictCode, profiles.subdistrictCode))
+        .where(and(...conditions))
+        .orderBy(order)
         .groupBy(users.id)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),

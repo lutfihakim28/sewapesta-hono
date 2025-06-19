@@ -36,35 +36,29 @@ export class ItemRevenueTermService {
       ))
     }
 
-    let listingQuery = db.select({
-      ...itemRevenueTermColumns,
-      owner: {
-        id: users.id,
-        name: profiles.name,
-        phone: profiles.phone,
-      },
-      item: {
-        id: items.id,
-        name: items.name,
-      }
-    })
-      .from(itemRevenueTerms)
-      .innerJoin(items, eq(items.id, itemRevenueTerms.itemId))
-      .innerJoin(users, eq(users.id, inventories.ownerId))
-      .innerJoin(profiles, eq(profiles.userId, users.id))
-      .where(and(...conditions))
-      .$dynamic()
-
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as ItemRevenueTermColumn;
-      const order = orderFn(itemRevenueTerms[sort]);
-
-      listingQuery = listingQuery.orderBy(order);
-    }
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as ItemRevenueTermColumn || 'createdAt';
+    const order = orderFn(itemRevenueTerms[sort]);
 
     const [_itemRevenueTerms, [meta]] = await Promise.all([
-      listingQuery
+      db.select({
+        ...itemRevenueTermColumns,
+        owner: {
+          id: users.id,
+          name: profiles.name,
+          phone: profiles.phone,
+        },
+        item: {
+          id: items.id,
+          name: items.name,
+        }
+      })
+        .from(itemRevenueTerms)
+        .innerJoin(items, eq(items.id, itemRevenueTerms.itemId))
+        .innerJoin(users, eq(users.id, inventories.ownerId))
+        .innerJoin(profiles, eq(profiles.userId, users.id))
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({

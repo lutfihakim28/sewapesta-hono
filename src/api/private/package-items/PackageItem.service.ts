@@ -33,42 +33,36 @@ export class PackageItemService {
       ))
     }
 
-    let listingQuery = db.select({
-      ...packageItemColumns,
-      owner: {
-        id: users.id,
-        name: profiles.name,
-        phone: profiles.phone,
-      },
-      item: {
-        id: items.id,
-        name: items.name,
-      },
-      package: {
-        id: packages.id,
-        name: packages.name
-      }
-    })
-      .from(packageItems)
-      .innerJoin(items, eq(items.id, packageItems.itemId))
-      .innerJoin(users, or(
-        eq(users.id, inventories.ownerId),
-        eq(users.id, equipments.ownerId),
-      ))
-      .innerJoin(profiles, eq(profiles.userId, users.id))
-      .where(and(...conditions))
-      .$dynamic()
-
-    if (query.sort && query.sortDirection) {
-      const orderFn = query.sortDirection === SortDirectionEnum.Desc ? desc : asc;
-      const sort = query.sort as PackageItemColumn;
-      const order = orderFn(packageItems[sort]);
-
-      listingQuery = listingQuery.orderBy(order);
-    }
+    const orderFn = query.sortDirection === SortDirectionEnum.Asc ? asc : desc;
+    const sort = query.sort as PackageItemColumn || 'createdAt';
+    const order = orderFn(packageItems[sort]);
 
     const [_packageItems, [meta]] = await Promise.all([
-      listingQuery
+      db.select({
+        ...packageItemColumns,
+        owner: {
+          id: users.id,
+          name: profiles.name,
+          phone: profiles.phone,
+        },
+        item: {
+          id: items.id,
+          name: items.name,
+        },
+        package: {
+          id: packages.id,
+          name: packages.name
+        }
+      })
+        .from(packageItems)
+        .innerJoin(items, eq(items.id, packageItems.itemId))
+        .innerJoin(users, or(
+          eq(users.id, inventories.ownerId),
+          eq(users.id, equipments.ownerId),
+        ))
+        .innerJoin(profiles, eq(profiles.userId, users.id))
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(Number(query.pageSize || 5))
         .offset(countOffset(query.page, query.pageSize)),
       db.select({
