@@ -11,6 +11,7 @@ import { SchemaType } from '@/utils/types/Schema.type';
 import { ArraySchema } from '@/utils/schemas/Array.schema';
 import { tMessage, tData } from '@/utils/constants/locales/locale';
 import { OptionSchema } from '@/utils/schemas/Option.schema';
+import { ObjectSchema } from '@/utils/schemas/Object.schema';
 
 export type PackageColumn = keyof typeof packages.$inferSelect;
 
@@ -54,6 +55,16 @@ export const PackageRequestSchema = createInsertSchema(packages, {
   productId: true,
 }).openapi('PackageRequest')
 
+export const PackageWithItemsRequestSchema = new ObjectSchema({
+  name: new StringSchema('Name').getSchema(),
+  price: new NumberSchema('Price').whole().getSchema(),
+  productId: new NumberSchema('Product ID').natural().getSchema(),
+  items: new ArraySchema('Items', new ObjectSchema({
+    itemId: new NumberSchema('Item ID').natural().getSchema(),
+    quantity: new NumberSchema('Quantity').whole().getSchema(),
+  }).getSchema()).nonempty().getSchema(),
+}).getSchema().openapi('PackageWithItemsRequest');
+
 export const PackageResponseListSchema = ApiResponseListSchema(PackageListSchema, tMessage({
   lang: 'en',
   key: 'successList',
@@ -91,3 +102,4 @@ export type Package = SchemaType<typeof PackageSchema>
 export type PackageList = SchemaType<typeof PackageListSchema>
 export type PackageFilter = SchemaType<typeof PackageFilterSchema>
 export type PackageRequest = SchemaType<typeof PackageRequestSchema>
+export type PackageWithItemsRequest = SchemaType<typeof PackageWithItemsRequestSchema>;

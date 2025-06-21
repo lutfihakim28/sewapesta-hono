@@ -2,7 +2,7 @@ import { honoApp } from '@/utils/helpers/hono';
 import { PackageService } from './Package.service';
 import { ApiResponse, ApiResponseData, ApiResponseList } from '@/utils/dtos/ApiResponse.dto';
 import { Meta } from '@/utils/dtos/Meta.dto';
-import { PackageCreateRoute, PackageDeleteRoute, PackageDetailRoute, PackageListRoute, PackageOptionRoute, PackageUpdateRoute } from './Package.route';
+import { PackageCreateRoute, PackageCreateWithItemsRoute, PackageDeleteRoute, PackageDetailRoute, PackageListRoute, PackageOptionRoute, PackageUpdateRoute } from './Package.route';
 import { AcceptedLocale, tData, tMessage } from '@/utils/constants/locales/locale';
 import { NotFoundException } from '@/utils/exceptions/NotFoundException';
 
@@ -114,6 +114,26 @@ PackageController.openapi(PackageCreateRoute, async (context) => {
     data: _package
   }), 200)
 })
+
+PackageController.openapi(PackageCreateWithItemsRoute, async (context) => {
+  const lang = context.get('language') as AcceptedLocale;
+  const body = context.req.valid('json');
+  const created = await PackageService.createWithItems(body);
+  return context.json(new ApiResponseData({
+    code: 201,
+    messages: [
+      tMessage({
+        lang,
+        key: 'successCreate',
+        textCase: 'sentence',
+        params: {
+          data: tData({ lang, key: 'package' })
+        }
+      })
+    ],
+    data: created
+  }), 201);
+});
 
 PackageController.openapi(PackageUpdateRoute, async (context) => {
   const lang = context.get('language') as AcceptedLocale;

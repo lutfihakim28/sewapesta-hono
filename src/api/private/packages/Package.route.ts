@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import { SuccessSchema } from '@/utils/schemas/Success.schema'
 import { OpenApiResponse } from '@/utils/dtos/OpenApiResponse.dto'
 import { ParamIdSchema } from '@/utils/schemas/ParamId.schema'
-import { PackageFilterSchema, PackageOptionResponseSchema, PackageRequestSchema, PackageResponseDataSchema, PackageResponseListSchema } from './Package.schema'
+import { PackageFilterSchema, PackageOptionResponseSchema, PackageRequestSchema, PackageResponseDataSchema, PackageResponseListSchema, PackageWithItemsRequestSchema } from './Package.schema'
 
 const tag = 'Package'
 
@@ -78,6 +78,25 @@ export const PackageUpdateRoute = createRoute({
   responses: new OpenApiResponse({
     successResponse: { schema: PackageResponseDataSchema, description: 'Package updated' },
     codes: [401, 403, 404, 422],
+  }),
+})
+
+export const PackageCreateWithItemsRoute = createRoute({
+  method: 'post',
+  path: '/with-items',
+  tags: [tag],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: PackageWithItemsRequestSchema
+        }
+      },
+    }
+  },
+  responses: new OpenApiResponse({
+    successResponse: { schema: PackageResponseDataSchema, description: 'Package and items created' },
+    codes: [401, 403, 422],
   }),
 })
 

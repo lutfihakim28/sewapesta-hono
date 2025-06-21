@@ -13,6 +13,9 @@ import { ConstraintException } from '@/utils/exceptions/ConstraintException';
 import { Option } from '@/utils/schemas/Option.schema';
 import { SortDirectionEnum } from '@/utils/enums/SortDirectionEnum';
 
+import { PackageWithItemsRequest } from './Package.schema';
+import { packageItems } from 'db/schema/package-items';
+
 export class PackageService {
   static async list(query: PackageFilter): Promise<[PackageList, number]> {
     const conditions: ReturnType<typeof and>[] = [
@@ -84,6 +87,24 @@ export class PackageService {
       .returning(packageColumns);
 
     return newPackage;
+  }
+
+  static async createWithItems(data: PackageWithItemsRequest): Promise<Package> {
+    return await db.transaction(async (transaction) => {
+      const [createdPackage] = await transaction.insert(packages).values({
+        name: data.name,
+        price: data.price,
+        productId: data.productId,
+      }).returning(packageColumns);
+
+      await transaction.insert(packageItems).values(data.items.map(item => ({
+        packageId: createdPackage.id,
+        itemId: item.itemId,
+        quantity: item.quantity,
+      })));
+
+      return createdPackage;
+    });
   }
 
   static async update(id: number, payload: PackageRequest): Promise<Package> {
